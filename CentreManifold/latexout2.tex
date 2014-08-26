@@ -1,0 +1,79 @@
+\section{Output LaTeX version of results}
+% AJR, 24 aug 2012 -- aug 2014
+
+Change the printing of temporary arrays.
+\begin{reduce}
+array tmpzz(m,n);
+defid tmp,name="u";
+defid tmps,name="\dot s";
+defid tmpz,name="\vec z";
+defid tmpzz,name="z";
+defindex tmpzz(down,down);
+\end{reduce}
+
+Gather complicated result
+\begin{reduce}
+%for k:=1:m do tmpz(k):=for j:=1:n collect (1*coeffn(zs_,e_(j,k),1));
+for k:=1:m do for j:=1:n do tmpzz(k,j):=(1*coeffn(zs_,e_(j,k),1));
+\end{reduce}
+
+Write to a file the commands needed to write the LaTeX expressions.
+Write the centre manifold to one order lower than computed.
+\begin{reduce}
+out "scratchfile.red";
+write "write ""\)
+\paragraph{The centre manifold}
+These give the location of the centre manifold in
+terms of parameters~\(s\sb j\).
+\("";";
+for j:=1:n do write "tmp(",j,
+  "):=coeffn(small*uu_,e_(",j,",1),1)/small;";
+\end{reduce}
+
+Write the commands to write the ODEs on the centre manifold.
+\begin{reduce}
+write "write ""\)
+\paragraph{Centre manifold ODEs}
+The system evolves on the centre manifold such
+that the parameters evolve according to these ODEs.
+\("";";
+for j:=1:m do write "tmps(",j,"):=1*coeffn(gg_,e_(",j,",1),1);";
+\end{reduce}
+
+Optionally write the commands to write the projection vectors on the slow manifold.
+\begin{reduce}
+if itisSlowMan_ then begin
+  write "write ""\)
+\paragraph{Normals to isochrons at the slow manifold}
+Use these vectors: to project initial conditions
+onto the slow manifold; to project non-autonomous
+forcing onto the slow evolution; to predict the
+consequences of modifying the original system; in
+uncertainty quantification to quantify effects on
+the model of uncertainties in the original system.
+The normal vector \(\vec z\sb j:=(z\sb{j1},\ldots,z\sb{jn})\)
+\("";";
+  for i:=1:m do for j:=1:n do 
+  write "tmpzz(",i,",",j,"):=tmpzz(",i,",",j,");";
+end;
+\end{reduce}
+
+Finish the scratchfile.
+\begin{reduce}
+write "end;";
+shut "scratchfile.red";
+\end{reduce}
+
+Execute the file with the required commands, with output to the main centre manifold LaTeX file.
+
+\begin{reduce}
+out "centreMan.tex";
+on latex;
+in "scratchfile.red"$
+off latex;
+shut "centreMan.tex";
+\end{reduce}
+
+\begin{reduce}
+end;
+\end{reduce}

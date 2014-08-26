@@ -1,0 +1,198 @@
+\section{Initialise LaTeX output}
+% AJR, 21 aug 2012 -- Aug 2014
+
+This section writes to various files so the output to \verb|cmsyso.txt| must be redone afterwards.
+
+First define how various tokens get printed.
+
+\begin{reduce}
+load_package rlfi;
+deflist('((!( !\!b!i!g!() (!) !\!b!i!g!)) (!P!I !\!p!i! )
+         (!p!i !\!p!i! ) (!E !e) (!I !i) (e !e) (i !i)),'name)$
+\end{reduce}
+
+Override the procedure that prints annoying messages about multicharacter symbols.  
+It ends the output of one expression.  
+This is just a copy from \verb|rlfi.red| with the appropriate if-statement deleted.
+While interfering, hardcode that the mathematics is in inline mode.
+
+\begin{reduce}
+%write "Ignore immediately following messages";
+symbolic procedure prinlaend;
+<<terpri();
+  prin2t "\)\par";
+  if !*verbatim then
+      <<prin2t "\begin{verbatim}";
+        prin2t "REDUCE Input:">>;
+  ncharspr!*:=0;
+  if ofl!* then linelength(car linel!*)
+    else laline!*:=cdr linel!*;
+  nochar!*:=append(nochar!*,nochar1!*);
+  nochar1!*:=nil >>$
+  %
+\end{reduce}
+Similarly, hardcode at the beginning of expression output that the mathematics is in inline mode.
+\begin{reduce}
+symbolic procedure prinlabegin;
+% Initializes the output
+<<if !*verbatim then
+      <<terpri();
+        prin2t "\end{verbatim}">>;
+  linel!*:=linelength nil . laline!*;
+  if ofl!* then linelength(laline!* + 2)
+    else laline!*:=car linel!* - 2;
+  prin2 "\(" >>$
+\end{reduce}
+
+Override the procedure that outputs the \LaTeX\ preamble 
+upon the command \verb|on latex|.
+Presumably modified from that in \verb|rlfi.red|.
+Use it to write a decent header that we use for one master file.
+
+\begin{reduce}
+symbolic procedure latexon;
+<<!*!*a2sfn:='texaeval;
+  !*raise:=nil;
+  prin2t "\documentclass[11pt,a5paper]{article}";
+  prin2t "\usepackage[a5paper,margin=13mm]{geometry}";
+  prin2t "\usepackage{parskip,time} \raggedright";
+  prin2t "\def\cis\big(#1\big){\,e^{#1i}}";
+  prin2t "\def\eps{\varepsilon}";
+  prin2t "\title{Centre manifold of your dynamical system}";
+  prin2t "\author{A. J. Roberts, University of Adelaide\\";
+  prin2t "\texttt{http://www.maths.adelaide.edu.au/anthony.roberts}}";
+  prin2t "\date{\now, \today}";
+  prin2t "\begin{document}";
+  prin2t "\maketitle";
+  prin2t "Throughout and generally: the lowest order, most";
+  prin2t "important, terms are near the end of each expression.";
+  prin2t "\input{centreManSys}";
+  if !*verbatim then
+      <<prin2t "\begin{verbatim}";
+        prin2t "REDUCE Input:">>;
+  put('tex,'rtypefn,'(lambda(x) 'tex)) >>$
+\end{reduce}
+
+The above definition for \verb|\cis| is not quite right for \verb|rlfi|, but I do not know how to fix it.
+
+Set the default output to be inline mathematics.
+
+\begin{reduce}
+mathstyle math;
+\end{reduce}
+
+Define the Greek alphabet with \verb|small| as well.
+
+\begin{reduce}
+defid small,name="\eps";%varepsilon;
+defid alpha,name=alpha;
+defid beta,name=beta;
+defid gamma,name=gamma;
+defid delta,name=delta;
+defid epsilon,name=epsilon;
+defid varepsilon,name=varepsilon;
+defid zeta,name=zeta;
+defid eta,name=eta;
+defid theta,name=theta;
+defid vartheta,name=vartheta;
+defid iota,name=iota;
+defid kappa,name=kappa;
+defid lambda,name=lambda;
+defid mu,name=mu;
+defid nu,name=nu;
+defid xi,name=xi;
+defid pi,name=pi;
+defid varpi,name=varpi;
+defid rho,name=rho;
+defid varrho,name=varrho;
+defid sigma,name=sigma;
+defid varsigma,name=varsigma;
+defid tau,name=tau;
+defid upsilon,name=upsilon;
+defid phi,name=phi;
+defid varphi,name=varphi;
+defid chi,name=chi;
+defid psi,name=psi;
+defid omega,name=omega;
+defid Gamma,name=Gamma;
+defid Delta,name=Delta;
+defid Theta,name=Theta;
+defid Lambda,name=Lambda;
+defid Xi,name=Xi;
+defid Pi,name=Pi;
+defid Sigma,name=Sigma;
+defid Upsilon,name=Upsilon;
+defid Phi,name=Phi;
+defid Psi,name=Psi;
+defid Omega,name=Omega;
+\end{reduce}
+
+
+\begin{reduce}
+defindex e_(down,down);
+defid e_,name="e";
+defindex d_(arg,down,down);
+defid d_,name="D";
+defindex u(down);
+defid u1,name="u\sb1"; 
+defid u2,name="u\sb2"; 
+defid u3,name="u\sb3"; 
+defid u4,name="u\sb4"; 
+defid u5,name="u\sb5"; 
+defid u6,name="u\sb6"; 
+defid u7,name="u\sb7"; 
+defid u8,name="u\sb8"; 
+defid u9,name="u\sb9"; 
+defindex s(down);
+defid cis,name="\cis";
+defindex cis(arg);
+\end{reduce}
+
+
+Can we write the system?  
+Not in matrices apparently.
+So define a dummy array \verb|tmp| that we use to get the correct symbol typeset.
+
+\begin{reduce}
+array tmp(n),tmps(m),tmpz(m);
+defindex tmp(down);
+defindex tmps(down);
+defindex tmpz(down);
+defid tmp,name="\dot u";
+defid tmps,name="\vec e";
+defid tmpz,name="\vec z";
+rhs_:=rhsfn_$
+for k:=1:m do tmps(k):={for j:=1:n collect ee_(j,k),cis(freq(k)*t)};
+for k:=1:m do tmpz(k):={for j:=1:n collect zz_(j,k),cis(freq(k)*t)};
+\end{reduce}
+
+We have to be shifty here because \verb|rlfi| does not work inside a loop: so write the commands to a file, and then input the file.
+
+\begin{reduce}
+out "scratchfile.red";
+write "write ""\)
+\paragraph{The specified dynamical system}
+\("";";
+for j:=1:n do write "tmp(",j,"):=coeffn(rhs_,e_(",j,",1),1);";
+write "write ""\)
+\paragraph{Centre subspace basis vectors}
+\("";";
+for j:=1:m do write "tmps(",j,"):=tmps(",j,");";
+for j:=1:m do write "tmpz(",j,"):=tmpz(",j,");";
+write "end;";
+shut "scratchfile.red";
+\end{reduce}
+Now print the dynamical system to the LaTeX sub-file.
+
+\begin{reduce}
+on latex$
+out "centreManSys.tex"$
+in "scratchfile.red"$
+shut "centreManSys.tex"$
+off latex$
+\end{reduce}
+
+Finish the input.
+\begin{reduce}
+end;
+\end{reduce}

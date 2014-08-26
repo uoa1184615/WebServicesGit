@@ -1,0 +1,17 @@
+*.log
+*.synctex.gz*
+*.out
+*.blg
+*~
+*.toc
+*.trc
+*.xref
+*.DS_Store
+*.stc*
+*.mtc*
+*.maf
+*.lpc
+*.nav
+*.snm
+*.eps
+*.ps

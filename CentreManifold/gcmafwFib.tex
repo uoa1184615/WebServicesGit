@@ -1,0 +1,3136 @@
+\documentclass[11pt,a5paper]{article}
+
+\title{A general centre manifold construction algorithm for the web, including isochrons of slow manifolds}
+\author{A.~J. Roberts}
+\date{\today}
+
+
+\usepackage{natbib,amsmath,defns,reducecode}
+\let\harvardurl\url
+\IfFileExists{ajr.sty}{\usepackage{ajr}}{}
+\Cal L \Cal E \Cal Z
+\def\dde{\textsc{dde}}
+\newcommand{\adj}[1]{#1^\dagger} % denotes cc transpose
+% for output of coordinate transform
+\def\cis\big(#1\big){\,e^{#1i}}
+\def\eps{\varepsilon}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This code is the heart and muscle of a web service.
+The web service derives a centre manifold of any specified system of ordinary differential equations or delay differential equations, when the system has fast and centre modes. 
+The centre modes may be slow, as in a pitchfork bifurcation, or oscillatory, as in a Hopf bifurcation, or some more complicated superposition. 
+In the case when the fast modes all decay, the centre manifold supplies a faithful large time model of the dynamics. 
+Further, this code now derives vectors defining the projection onto the centre manifold along the isochrons: this projection is needed for initial conditions, forcing, system modifications, and uncertainty quantification.
+\end{abstract}
+
+\tableofcontents
+
+\section{Overall initialisation}
+
+In the following, assign \verb|thecase:=myweb;| for the web service (or to read a system from file \verb|cmsysb.red|), otherwise assign \verb|thecase| to be any of the example dynamical systems in set~\verb|thecases|.
+\begin{reduce}
+% see gcmafwFib.pdf for detailed explanation
+% AJ Roberts, Nov 2013 -- Aug 2014
+thecase:=lorenz86slow; 
+thecases:={onedde, anotherdde, twodde, dde2d, dde2d2ha,
+dde2d2hb, simple2d, simple2ds, fourstatemarkov, another2d,
+another2ds, simple3d, simple3ds, geneigenvec, bifurcate2d,
+simpleosc, perturbfreq, nonseparatedosc, quasidelayosc,
+quasidelayoscmod, rosslerlike, doubleosc, oscmeanflow,
+modulateduffing, modulateoscillator, StoleriuOne,
+StoleriuTwo, delayprolif, delayedprolif, normalmodes,
+forcedvdp, lorenz86slow }$
+\end{reduce}
+
+Define default parameters for the iteration:
+\verb|maxiter_|~is the maximum number of allowed iterations;
+\verb|toosmall|~is the order of errors in the analysis in terms of the parameter~\verb|small|.
+Specific problems may override these defaults.
+
+\begin{reduce}
+maxiter_:=29$
+factor small; 
+toosmall:=3$
+\end{reduce}
+
+For optional trace printing of test cases: 
+comment out second line when not needed.
+\begin{reduce}
+trace_:=0$
+%trace_:=1; maxiter_:=5; 
+\end{reduce}
+
+
+The \verb|rationalise| switch makes code much faster with complex numbers.
+The switch \verb|gcd| seems to wreck convergence, so leave it off.
+
+\begin{reduce}
+on div; off allfac; on revpri; 
+on rationalize;
+linelength 60$
+\end{reduce}
+
+Propose to use \verb|e_| as basis vector for matrices and vectors.
+Declare it non-commutative so that multiplication does not commute.
+\begin{reduce}
+operator e_;
+noncom e_;
+factor e_;
+let { e_(~j,~k)*e_(~l,~m)=>0 when k neq l
+    , e_(~j,~k)*e_(~l,~m)=>e_(j,m) when k=l 
+    , e_(~j,~k)^2=>0 when j neq k
+    , e_(~j,j)^2=>e_(j,j) };
+\end{reduce}
+Also need a transpose operator: do complex conjugation explicitly when needed.
+\begin{reduce}
+operator tpe_; linear tpe_;
+let tpe_(e_(~i,~j),e_)=>e_(j,i);
+\end{reduce}
+
+
+
+Need to enter delayed factors in the \ode{}s, so use operators for the dependent variables in the dynamical system (for the moment up to nine).
+\begin{reduce}
+operator u,u1,u2,u3,u4,u5,u6,u7,u8,u9;
+\end{reduce}
+
+Empty the output LaTeX file in case of error.
+
+\begin{reduce}
+out "centreMan.tex";
+write "This empty document indicates error.";
+shut "centreMan.tex";
+\end{reduce}
+
+Automatically testing a set of examples does not yet work. 
+\begin{reduce}
+%foreach thecase in thecases do begin
+\end{reduce}
+
+
+\section{Some example systems}
+
+Define the basic linear operator, centre manifold bases, and `nonlinear' function.  
+Note that Reduce's matrix transpose does not take complex conjugate.
+Then the web service inputs the system from a file, otherwise get the system from one of the examples that follow.
+
+\begin{reduce}
+if thecase=myweb then begin
+in "cmsysb.red"$
+end;
+\end{reduce}
+
+
+
+\subsection{Simple one variable delay differential equation}
+
+Model a delayed `logistic' system in one variable with
+\begin{equation*}
+\de tu=-(1+a)[1+u(t)]u(t-\pi/2),
+\end{equation*}
+for small parameter~\(a\).
+We code the parameter~\(a\) as `small', and observe it is consequently considered as `small squared' because all nonlinear terms and already `small' terms are multiplied by~\verb|small|.
+The marginal modes are~\(e^{\pm it}\) so nominate the frequencies~\(\pm 1\).
+The eigenvectors are just~\(1\cdot e^{\pm it}\). 
+Because for delay differential equations the time dependence~\(e^{\pm i\omega t}\) is an integral part of the definition of the eigenvector; hence the coded eigenvectors can be the same, as here, because they are differentiated through the time dependence~\(e^{\pm i\omega t}\).
+
+\begin{reduce}
+if thecase=onedde then begin
+ff_:=tp mat((-(1+small*a)*(1+u1)*u1(pi/2)));
+freqm_:=mat((1,-1));
+ee_:=tp mat((1),(1));
+zz_:=tp mat((1),(1));
+toosmall:=3; 
+factor s,a,cis;
+end;
+\end{reduce}
+
+The code works for orders higher than cubic, but is slow: takes about a minute per iteration.
+
+\paragraph{The centre manifold}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+u_{1}=\cis\big(-2 t\big) s_{2}^{2} \varepsilon  \big(1/5 i+2/5\big)+\cis
+\big(-t\big) s_{2}+\cis\big(2 t\big) s_{1}^{2} \varepsilon  \big(-1/5 i+
+2/5\big)+\cis\big(t\big) s_{1}
+\end{math}\par
+
+\paragraph{Centre manifold ODEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot s_{1}=s_{2} s_{1}^{2} \varepsilon ^{2} \big(-2/5 i \pi -12/5 i-6/5 
+\pi +4/5\big)/\big(\pi ^{2}+4\big)+s_{1} a \varepsilon ^{2} \big(4 i+2 
+\pi \big)/\big(\pi ^{2}+4\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=s_{2}^{2} s_{1} \varepsilon ^{2} \big(2/5 i \pi +12/5 i-6/5 
+\pi +4/5\big)/\big(\pi ^{2}+4\big)+s_{2} a \varepsilon ^{2} \big(-4 i+2 
+\pi \big)/\big(\pi ^{2}+4\big)
+\end{math}\par
+
+Observe that the real parts of these \ode{}s indicate linear growth for positive parameter~\(a\), limited by nonlinear saturation.
+A classic Hopf bifurcation (although I have not recorded here evidence for the attractiveness).
+
+
+\subsection{Another one variable delay differential equation}
+
+Model a delayed `logistic' system in one variable with
+\begin{equation*}
+\de tu=-u(t)-(\sqrt2+a)u(t-3\pi/4)+\mu u(t-3\pi/4)^2+\nu u(t-3\pi/4)^3,
+\end{equation*}
+for small parameter~\(a\) and nonlinearity parameters \(\mu\) and~\(\nu\).  Numerical computation of the spectrum indicates that the system has a Hopf bifurcation as parameter~\(a\) crosses zero.%
+\footnote{Replacing \(-(\sqrt2+a)\) with \(+(1+a)\) leads to a pitchfork bifurcation with broken symmetry when \(\mu\neq 0\).}
+\begin{verbatim}
+ac=-sqrt(2), tau=3*pi/4
+ce=@(z) z+1-ac*exp(-tau*z)
+lams=fsolve(ce,randn(100,2)*[2;2*i])
+plot(real(lams),imag(lams),'o')
+\end{verbatim}
+We code the parameter~\(a\) as `small', and observe it is consequently considered as `small squared' because all nonlinear terms and already `small' terms are multiplied by~\verb|small|.
+The marginal modes are~\(e^{\pm it}\) so nominate the frequencies~\(\pm 1\).
+The eigenvectors are just~\(1\cdot e^{\pm it}\). 
+Because for delay differential equations the time dependence~\(e^{\pm i\omega t}\) is an integral part of the definition of the eigenvector; hence the coded eigenvectors can be the same, as here, because they are differentiated through the time dependence~\(e^{\pm i\omega t}\).
+
+\begin{reduce}
+if thecase=anotherdde then begin
+ff_:=tp mat((-u1-(sqrt(2)+small*a)*u1(3*pi/4)
+    +mu*u1(3*pi/4)^2 +small*nu*u1(3*pi/4)^3));
+freqm_:=mat((1,-1));
+ee_:=tp mat((1),(1));
+zz_:=tp mat((1),(1));
+toosmall:=3; 
+factor s,a,mu,nu,cis;
+end;
+\end{reduce}
+
+The modelling predicts a supercritical Hopf bifurcation as parameter~\(a\) increases through zero, although if nonlinearity parameter~\(\nu\) is large enough negative, then the bifurcation will be subcritical.
+
+
+
+
+
+\subsection{Separated delay differential equations}
+
+Now consider the system
+\begin{equation*}
+\dot x=-[1+a-y(t)]x(t-\pi/2)
+\quad\text{and}\quad
+\dot y=-y+x^2.
+\end{equation*}
+Without the `fast' variable~\(y\) the \(x\)-\ode\ would be at marginal criticality when parameter \(a=0\).  
+With the coupling, any oscillations in~\(x\) should drive a positive~\(y\) which then helps stabilise the oscillations.
+Let's see this in analysis.
+
+Code the system as follows with small parameter~\(a\).
+Because the system is linearly separated, the eigenvectors are simple: the eigenvectors of the marginal modes are \((1,0)e^{\pm it}\), as are the adjoint's eigenvectors.
+
+\begin{reduce}
+if thecase=twodde then begin
+ff_:=tp mat((
+    -(1+small*a-u2)*u1(pi/2),
+    -u2+u1^2
+    ));
+freqm_:=mat((1,-1));
+ee_:=tp mat((1,0),(1,0));
+zz_:=tp mat((1,0),(1,0));
+toosmall:=3; 
+factor s,a,cis;
+end;
+\end{reduce}
+
+
+\paragraph{The centre manifold}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+u_{1}=\cis\big(-t\big) s_{2}+\cis\big(t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\cis\big(-2 t\big) s_{2}^{2} \varepsilon  \big(2/5 i+1/5\big)+\cis
+\big(2 t\big) s_{1}^{2} \varepsilon  \big(-2/5 i+1/5\big)+2 s_{2} s_{1} 
+\varepsilon 
+\end{math}\par
+
+\paragraph{Centre manifold ODEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot s_{1}=s_{2} s_{1}^{2} \varepsilon ^{2} \big(-4/5 i \pi -36/5 i-18/5
+ \pi +8/5\big)/\big(\pi ^{2}+4\big)+s_{1} a \varepsilon ^{2} \big(4 i+2 
+\pi \big)/\big(\pi ^{2}+4\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=s_{2}^{2} s_{1} \varepsilon ^{2} \big(4/5 i \pi +36/5 i-18/5 
+\pi +8/5\big)/\big(\pi ^{2}+4\big)+s_{2} a \varepsilon ^{2} \big(-4 i+2 
+\pi \big)/\big(\pi ^{2}+4\big)
+\end{math}
+
+
+
+
+\subsection{Linearly coupled 2D DDE}
+
+Here we explore a system where the centre modes involve both variables.  Consider the system
+\begin{equation*}
+\dot u_1=u_2(t-\pi/2)-u_1^2
+\quad\text{and}\quad
+\dot u_2=u_1(t-\pi/2)+u_2^2.
+\end{equation*}
+We find the quadratic reaction does not stabilise oscillating growth.
+
+Numerical solution of the characteristic equation indicate that there is one unstable mode, \(\lambda=0.4745\), two centre modes, \(\lambda=\pm i\), and all the rest are stable modes with the gravest having eigenvalue \(\lambda=-0.6846\pm i2.8499\).
+The analysis gives the centre modes are nonlinearly unstable: \(\dot a\approx (0.6758\pm i1.8616)|a|^2a\).
+The following Matlab/Octave code finds eigenvalues.
+\begin{verbatim}
+ce=@(z) z.^2-exp(-pi*z)
+lams=fsolve(ce,randn(100,2)*[2;10*i])
+plot(real(lams),imag(lams),'o')
+\end{verbatim}
+
+Interestingly, the centre eigenvectors are \((1,-1)e^{\pm it}\) so that \(u_2\) is in opposite phase to~\(u_1\).
+The adjoint's eigenvectors are the same.
+
+\begin{reduce}
+if thecase=dde2d then begin
+ff_:=tp mat((+u2(pi/2)-u1^2,+u1(pi/2)+u2^2));
+freqm_:=mat((1,-1));
+ee_:=tp mat((1,-1),(1,-1));
+zz_:=tp mat((1,-1),(1,-1));
+toosmall:=3; factor s,small;
+end;
+\end{reduce}
+
+\paragraph{The centre manifold}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+u_{1}=s_{2}^{2} \varepsilon  \big(-2/5 \cis\big(-2 t\big) i+1/5 \cis
+\big(-2 t\big)\big)-2 s_{2} s_{1} \varepsilon +s_{2} \cis\big(-t\big)+s_
+{1}^{2} \varepsilon  \big(2/5 \cis\big(2 t\big) i+1/5 \cis\big(2 t\big)
+\big)+s_{1} \cis\big(t\big)
+\end{math}\par
+
+\begin{math}
+u_{2}=s_{2}^{2} \varepsilon  \big(2/5 \cis\big(-2 t\big) i-1/5 \cis\big(
+-2 t\big)\big)+2 s_{2} s_{1} \varepsilon -s_{2} \cis\big(-t\big)+s_{1}^{
+2} \varepsilon  \big(-2/5 \cis\big(2 t\big) i-1/5 \cis\big(2 t\big)\big)
+-s_{1} \cis\big(t\big)
+\end{math}\par
+
+
+\paragraph{Centre manifold ODEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot s_{1}=s_{2} s_{1}^{2} \varepsilon ^{2} \big(-36/5 i \pi -16/5 i-8/5
+ \pi +72/5\big)/\big(\pi ^{2}+4\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=s_{2}^{2} s_{1} \varepsilon ^{2} \big(36/5 i \pi +16/5 i-8/5 
+\pi +72/5\big)/\big(\pi ^{2}+4\big)
+\end{math}
+
+This model predicts nonlinear growth of the centre modes, in addition to the growth of the unstable mode.
+
+
+\subsection{Double Hopf 2D DDE}
+
+\cite{Erneux2009} [\S7.2] explored an example of a laser subject to optoelectronic feedback.
+For certain parameter values it has a two frequency Hopf bifurcation.
+
+\cite{Erneux2009} [eq.~(7.42)] transformed the laser system to the non-dimensional
+\begin{equation*}
+(1+\eta)\dd t{\log[1+y]}=-\theta^2
+\left[y(t)+\eta y(t-\pi)\right],
+\end{equation*}
+for parameters \(\eta\) and~\(\theta\).  
+\cite{Erneux2009} identified double Hopf bifurcations from the origin at parameters~\((\eta,\theta)\) of \((3/5,2)\), \((7/25,4)\), \((-5/13,2)\) and~\((-9/41,4)\), among others.
+Here we work with a system of first order, \dde{}s, so transform the  \dde\ to
+\begin{eqnarray*}
+&&\dot x=-\theta^2
+\left[y(t)+\eta y(t-\pi)\right]/(1+\eta),
+\\&& \dot y=[1+y(t)]x(t).
+\end{eqnarray*}
+
+The following Octave/Matlab code plots the spectrum for the equilibrium at the origin.  
+The results indicate that in all four cases mentioned the centre manifold is attractive.
+The gravest eigenvalue being, respectively, \(-0.69\pm i3.87\), \(-0.38\pm i1.02\), \(-0.31\) and \(-0.41\pm i2.03\).
+\begin{verbatim}
+eta=3/5, theta=2
+ce=@(z) (1+eta)*z.^2+theta^2*(1+eta*exp(-pi*z))
+lams=fsolve(ce,randn(100,2)*[2;10*i])
+plot(real(lams),imag(lams),'o')
+\end{verbatim}
+
+
+
+Ensure you interpret `left-eigenvectors' as the eigenvectors of the adjoint operator (the complex conjugate transpose of the operator).
+
+\subsubsection{Parameters $(\eta,\theta)=(3/5,2)$}
+I invoke a slightly different perturbation of the parameter~\(\eta\) to that of \cite{Erneux2009}.
+The eigenvectors are \((1,\mp i/\omega)e^{\pm i\omega t}\) for frequencies \(\omega=1,2\), while the eigenvectors of the adjoint are \((1,\mp i\omega)e^{\pm i\omega t}\). 
+
+\begin{reduce}
+if thecase=dde2d2ha then begin
+eta:=3/5;
+theta:=2*(1+small*delta);
+ff_:=tp mat((
+    -theta^2*((1/(1+eta)-small*nu)*u2
+           +(eta/(1+eta)+small*nu)*u2(pi)),
+    +u1*(1+u2)
+    ));
+freqm_:=mat((1,2,-1,-2));
+ee_:=tp mat((1,-i),(1,-i/2),(1,+i),(1,+i/2));
+zz_:=tp mat((1,-i),(1,-2*i),(1,+i),(1,+2*i));
+toosmall:=3; 
+factor s,delta,nu,cis;
+end;
+\end{reduce}
+
+\paragraph{The centre manifold}
+is rather complicated.
+
+
+\begin{math}
+u_{1}=1/6 \cis\big(-4 t\big) s_{4}^{2} \varepsilon  i+3/16 \cis\big(-3 t
+\big) s_{4} s_{2} \varepsilon  i+\cis\big(-2 t\big) s_{4}+\cis\big(-2 t
+\big) s_{2}^{2} \varepsilon  \big(-9/2 i \pi ^{2}-16 i-6 \pi \big)/\big(
+9 \pi ^{2}+64\big)+\cis\big(-t\big) s_{4} s_{1} \varepsilon  \big(9/4 i 
+\pi ^{2}+2 i-3/2 \pi \big)/\big(9 \pi ^{2}+16\big)+\cis\big(-t\big) s_{2
+}-1/6 \cis\big(4 t\big) s_{3}^{2} \varepsilon  i-3/16 \cis\big(3 t\big) 
+s_{3} s_{1} \varepsilon  i+\cis\big(2 t\big) s_{3}+\cis\big(2 t\big) s_{
+1}^{2} \varepsilon  \big(9/2 i \pi ^{2}+16 i-6 \pi \big)/\big(9 \pi ^{2}
++64\big)+\cis\big(t\big) s_{3} s_{2} \varepsilon  \big(-9/4 i \pi ^{2}-2
+ i-3/2 \pi \big)/\big(9 \pi ^{2}+16\big)+\cis\big(t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=-1/6 \cis\big(-4 t\big) s_{4}^{2} \varepsilon -9/16 \cis\big(-3 t
+\big) s_{4} s_{2} \varepsilon +1/2 \cis\big(-2 t\big) s_{4} i+\cis\big(-
+2 t\big) s_{2}^{2} \varepsilon  \big(3 i \pi -9/4 \pi ^{2}-8\big)/\big(9
+ \pi ^{2}+64\big)+\cis\big(-t\big) s_{4} s_{1} \varepsilon  \big(3/2 i 
+\pi +9/4 \pi ^{2}+2\big)/\big(9 \pi ^{2}+16\big)+\cis\big(-t\big) s_{2} 
+i-1/6 \cis\big(4 t\big) s_{3}^{2} \varepsilon -9/16 \cis\big(3 t\big) s_
+{3} s_{1} \varepsilon -1/2 \cis\big(2 t\big) s_{3} i+\cis\big(2 t\big) s
+_{1}^{2} \varepsilon  \big(-3 i \pi -9/4 \pi ^{2}-8\big)/\big(9 \pi ^{2}
++64\big)+\cis\big(t\big) s_{3} s_{2} \varepsilon  \big(-3/2 i \pi +9/4 
+\pi ^{2}+2\big)/\big(9 \pi ^{2}+16\big)-\cis\big(t\big) s_{1} i
+\end{math}\par
+
+
+\paragraph{Centre manifold ODEs}
+describe complicated interactions, but mainly it is the coefficients that are complicated functions of~\(\pi\).
+
+\begin{math}
+\dot s_{1}=s_{4} s_{3} s_{1} \varepsilon ^{2} \big(-9963/4 i \pi ^{6}-
+38340 i \pi ^{4}-167424 i \pi ^{2}-147456 i+21141/16 \pi ^{7}+20007 \pi 
+^{5}+84096 \pi ^{3}+61440 \pi \big)/\big(6561 \pi ^{8}+116640 \pi ^{6}+
+684288 \pi ^{4}+1474560 \pi ^{2}+1048576\big)+s_{3} s_{2} \varepsilon  
+\big(-3 i \pi -4\big)/\big(9 \pi ^{2}+16\big)+s_{2} s_{1}^{2} 
+\varepsilon ^{2} \big(-2916 i \pi ^{6}-17280 i \pi ^{4}-3072 i \pi ^{2}-
+196608 i-8019/2 \pi ^{7}-44064 \pi ^{5}-93312 \pi ^{3}+122880 \pi \big)/
+\big(6561 \pi ^{8}+116640 \pi ^{6}+684288 \pi ^{4}+1474560 \pi ^{2}+
+1048576\big)+s_{1} \delta  \varepsilon ^{2} \big(16 i-12 \pi \big)/\big(
+9 \pi ^{2}+16\big)+s_{1} \nu  \varepsilon ^{2} \big(-64 i+48 \pi \big)/
+\big(9 \pi ^{2}+16\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=s_{4} s_{3} s_{2} \varepsilon ^{2} \big(9963/4 i \pi ^{6}+
+38340 i \pi ^{4}+167424 i \pi ^{2}+147456 i+21141/16 \pi ^{7}+20007 \pi 
+^{5}+84096 \pi ^{3}+61440 \pi \big)/\big(6561 \pi ^{8}+116640 \pi ^{6}+
+684288 \pi ^{4}+1474560 \pi ^{2}+1048576\big)+s_{4} s_{1} \varepsilon  
+\big(3 i \pi -4\big)/\big(9 \pi ^{2}+16\big)+s_{2}^{2} s_{1} 
+\varepsilon ^{2} \big(2916 i \pi ^{6}+17280 i \pi ^{4}+3072 i \pi ^{2}+
+196608 i-8019/2 \pi ^{7}-44064 \pi ^{5}-93312 \pi ^{3}+122880 \pi \big)/
+\big(6561 \pi ^{8}+116640 \pi ^{6}+684288 \pi ^{4}+1474560 \pi ^{2}+
+1048576\big)+s_{2} \delta  \varepsilon ^{2} \big(-16 i-12 \pi \big)/
+\big(9 \pi ^{2}+16\big)+s_{2} \nu  \varepsilon ^{2} \big(64 i+48 \pi 
+\big)/\big(9 \pi ^{2}+16\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{3}=s_{4} s_{3}^{2} \varepsilon ^{2} \big(-16/3 i-2 \pi \big)/
+\big(9 \pi ^{2}+64\big)+s_{3} s_{2} s_{1} \varepsilon ^{2} \big(-34992 i
+ \pi ^{6}-252288 i \pi ^{4}-559104 i \pi ^{2}-393216 i-10206 \pi ^{7}-
+64800 \pi ^{5}-138240 \pi ^{3}-98304 \pi \big)/\big(6561 \pi ^{8}+116640
+ \pi ^{6}+684288 \pi ^{4}+1474560 \pi ^{2}+1048576\big)+s_{3} \delta  
+\varepsilon ^{2} \big(128 i+48 \pi \big)/\big(9 \pi ^{2}+64\big)+s_{1}^{
+2} \varepsilon  \big(-24 i \pi +64\big)/\big(9 \pi ^{2}+64\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{4}=s_{4}^{2} s_{3} \varepsilon ^{2} \big(16/3 i-2 \pi \big)/
+\big(9 \pi ^{2}+64\big)+s_{4} s_{2} s_{1} \varepsilon ^{2} \big(34992 i 
+\pi ^{6}+252288 i \pi ^{4}+559104 i \pi ^{2}+393216 i-10206 \pi ^{7}-
+64800 \pi ^{5}-138240 \pi ^{3}-98304 \pi \big)/\big(6561 \pi ^{8}+116640
+ \pi ^{6}+684288 \pi ^{4}+1474560 \pi ^{2}+1048576\big)+s_{4} \delta  
+\varepsilon ^{2} \big(-128 i+48 \pi \big)/\big(9 \pi ^{2}+64\big)+s_{2}
+^{2} \varepsilon  \big(24 i \pi +64\big)/\big(9 \pi ^{2}+64\big)
+\end{math}
+
+
+
+
+\subsubsection{Parameters $(\eta,\theta)=(7/25,4)$}
+The eigenvectors are \((1,\mp i/\omega)e^{\pm i\omega t}\) for frequencies \(\omega=3,4\), while the eigenvectors of the adjoint are \((1,\mp i\omega)e^{\pm i\omega t}\). 
+
+\begin{reduce}
+if thecase=dde2d2hb then begin
+eta:=7/25;
+theta:=4*(1+small*delta);
+ff_:=tp mat((
+    -theta^2*((1/(1+eta)-small*nu)*u2
+           +(eta/(1+eta)+small*nu)*u2(pi)),
+    +u1*(1+u2)
+    ));
+freqm_:=mat((3,-3,4,-4));
+ee_:=tp mat((1,-i/3),(1,+i/3),(1,-i/4),(1,+i/4));
+zz_:=tp mat((1,-3*i),(1,+3*i),(1,-4*i),(1,+4*i));
+toosmall:=3; 
+factor s,delta,nu,cis;
+end;
+\end{reduce}
+
+
+\paragraph{The centre manifold}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+u_{1}=1/12 \cis\big(-8 t\big) s_{4}^{2} \varepsilon  i+21/160 \cis\big(-
+7 t\big) s_{4} s_{2} \varepsilon  i+4/15 \cis\big(-6 t\big) s_{2}^{2} 
+\varepsilon  i+\cis\big(-4 t\big) s_{4}+\cis\big(-3 t\big) s_{2}+3/32 
+\cis\big(-t\big) s_{4} s_{1} \varepsilon  i-1/12 \cis\big(8 t\big) s_{3}
+^{2} \varepsilon  i-21/160 \cis\big(7 t\big) s_{3} s_{1} \varepsilon  i-
+4/15 \cis\big(6 t\big) s_{1}^{2} \varepsilon  i+\cis\big(4 t\big) s_{3}+
+\cis\big(3 t\big) s_{1}-3/32 \cis\big(t\big) s_{3} s_{2} \varepsilon  i
+\end{math}\par
+
+\begin{math}
+u_{2}=-1/24 \cis\big(-8 t\big) s_{4}^{2} \varepsilon -49/480 \cis\big(-7
+ t\big) s_{4} s_{2} \varepsilon -1/10 \cis\big(-6 t\big) s_{2}^{2} 
+\varepsilon +1/4 \cis\big(-4 t\big) s_{4} i+1/3 \cis\big(-3 t\big) s_{2}
+ i-1/96 \cis\big(-t\big) s_{4} s_{1} \varepsilon -1/24 \cis\big(8 t\big)
+ s_{3}^{2} \varepsilon -49/480 \cis\big(7 t\big) s_{3} s_{1} 
+\varepsilon -1/10 \cis\big(6 t\big) s_{1}^{2} \varepsilon -1/4 \cis\big(
+4 t\big) s_{3} i-1/3 \cis\big(3 t\big) s_{1} i-1/96 \cis\big(t\big) s_{3
+} s_{2} \varepsilon 
+\end{math}\par
+
+\paragraph{Centre manifold ODEs}
+\ 
+
+\begin{math}
+\dot s_{1}=s_{4} s_{3} s_{1} \varepsilon ^{2} \big(-243/20 i+567/80 \pi 
+\big)/\big(49 \pi ^{2}+144\big)+s_{2} s_{1}^{2} \varepsilon ^{2} \big(-
+12/5 i+7/5 \pi \big)/\big(49 \pi ^{2}+144\big)+s_{1} \delta  
+\varepsilon ^{2} \big(432 i-252 \pi \big)/\big(49 \pi ^{2}+144\big)+s_{1
+} \nu  \varepsilon ^{2} \big(-768 i+448 \pi \big)/\big(49 \pi ^{2}+144
+\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=s_{4} s_{3} s_{2} \varepsilon ^{2} \big(243/20 i+567/80 \pi 
+\big)/\big(49 \pi ^{2}+144\big)+s_{2}^{2} s_{1} \varepsilon ^{2} \big(12
+/5 i+7/5 \pi \big)/\big(49 \pi ^{2}+144\big)+s_{2} \delta  \varepsilon 
+^{2} \big(-432 i-252 \pi \big)/\big(49 \pi ^{2}+144\big)+s_{2} \nu  
+\varepsilon ^{2} \big(768 i+448 \pi \big)/\big(49 \pi ^{2}+144\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{3}=s_{4} s_{3}^{2} \varepsilon ^{2} \big(-32/3 i-14/3 \pi \big)/
+\big(49 \pi ^{2}+256\big)+s_{3} s_{2} s_{1} \varepsilon ^{2} \big(-256/5
+ i-112/5 \pi \big)/\big(49 \pi ^{2}+256\big)+s_{3} \delta  \varepsilon 
+^{2} \big(1024 i+448 \pi \big)/\big(49 \pi ^{2}+256\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{4}=s_{4}^{2} s_{3} \varepsilon ^{2} \big(32/3 i-14/3 \pi \big)/
+\big(49 \pi ^{2}+256\big)+s_{4} s_{2} s_{1} \varepsilon ^{2} \big(256/5 
+i-112/5 \pi \big)/\big(49 \pi ^{2}+256\big)+s_{4} \delta  \varepsilon ^{
+2} \big(-1024 i+448 \pi \big)/\big(49 \pi ^{2}+256\big)
+\end{math}
+
+The interaction appears a lot simpler in this case.  
+Presumably simpler because the frequencies are `more irrational'.
+
+
+
+
+
+\subsection{Simple 2D ODE}
+
+Consider the system
+\begin{math}
+\dot u_{1}=-\varepsilon  u_{1}^{2}+u_{2}-u_{1}
+\end{math}
+and 
+\begin{math}
+\dot u_{2}=\varepsilon  u_{2}^{2}-u_{2}+u_{1}
+\end{math}\par
+
+\begin{reduce}
+if thecase=simple2d then begin
+ff_:=tp mat((-u1+u2-u1^2,u1-u2+u2^2));
+freqm_:=mat((0));
+ee_:=tp mat((1,1));
+zz_:=tp mat((1,1));
+toosmall:=5; 
+end;
+\end{reduce}
+
+
+
+\paragraph{The centre manifold}
+
+\begin{math}
+u_{1}=3/8 \varepsilon ^{3} s_{1}^{4}-1/2 \varepsilon  s_{1}^{2}+s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=-3/8 \varepsilon ^{3} s_{1}^{4}+1/2 \varepsilon  s_{1}^{2}+s_{1}
+\end{math}\par
+
+\paragraph{Centre manifold ODEs}
+
+\begin{math}
+\dot s_{1}=-3/4 \varepsilon ^{4} s_{1}^{5}+\varepsilon ^{2} s_{1}^{3}
+\end{math}\par
+
+\paragraph{Normals to isochrons at the slow manifold}
+Use these vectors: to project initial conditions
+onto the slow manifold; to project non-autonomous
+forcing onto the slow evolution; to predict the
+consequences of modifying the original system; in
+uncertainty quantification to quantify effects on
+the model of uncertainties in the original system.
+
+\(z_{11}=3/2 \eps^{4} s_{1}^{4}+3/4 \eps^{3} s_{1}^{3}-1/2 \eps^{2} s_{1}^{2}-1/2 \eps s_{1}+1/2
+\)\par
+
+\(z_{12}=3/2 \eps^{4} s_{1}^{4}-3/4 \eps^{3} s_{1}^{3}-1/2 \eps^{2} s_{1}^{2}+1/2 \eps s_{1}+1/2
+\)\par
+
+
+\subsubsection{The stable manifold}
+Appears to get sensible answers even for the stable manifold!
+Just invoke this case to characterise the linear stable subspace.
+\begin{reduce}
+if thecase=simple2ds then begin
+ff_:=tp mat((-u1+u2-u1^2,u1-u2+u2^2));
+freqm_:=mat((i*2));
+ee_:=tp mat((1,-1));
+zz_:=tp mat((1,-1));
+toosmall:=5;
+end;
+\end{reduce}
+
+\paragraph{The stable manifold}
+where the double factor of~\(i\) in the exponentials give decaying modes of~\(e^{-2t},e^{-6t},e^{-8t}\).
+
+\begin{math}
+u_{1}=1/8 \varepsilon ^{3} \cis\big(8 i t\big) s_{1}^{4}+1/4 
+\varepsilon ^{2} \cis\big(6 i t\big) s_{1}^{3}+1/2 \varepsilon  \cis
+\big(4 i t\big) s_{1}^{2}+\cis\big(2 i t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=-1/8 \varepsilon ^{3} \cis\big(8 i t\big) s_{1}^{4}-1/4 
+\varepsilon ^{2} \cis\big(6 i t\big) s_{1}^{3}-1/2 \varepsilon  \cis
+\big(4 i t\big) s_{1}^{2}-\cis\big(2 i t\big) s_{1}
+\end{math}\par
+
+
+\paragraph{Stable manifold ODEs} is the trivial
+\begin{math}
+\dot s_{1}=0
+\end{math}
+
+
+
+
+
+
+\subsection{Four state Markov chain}
+Variable $\varepsilon$ characterise the perturbation.
+
+\begin{math}
+\dot u_{1}=-\varepsilon  u_{1}+u_{2}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=\varepsilon  \big(u_{3}-u_{2}+u_{1}\big)-u_{2}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=\varepsilon  \big(u_{4}-u_{3}+u_{2}\big)-u_{3}
+\end{math}\par
+
+\begin{math}
+\dot u_{4}=-\varepsilon  u_{4}+u_{3}
+\end{math}\par
+
+The linear perturbation terms gets multiplied by \verb|small| again, but I do not see how to avoid that without wrecking other desirable things: such as, it is useful to multiply some nonlinear terms by small to show they are of higher order than other nonlinear terms. 
+
+\begin{reduce}
+if thecase=fourstatemarkov then begin
+factor epsilon;
+ff_:=tp mat((u2,-u2,-u3,u3))
++small*tp mat((-u1,+u1-u2+u3,+u2-u3+u4,-u4));
+freqm_:=mat((0,0));
+ee_:=tp mat((0,0,0,1),(1,0,0,0));
+zz_:=tp mat((0,0,1,1),(1,1,0,0));
+toosmall:=7; 
+end;
+\end{reduce}
+
+
+\paragraph{The centre manifold}
+
+\begin{math}
+u_{1}=\varepsilon ^{2} \big(2 s_{2}-s_{1}\big)-
+\varepsilon  s_{2}+s_{2}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon ^{2} \big(-2 s_{2}+s_{1}\big)+
+\varepsilon  s_{2}
+\end{math}\par
+
+\begin{math}
+u_{3}=\varepsilon ^{2} \big(s_{2}-2 s_{1}\big)+
+\varepsilon  s_{1}
+\end{math}\par
+
+\begin{math}
+u_{4}=\varepsilon ^{2} \big(-s_{2}+2 s_{1}\big)-
+\varepsilon  s_{1}+s_{1}
+\end{math}\par
+
+
+\paragraph{Centre manifold ODEs}
+
+\begin{math}
+\dot s_{1}=\varepsilon ^{3} \big(-3 s_{2}+3 s_{1}\big)+
+\varepsilon ^{2} \big(s_{2}-s_{1}\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon ^{3} \big(3 s_{2}-3 s_{1}\big)+
+\varepsilon ^{2} \big(-s_{2}+s_{1}\big)
+\end{math}
+
+\paragraph{Normals to isochrons at the slow manifold}
+\(
+\)\par
+
+\(z_{11}=6 \eps^{6}-\eps^{4}
+\)\par
+
+\(z_{12}=19 \eps^{6}-4 \eps^{4}+\eps^{2}
+\)\par
+
+\(z_{13}=-19 \eps^{6}+4 \eps^{4}-\eps^{2}+1
+\)\par
+
+\(z_{14}=-6 \eps^{6}+\eps^{4}+1
+\)\par
+
+\(z_{21}=-6 \eps^{6}+\eps^{4}+1
+\)\par
+
+\(z_{22}=-19 \eps^{6}+4 \eps^{4}-\eps^{2}+1
+\)\par
+
+\(z_{23}=19 \eps^{6}-4 \eps^{4}+\eps^{2}
+\)\par
+
+\(z_{24}=6 \eps^{6}-\eps^{4}
+\)\par
+
+
+\subsection{Bifurcating 2D system}
+
+This example tests labelling a small parameter and having a cubic term labelled as smaller than a quadratic term.
+
+\begin{math}
+\dot u_{1}=-\varepsilon ^{2} u_{2} u_{1}^{2}-u_{2}-1/2 u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=\varepsilon  \big(-u_{2}^{2}+u_{2} \epsilon \big)-2 u_{2}-u_{
+1}
+\end{math}
+
+\begin{reduce}
+if thecase=another2d then begin
+ff_:=tp mat((
+    -u1/2-u2-small*u1^2*u2,
+    -u1-2*u2+small*epsilon*u2-u2^2
+  ));
+freqm_:=mat((0));
+ee_:=tp mat((1,-1/2));
+zz_:=tp mat((1,-1/2));
+end;
+\end{reduce}
+
+
+\paragraph{The centre manifold}
+
+\begin{math}
+u_{1}=\varepsilon  \big(-1/25 s_{1}^{2}-2/25 s_{1} \epsilon \big)+s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon  \big(-2/25 s_{1}^{2}-4/25 s_{1} \epsilon \big)-1/2 s_
+{1}
+\end{math}\par
+
+
+\paragraph{Centre manifold ODEs}
+
+
+\begin{math}
+\dot s_{1}=\varepsilon ^{2} \big(54/125 s_{1}^{3}+12/125 s_{1}^{2} 
+\epsilon +8/125 s_{1} \epsilon ^{2}\big)+\varepsilon  \big(1/10 s_{1}^{2
+}+1/5 s_{1} \epsilon \big)
+\end{math}
+
+\paragraph{Normals to isochrons at the slow manifold}
+\(
+\)\par
+
+\(z_{11}=\eps^{2} \big(-352/3125 s_{1}^{2}-8/125 \epsilon \big)-8/125 \eps
+ s_{1}+4/5
+\)\par
+
+\(z_{12}=\eps^{2} \big(-544/3125 s_{1}^{2}-16/125 \epsilon \big)-16/125 
+\eps s_{1}-2/5
+\)\par
+
+
+
+\subsubsection{The stable manifold}
+
+Appears to also get the stable manifold.
+\begin{reduce}
+if thecase=another2ds then begin
+ff_:=tp mat((
+    -u1/2-u2-small*u1^2*u2,
+    -u1-2*u2+small*epsilon*u2-u2^2
+  ));
+freqm_:=mat((i*5/2));
+ee_:=tp mat((1,2));
+zz_:=tp mat((1,2));
+toosmall:=5;
+end;
+\end{reduce}
+
+\paragraph{The stable manifold}
+ignoring the as yet awful formatting of the exponential,
+
+\begin{math}
+u_{1}=\varepsilon ^{2} \big(838/1875 \cis\big(\big(15 i t\big)/2\big) s_
+{1}^{3}+8/25 \cis\big(\big(5 i t\big)/2\big) s_{1} \epsilon \big)+8/25 
+\varepsilon  \cis\big(5 i t\big) s_{1}^{2}+\cis\big(\big(5 i t\big)/2
+\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon ^{2} \big(2116/1875 \cis\big(\big(15 i t\big)/2\big) s
+_{1}^{3}-4/25 \cis\big(\big(5 i t\big)/2\big) s_{1} \epsilon \big)+36/25
+ \varepsilon  \cis\big(5 i t\big) s_{1}^{2}+2 \cis\big(\big(5 i t\big)/2
+\big) s_{1}
+\end{math}
+
+
+\paragraph{Stable manifold ODEs}
+shows the change in rate due to parameter variation:
+\begin{math}
+\dot s_{1}=4/5 \varepsilon ^{2} s_{1} \epsilon 
+\end{math}
+
+
+
+
+
+
+
+\subsection{Simple 3D system}
+
+This example is straightforward.
+
+\begin{math}
+\dot u_{1}=\varepsilon  u_{3} u_{2}+2 u_{3}+u_{2}+2 u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=-\varepsilon  u_{3} u_{1}+u_{3}-u_{2}+u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=-\varepsilon  u_{2} u_{1}-3 u_{3}-u_{2}-3 u_{1}
+\end{math}
+
+\begin{reduce}
+if thecase=simple3d then begin
+ff_:=tp mat((2*u1+u2+2*u3+u2*u3
+  ,u1-u2+u3-u1*u3
+  ,-3*u1-u2-3*u3-u1*u2));
+freqm_:=mat((0));
+ee_:=tp mat((1,0,-1));
+zz_:=tp mat((4,1,3));
+end;
+\end{reduce}
+
+
+\paragraph{The centre manifold} 
+
+\begin{math}
+u_{1}=-\varepsilon  s_{1}^{2}+s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon  s_{1}^{2}
+\end{math}\par
+
+\begin{math}
+u_{3}=\varepsilon  s_{1}^{2}-s_{1}
+\end{math}\par
+
+
+\paragraph{Centre manifold ODEs} 
+
+\begin{math}
+\dot s_{1}=-9 \varepsilon ^{2} s_{1}^{3}+\varepsilon  s_{1}^{2}
+\end{math}
+
+\paragraph{Normals to isochrons at the slow manifold}
+\(
+\)\par
+
+\(z_{11}=258 \eps^{2} s_{1}^{2}-16 \eps s_{1}+4
+\)\par
+
+\(z_{12}=93 \eps^{2} s_{1}^{2}-9 \eps s_{1}+1
+\)\par
+
+\(z_{13}=240 \eps^{2} s_{1}^{2}-16 \eps s_{1}+3
+\)\par
+
+
+
+
+
+\subsubsection{Its 2D stable manifold with generalised eigenvectors}
+
+Despite the generalised eigenvectors, the following alternative appears to generate the stable manifold if you wish:
+\begin{reduce}
+if thecase=simple3ds then begin
+ff_:=tp mat((2*u1+u2+2*u3+u2*u3
+  ,u1-u2+u3-u1*u3
+  ,-3*u1-u2-3*u3-u1*u2));
+freqm_:=mat((i,i));
+ee_:=tp mat((1,-1,-1),(1,7/2,-5/2));
+zz_:=tp mat((0,1,0),(1,0,1));
+end;
+\end{reduce}
+
+\paragraph{The adjusted dynamical system}
+Modified in order cater for the generalised eigenvector.
+
+\begin{math}
+\dot u_{1}=\varepsilon  \big(u_{3} u_{2}-u_{3}-u_{1}\big)+3 u_{3}+u_{2}+
+3 u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=\varepsilon  \big(-u_{3} u_{1}+u_{3}+u_{1}\big)-u_{2}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=\varepsilon  \big(u_{3}-u_{2} u_{1}+u_{1}\big)-4 u_{3}-u_{2}-
+4 u_{1}
+\end{math}
+
+\paragraph{The stable manifold}
+noting the double~\(i\) factors give decaying modes.
+
+\begin{math}
+u_{1}=\varepsilon  \big(-51/4 \cis\big(2 i t\big) s_{2}^{2}-3 \cis\big(2
+ i t\big) s_{2} s_{1}+3 \cis\big(2 i t\big) s_{1}^{2}\big)+\cis\big(i t
+\big) s_{2}+\cis\big(i t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon  \big(-5/2 \cis\big(2 i t\big) s_{2}^{2}-7/2 \cis\big(
+2 i t\big) s_{2} s_{1}-\cis\big(2 i t\big) s_{1}^{2}\big)+7/2 \cis\big(i
+ t\big) s_{2}-\cis\big(i t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{3}=\varepsilon  \big(25 \cis\big(2 i t\big) s_{2}^{2}+13/2 \cis\big(2
+ i t\big) s_{2} s_{1}-5 \cis\big(2 i t\big) s_{1}^{2}\big)-5/2 \cis\big(
+i t\big) s_{2}-\cis\big(i t\big) s_{1}
+\end{math}\par
+
+
+\paragraph{Stable manifold ODEs}
+\begin{math}
+\dot s_{1}=3/2 \varepsilon  s_{2}
+\end{math}
+and
+\begin{math}
+\dot s_{2}=0
+\end{math}
+
+
+
+
+\subsection{3D system with a generalised eigenvector}
+Took longer to converge, but converge it does.
+However, now I force the off-diagonal term to be small.
+
+\begin{math}
+\dot u_{1}=\varepsilon  \big(u_{3} u_{2}+u_{3}+u_{2}+u_{1}\big)+u_{3}+u_
+{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=-\varepsilon  u_{3} u_{1}+u_{3}+u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=\varepsilon  \big(-u_{3}-u_{2} u_{1}-u_{2}-u_{1}\big)-2 u_{3}
+-2 u_{1}
+\end{math}
+
+\begin{reduce}
+if thecase=geneigenvec then begin
+ff_:=tp mat((
+    2*u1+u2+2*u3+u2*u3,
+    u1+u3-u1*u3,
+    -3*u1-u2-3*u3-u1*u2
+    ));
+freqm_:=mat((0,0));
+ee_:=tp mat((1,0,-1),(0,1,0));
+zz_:=tp mat((1,-1,0),(1,1,1));
+toosmall:=3;
+end;
+\end{reduce}
+
+\paragraph{The centre manifold} 
+
+\begin{math}
+u_{1}=2 \varepsilon  s_{2} s_{1}+s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=2 \varepsilon  s_{2} s_{1}+s_{2}
+\end{math}\par
+
+\begin{math}
+u_{3}=-4 \varepsilon  s_{2} s_{1}-s_{1}
+\end{math}\par
+ 
+\paragraph{Centre manifold ODEs}
+
+\begin{math}
+\dot s_{1}=\varepsilon ^{2} \big(-10 s_{2}^{2} s_{1}-6 s_{2} s_{1}^{2}
+\big)+\varepsilon  \big(-3 s_{2} s_{1}+s_{2}\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon ^{2} \big(-6 s_{2}^{2} s_{1}+2 s_{2} s_{1}^{2}
+\big)+\varepsilon  \big(-2 s_{2} s_{1}+s_{1}^{2}\big)
+\end{math}
+
+\paragraph{Normals to isochrons at the slow manifold}
+\(
+\)\par
+
+\(z_{11}=\eps^{2} \big(50 s_{2}^{2}+60 s_{2} s_{1}+14 s_{1}^{2}+s_{1}\big)
++\eps \big(5 s_{2}+3 s_{1}\big)+2
+\)\par
+
+\(z_{12}=\eps^{2} \big(10 s_{2} s_{1}+6 s_{1}^{2}\big)
+\)\par
+
+\(z_{13}=\eps^{2} \big(40 s_{2}^{2}+54 s_{2} s_{1}+14 s_{1}^{2}+s_{1}\big)
++\eps \big(5 s_{2}+3 s_{1}\big)+1
+\)\par
+
+\(z_{21}=\eps^{2} \big(31 s_{2}^{2}+8 s_{2} s_{1}-s_{2}-9 s_{1}^{2}\big)+
+\eps \big(3 s_{2}-s_{1}\big)+1
+\)\par
+
+\(z_{22}=\eps^{2} \big(6 s_{2} s_{1}-2 s_{1}^{2}\big)+1
+\)\par
+
+\(z_{23}=\eps^{2} \big(25 s_{2}^{2}+10 s_{2} s_{1}-s_{2}-9 s_{1}^{2}\big)+
+\eps \big(3 s_{2}-s_{1}\big)+1
+\)\par
+
+
+
+
+
+\subsection{Separated system}
+To see if small part in the slow variable ruins convergence.
+The answer is that it did---hence we include code to make anything non-oscillatory in the slow variables to be small.
+Also test a non-zero constant forcing.
+
+\begin{math}
+\dot u_{1}=\varepsilon  \big(-u_{2} u_{1}+u_{1} \alpha\big)
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=\varepsilon  \big(\beta -2 u_{2}^{2}+u_{1}^{2}\big)-u_{2}
+\end{math}
+
+\begin{reduce}
+if thecase=bifurcate2d then begin
+ff_:=tp mat((
+    alpha*u1-u1*u2,
+    -u2+u1^2-2*u2^2+beta
+    ));
+freqm_:=mat((0));
+ee_:=tp mat((1,0));
+zz_:=tp mat((1,0));
+toosmall:=4;
+end;
+\end{reduce}
+
+\paragraph{The centre manifold} 
+
+\begin{math}
+u_{1}=s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon ( s_{1}^{2}+\beta)
+\end{math}\par
+ 
+\paragraph{Centre manifold ODEs} 
+
+\begin{math}
+\dot s_{1}=-\varepsilon ^{2} (s_{1}^{3}-\beta s_1)+\varepsilon  s_{1} \alpha
+\end{math}
+
+\paragraph{Normals to isochrons at the slow manifold}
+\(
+\)\par
+
+\(z_{11}=2 \eps^{2} s_{1}^{2}+1
+\)\par
+
+\(z_{12}=-\eps s_{1}
+\)\par
+
+
+
+
+ 
+\subsection{Oscillatory centre manifold---separated form}
+
+Let's try complex eigenvectors.
+Adjoint eigenvectors~\verb|zz_| must be the eigenvectors of the complex conjugate transpose matrix.
+
+\begin{math}
+\dot u_{1}=u_{2}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=-\varepsilon  u_{3} u_{1}-u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=5 \varepsilon  u_{1}^{2}-u_{3}
+\end{math}
+
+\begin{reduce}
+if thecase=simpleosc then begin
+ff_:=tp mat((u2,-u1-u1*u3,-u3+5*u1^2));
+freqm_:=mat((1,-1));
+ee_:=tp mat((1,+i,0),(1,-i,0));
+zz_:=tp mat((1,+i,0),(1,-i,0));
+end;
+\end{reduce}
+
+\paragraph{The centre manifold} 
+
+\begin{math}
+u_{1}=\cis\big(-t\big) s_{2}+\cis\big(t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=-\cis\big(-t\big) s_{2} i+\cis\big(t\big) s_{1} i
+\end{math}\par
+
+\begin{math}
+u_{3}=\varepsilon  \big(2 \cis\big(-2 t\big) s_{2}^{2} i+\cis\big(-2 t
+\big) s_{2}^{2}-2 \cis\big(2 t\big) s_{1}^{2} i+\cis\big(2 t\big) s_{1}
+^{2}+10 s_{2} s_{1}\big)
+\end{math}\par
+ 
+\paragraph{Centre manifold ODEs} 
+\begin{math}
+\dot s_{1}=\varepsilon ^{2} \big(11/2 s_{2} s_{1}^{2} i+s_{2} s_{1}^{2}
+\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon ^{2} \big(-11/2 s_{2}^{2} s_{1} i+s_{2}^{2} s_{1}
+\big)
+\end{math}
+
+
+
+
+\subsection{Perturbed frequency oscillatory centre manifold---separated form}
+  Putting real parameters into the linear operator works here also.
+
+\begin{math}
+\dot u_{1}=\varepsilon  \big(u_{2} b+u_{1} a\big)+u_{2}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=\varepsilon  \big(u_{2} d-u_{1} c\big)-u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=-u_{3}
+\end{math}
+
+\begin{reduce}
+if thecase=perturbfreq then begin
+ff_:=tp mat((a*u1+(1+b)*u2,d*u2-(1+c)*u1,-u3));
+freqm_:=mat((1,-1));
+ee_:=tp mat((1,+i,0),(1,-i,0));
+zz_:=tp mat((1,+i,0),(1,-i,0));
+end;
+\end{reduce}
+
+\paragraph{The centre manifold} 
+
+\begin{math}
+u_{1}=\varepsilon  \big(1/4 \cis\big(-t\big) s_{2} a i+1/4 \cis\big(-t
+\big) s_{2} b-1/4 \cis\big(-t\big) s_{2} c-1/4 \cis\big(-t\big) s_{2} d 
+i-1/4 \cis\big(t\big) s_{1} a i+1/4 \cis\big(t\big) s_{1} b-1/4 \cis
+\big(t\big) s_{1} c+1/4 \cis\big(t\big) s_{1} d i\big)+\cis\big(-t\big) 
+s_{2}+\cis\big(t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon  \big(-1/4 \cis\big(-t\big) s_{2} a+1/4 \cis\big(-t
+\big) s_{2} b i-1/4 \cis\big(-t\big) s_{2} c i+1/4 \cis\big(-t\big) s_{2
+} d-1/4 \cis\big(t\big) s_{1} a-1/4 \cis\big(t\big) s_{1} b i+1/4 \cis
+\big(t\big) s_{1} c i+1/4 \cis\big(t\big) s_{1} d\big)-\cis\big(-t\big) 
+s_{2} i+\cis\big(t\big) s_{1} i
+\end{math}\par
+
+\begin{math}
+u_{3}=0
+\end{math}\par
+
+\paragraph{Centre manifold ODEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot s_{1}=\varepsilon ^{2} \big(-1/8 s_{1} a^{2} i+1/4 s_{1} a d i-1/8 
+s_{1} b^{2} i+1/4 s_{1} b c i-1/8 s_{1} c^{2} i-1/8 s_{1} d^{2} i\big)+
+\varepsilon  \big(1/2 s_{1} a+1/2 s_{1} b i+1/2 s_{1} c i+1/2 s_{1} d
+\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon ^{2} \big(1/8 s_{2} a^{2} i-1/4 s_{2} a d i+1/8 s
+_{2} b^{2} i-1/4 s_{2} b c i+1/8 s_{2} c^{2} i+1/8 s_{2} d^{2} i\big)+
+\varepsilon  \big(1/2 s_{2} a-1/2 s_{2} b i-1/2 s_{2} c i+1/2 s_{2} d
+\big)
+\end{math}
+
+
+
+
+
+\subsection{More general oscillatory centre manifold}
+Consider the frequency two dynamics of the following system in  non-separated form.
+
+\begin{math}
+\dot u_{1}=\varepsilon  \big(u_{2} u_{1}+u_{1} \epsilon \big)-2 u_{3}-2 
+u_{2}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=-2 u_{3}-3 u_{2}+u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=2 u_{3}+3 u_{2}+u_{1}
+\end{math}
+
+\begin{reduce}
+if thecase=nonseparatedosc then begin
+ff_:=tp mat((
+    -2*u2-2*u3+epsilon*u1+u1*u2,
+    u1-3*u2-2*u3,
+    u1+3*u2+2*u3
+    ));
+freqm_:=mat((+2,-2));
+ee_:=tp mat((1,1,-1-i),(1,1,-1+i));
+zz_:=tp mat((1,-i,-i),(1,+i,+i));
+end;
+\end{reduce}
+
+\paragraph{The centre manifold} 
+
+\begin{math}
+u_{1}=\varepsilon  \big(1/3 \cis\big(-4 t\big) s_{2}^{2} i+1/8 \cis\big(
+-2 t\big) s_{2} \epsilon  i-1/3 \cis\big(4 t\big) s_{1}^{2} i-1/8 \cis
+\big(2 t\big) s_{1} \epsilon  i\big)+\cis\big(-2 t\big) s_{2}+\cis\big(2
+ t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon  \big(5/51 \cis\big(-4 t\big) s_{2}^{2} i-1/17 \cis
+\big(-4 t\big) s_{2}^{2}-11/40 \cis\big(-2 t\big) s_{2} \epsilon  i-1/5 
+\cis\big(-2 t\big) s_{2} \epsilon -5/51 \cis\big(4 t\big) s_{1}^{2} i-1/
+17 \cis\big(4 t\big) s_{1}^{2}+11/40 \cis\big(2 t\big) s_{1} \epsilon  i
+-1/5 \cis\big(2 t\big) s_{1} \epsilon -2 s_{2} s_{1}\big)+\cis\big(-2 t
+\big) s_{2}+\cis\big(2 t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{3}=\varepsilon  \big(-5/51 \cis\big(-4 t\big) s_{2}^{2} i-11/102 \cis
+\big(-4 t\big) s_{2}^{2}+11/40 \cis\big(-2 t\big) s_{2} \epsilon  i+13/
+40 \cis\big(-2 t\big) s_{2} \epsilon +5/51 \cis\big(4 t\big) s_{1}^{2} i
+-11/102 \cis\big(4 t\big) s_{1}^{2}-11/40 \cis\big(2 t\big) s_{1} 
+\epsilon  i+13/40 \cis\big(2 t\big) s_{1} \epsilon +3 s_{2} s_{1}\big)+
+\cis\big(-2 t\big) s_{2} i-\cis\big(-2 t\big) s_{2}-\cis\big(2 t\big) s_
+{1} i-\cis\big(2 t\big) s_{1}
+\end{math}\par
+ 
+\paragraph{Centre manifold ODEs} 
+
+\begin{math}
+\dot s_{1}=\varepsilon ^{2} \big(-11/51 s_{2} s_{1}^{2} i-35/34 s_{2} s_
+{1}^{2}-1/16 s_{1} \epsilon ^{2} i\big)+1/2 \varepsilon  s_{1} \epsilon 
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon ^{2} \big(11/51 s_{2}^{2} s_{1} i-35/34 s_{2}^{2}
+ s_{1}+1/16 s_{2} \epsilon ^{2} i\big)+1/2 \varepsilon  s_{2} \epsilon 
+\end{math}
+
+
+
+
+
+
+\subsection{Quasi-delay differential equation}
+Shows Hopf bifurcation as parameter~$a$ crosses~$-4$ to oscillations with base frequency two.
+
+\begin{math}
+\dot u_{1}=\varepsilon ^{2} \big(-u_{3} \alpha -u_{1}^{3}\big)-2 
+\varepsilon  u_{1}^{2}-4 u_{3}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=-2 u_{2}+2 u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=-2 u_{3}+2 u_{2}
+\end{math}
+
+\begin{reduce}
+if thecase=quasidelayosc then begin
+ff_:=tp mat((
+    -4*u3-small*alpha*u3-2*u1^2-small*u1^3,
+    2*u1-2*u2,
+    2*u2-2*u3
+    ));
+freqm_:=mat((2,-2));
+ee_:=tp mat((1,1/2-i/2,-i/2),(1,1/2+i/2,+i/2));
+zz_:=tp mat((1,-i,-1-i),(1,+i,-1+i));
+end;
+\end{reduce}
+
+\paragraph{The centre manifold}
+
+\begin{math}
+u_{1}=\varepsilon  \big(-7/12 \cis\big(-4 t\big) s_{2}^{2} i+1/12 \cis
+\big(-4 t\big) s_{2}^{2}+7/12 \cis\big(4 t\big) s_{1}^{2} i+1/12 \cis
+\big(4 t\big) s_{1}^{2}-s_{2} s_{1}\big)+\cis\big(-2 t\big) s_{2}+\cis
+\big(2 t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon  \big(-1/12 \cis\big(-4 t\big) s_{2}^{2} i+1/4 \cis
+\big(-4 t\big) s_{2}^{2}+1/12 \cis\big(4 t\big) s_{1}^{2} i+1/4 \cis
+\big(4 t\big) s_{1}^{2}-s_{2} s_{1}\big)+1/2 \cis\big(-2 t\big) s_{2} i+
+1/2 \cis\big(-2 t\big) s_{2}-1/2 \cis\big(2 t\big) s_{1} i+1/2 \cis\big(
+2 t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{3}=\varepsilon  \big(1/12 \cis\big(-4 t\big) s_{2}^{2} i+1/12 \cis
+\big(-4 t\big) s_{2}^{2}-1/12 \cis\big(4 t\big) s_{1}^{2} i+1/12 \cis
+\big(4 t\big) s_{1}^{2}-s_{2} s_{1}\big)+1/2 \cis\big(-2 t\big) s_{2} i-
+1/2 \cis\big(2 t\big) s_{1} i
+\end{math}\par
+ 
+\paragraph{Centre manifold ODEs} 
+\begin{math}
+\dot s_{1}=\varepsilon ^{2} \big(-16/15 s_{2} s_{1}^{2} i-1/5 s_{2} s_{1
+}^{2}+1/5 s_{1} \alpha  i+1/10 s_{1} \alpha \big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon ^{2} \big(16/15 s_{2}^{2} s_{1} i-1/5 s_{2}^{2} s
+_{1}-1/5 s_{2} \alpha  i+1/10 s_{2} \alpha \big)
+\end{math}
+
+
+
+
+
+
+\subsection{Detuned version of quasi-delayed}
+The following modified version of the previous shows that we can `detune' the linear operator and my `adjustment' of the linear operator seems to work.  
+Here the $1/2$ in $\mathcal L_{1,1}$ should be zero for these eigenvectors: my adjustment seems to fix it OK.
+But now, knowing the frequencies, my adjustment is different (and probably better).
+
+\begin{math}
+\dot u_{1}=\varepsilon ^{2} \big(-u_{3} \alpha -u_{1}^{3}\big)+
+\varepsilon  \big(-1/5 u_{3}+1/5 u_{2}-2 u_{1}^{2}+2/5 u_{1}\big)-19/5 u
+_{3}-1/5 u_{2}+1/10 u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=-2 u_{2}+2 u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=-2 u_{3}+2 u_{2}
+\end{math}
+
+\begin{reduce}
+if thecase=quasidelayoscmod then begin
+ff_:=tp mat((
+    u1/2-4*u3-small*alpha*u3-2*u1^2-small*u1^3,
+    2*u1-2*u2,
+    2*u2-2*u3
+    ));
+freqm_:=mat((2,-2));
+ee_:=tp mat((1,1/2-i/2,-i/2),(1,1/2+i/2,+i/2));
+zz_:=tp mat((1,-i,-1-i),(1,+i,-1+i));
+toosmall:=3;
+end;
+\end{reduce}
+
+
+
+\paragraph{The centre manifold}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+u_{1}=\varepsilon  \big(-1840/3121 \cis\big(-4 t\big) s_{2}^{2} i+860/
+9363 \cis\big(-4 t\big) s_{2}^{2}+237/3842 \cis\big(-2 t\big) s_{2} i+87
+/1921 \cis\big(-2 t\big) s_{2}+1840/3121 \cis\big(4 t\big) s_{1}^{2} i+
+860/9363 \cis\big(4 t\big) s_{1}^{2}-237/3842 \cis\big(2 t\big) s_{1} i+
+87/1921 \cis\big(2 t\big) s_{1}-40/39 s_{2} s_{1}\big)+\cis\big(-2 t
+\big) s_{2}+\cis\big(2 t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon  \big(-760/9363 \cis\big(-4 t\big) s_{2}^{2} i+2380/
+9363 \cis\big(-4 t\big) s_{2}^{2}+21/7684 \cis\big(-2 t\big) s_{2} i+137
+/7684 \cis\big(-2 t\big) s_{2}+760/9363 \cis\big(4 t\big) s_{1}^{2} i+
+2380/9363 \cis\big(4 t\big) s_{1}^{2}-21/7684 \cis\big(2 t\big) s_{1} i+
+137/7684 \cis\big(2 t\big) s_{1}-40/39 s_{2} s_{1}\big)+1/2 \cis\big(-2 
+t\big) s_{2} i+1/2 \cis\big(-2 t\big) s_{2}-1/2 \cis\big(2 t\big) s_{1} 
+i+1/2 \cis\big(2 t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{3}=\varepsilon  \big(800/9363 \cis\big(-4 t\big) s_{2}^{2} i+260/3121
+ \cis\big(-4 t\big) s_{2}^{2}-4/1921 \cis\big(-2 t\big) s_{2} i+353/7684
+ \cis\big(-2 t\big) s_{2}-800/9363 \cis\big(4 t\big) s_{1}^{2} i+260/
+3121 \cis\big(4 t\big) s_{1}^{2}+4/1921 \cis\big(2 t\big) s_{1} i+353/
+7684 \cis\big(2 t\big) s_{1}-40/39 s_{2} s_{1}\big)+1/2 \cis\big(-2 t
+\big) s_{2} i-1/2 \cis\big(2 t\big) s_{1} i
+\end{math}\par
+
+
+\paragraph{Centre manifold ODEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot s_{1}=\varepsilon ^{2} \big(-259684400/233822199 s_{2} s_{1}^{2} i-
+1154340/5995441 s_{2} s_{1}^{2}+390/1921 s_{1} \alpha  i+200/1921 s_{1} 
+\alpha -90446425/7088952961 s_{1} i-1300360/7088952961 s_{1}\big)+
+\varepsilon  \big(-200/1921 s_{1} i+390/1921 s_{1}\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon ^{2} \big(259684400/233822199 s_{2}^{2} s_{1} i-
+1154340/5995441 s_{2}^{2} s_{1}-390/1921 s_{2} \alpha  i+200/1921 s_{2} 
+\alpha +90446425/7088952961 s_{2} i-1300360/7088952961 s_{2}\big)+
+\varepsilon  \big(200/1921 s_{2} i+390/1921 s_{2}\big)
+\end{math}
+
+Observe the terms linear in~\(\varepsilon\) due to my fudging of the linear dynamics.
+
+
+
+
+\subsection{Rossler-like system}
+Has Hopf bifurcation as parameter crosses zero to oscillations of base frequency one.
+ 
+ \begin{math}
+\dot u_{1}=-u_{3}-u_{2}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=\varepsilon  u_{2} a+u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=\varepsilon  \big(u_{3} u_{1}-1/5 u_{2} u_{1}\big)-5 u_{3}
+\end{math}
+
+\begin{reduce}
+if thecase=rosslerlike then begin
+ff_:=tp mat((
+    -u2-u3,
+    u1+small*a*u2,
+    -5*u3-u1*u2/5+u1*u3
+    ));
+freqm_:=mat((1,-1));
+ee_:=tp mat((1,-i,0),(1,i,0));
+zz_:=tp mat((-5+i,1+5*i,1),(-5-i,1-5*i,1));
+end;
+\end{reduce}
+
+\paragraph{The centre manifold} 
+
+\begin{math}
+u_{1}=\varepsilon  \big(-4/435 \cis\big(-2 t\big) s_{2}^{2} i-2/87 \cis
+\big(-2 t\big) s_{2}^{2}-1/4 \cis\big(-t\big) s_{2} a i+4/435 \cis\big(2
+ t\big) s_{1}^{2} i-2/87 \cis\big(2 t\big) s_{1}^{2}+1/4 \cis\big(t\big)
+ s_{1} a i\big)+\cis\big(-t\big) s_{2}+\cis\big(t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon  \big(-1/87 \cis\big(-2 t\big) s_{2}^{2} i+2/435 \cis
+\big(-2 t\big) s_{2}^{2}-1/4 \cis\big(-t\big) s_{2} a+1/87 \cis\big(2 t
+\big) s_{1}^{2} i+2/435 \cis\big(2 t\big) s_{1}^{2}-1/4 \cis\big(t\big) 
+s_{1} a\big)+\cis\big(-t\big) s_{2} i-\cis\big(t\big) s_{1} i
+\end{math}\par
+
+\begin{math}
+u_{3}=\varepsilon  \big(-1/29 \cis\big(-2 t\big) s_{2}^{2} i+2/145 \cis
+\big(-2 t\big) s_{2}^{2}+1/29 \cis\big(2 t\big) s_{1}^{2} i+2/145 \cis
+\big(2 t\big) s_{1}^{2}\big)
+\end{math}\par
+ 
+\paragraph{Centre manifold ODEs} 
+
+\begin{math}
+\dot s_{1}=\varepsilon ^{2} \big(-92/28275 s_{2} s_{1}^{2} i-4/1885 s_{2
+} s_{1}^{2}-1/8 s_{1} a^{2} i\big)+1/2 \varepsilon  s_{1} a
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon ^{2} \big(92/28275 s_{2}^{2} s_{1} i-4/1885 s_{2}
+^{2} s_{1}+1/8 s_{2} a^{2} i\big)+1/2 \varepsilon  s_{2} a
+\end{math}
+
+
+
+
+
+
+\subsection{Fudge a couple of these oscillations together}
+Use say different base frequencies of one and two.
+Put in a couple of coupling terms.
+It seems to work fine, although the computation time zooms up even for the basic third order errors.
+
+\begin{math}
+\dot u_{1}=\varepsilon  u_{4}^{2}-u_{3}-u_{2}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=\varepsilon  u_{2} a+u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=\varepsilon  \big(u_{3} u_{1}-1/5 u_{2} u_{1}\big)-5 u_{3}
+\end{math}\par
+
+\begin{math}
+\dot u_{4}=\varepsilon  \big(u_{6} u_{5}+u_{4} \epsilon \big)-2 u_{6}-2 
+u_{5}
+\end{math}\par
+
+\begin{math}
+\dot u_{5}=\varepsilon  u_{1}^{2}-2 u_{6}-3 u_{5}+u_{4}
+\end{math}\par
+
+\begin{math}
+\dot u_{6}=2 u_{6}+3 u_{5}+u_{4}
+\end{math}
+
+\begin{reduce}
+if thecase=doubleosc then begin
+ff_:=tp mat((
+  -u2-u3+u4^2,
+  u1+a*u2,
+  -5*u3-u1*u2/5+u1*u3,
+  -2*u5-2*u6+small*epsilon*u4+u5*u6,
+  u4-3*u5-2*u6+u1^2,
+  u4+3*u5+2*u6
+  ));
+freqm_:=mat((1,-1,2,-2));
+ee_:=tp mat((1,-i,0,0,0,0),(1,i,0,0,0,0)
+  ,(0,0,0,1,1,-1-i),(0,0,0,1,1,-1+i));
+zz_:=tp mat((-5+i,1+5*i,1,0,0,0),(-5-i,1-5*i,1,0,0,0)
+  ,(0,0,0,1,-i,-i),(0,0,0,1,+i,+i));
+end;
+\end{reduce}
+
+\paragraph{The centre manifold} 
+
+\begin{math}
+u_{1}=\varepsilon  \big(4/15 \cis\big(-4 t\big) s_{4}^{2} i-4/435 \cis
+\big(-2 t\big) s_{2}^{2} i-2/87 \cis\big(-2 t\big) s_{2}^{2}-1/4 \cis
+\big(-t\big) s_{2} a i-4/15 \cis\big(4 t\big) s_{3}^{2} i+4/435 \cis
+\big(2 t\big) s_{1}^{2} i-2/87 \cis\big(2 t\big) s_{1}^{2}+1/4 \cis\big(
+t\big) s_{1} a i\big)+\cis\big(-t\big) s_{2}+\cis\big(t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon  \big(-1/15 \cis\big(-4 t\big) s_{4}^{2}-1/87 \cis
+\big(-2 t\big) s_{2}^{2} i+2/435 \cis\big(-2 t\big) s_{2}^{2}-1/4 \cis
+\big(-t\big) s_{2} a-1/15 \cis\big(4 t\big) s_{3}^{2}+1/87 \cis\big(2 t
+\big) s_{1}^{2} i+2/435 \cis\big(2 t\big) s_{1}^{2}-1/4 \cis\big(t\big) 
+s_{1} a+2 s_{4} s_{3}\big)+\cis\big(-t\big) s_{2} i-\cis\big(t\big) s_{1
+} i
+\end{math}\par
+
+\begin{math}
+u_{3}=\varepsilon  \big(-1/29 \cis\big(-2 t\big) s_{2}^{2} i+2/145 \cis
+\big(-2 t\big) s_{2}^{2}+1/29 \cis\big(2 t\big) s_{1}^{2} i+2/145 \cis
+\big(2 t\big) s_{1}^{2}\big)
+\end{math}\par
+
+\begin{math}
+u_{4}=\varepsilon  \big(-1/3 \cis\big(-4 t\big) s_{4}^{2} i-1/3 \cis
+\big(-4 t\big) s_{4}^{2}+1/8 \cis\big(-2 t\big) s_{4} \epsilon  i-1/8 
+\cis\big(-2 t\big) s_{2}^{2}+1/3 \cis\big(4 t\big) s_{3}^{2} i-1/3 \cis
+\big(4 t\big) s_{3}^{2}-1/8 \cis\big(2 t\big) s_{3} \epsilon  i-1/8 \cis
+\big(2 t\big) s_{1}^{2}-s_{2} s_{1}\big)+\cis\big(-2 t\big) s_{4}+\cis
+\big(2 t\big) s_{3}
+\end{math}\par
+
+\begin{math}
+u_{5}=\varepsilon  \big(-8/51 \cis\big(-4 t\big) s_{4}^{2} i-2/51 \cis
+\big(-4 t\big) s_{4}^{2}-11/40 \cis\big(-2 t\big) s_{4} \epsilon  i-1/5 
+\cis\big(-2 t\big) s_{4} \epsilon +2/5 \cis\big(-2 t\big) s_{2}^{2} i+3/
+40 \cis\big(-2 t\big) s_{2}^{2}+8/51 \cis\big(4 t\big) s_{3}^{2} i-2/51 
+\cis\big(4 t\big) s_{3}^{2}+11/40 \cis\big(2 t\big) s_{3} \epsilon  i-1/
+5 \cis\big(2 t\big) s_{3} \epsilon -2/5 \cis\big(2 t\big) s_{1}^{2} i+3/
+40 \cis\big(2 t\big) s_{1}^{2}+2 s_{4} s_{3}+s_{2} s_{1}\big)+\cis\big(-
+2 t\big) s_{4}+\cis\big(2 t\big) s_{3}
+\end{math}\par
+
+\begin{math}
+u_{6}=\varepsilon  \big(-1/102 \cis\big(-4 t\big) s_{4}^{2} i+7/34 \cis
+\big(-4 t\big) s_{4}^{2}+11/40 \cis\big(-2 t\big) s_{4} \epsilon  i+13/
+40 \cis\big(-2 t\big) s_{4} \epsilon -11/40 \cis\big(-2 t\big) s_{2}^{2}
+ i-3/40 \cis\big(-2 t\big) s_{2}^{2}+1/102 \cis\big(4 t\big) s_{3}^{2} i
++7/34 \cis\big(4 t\big) s_{3}^{2}-11/40 \cis\big(2 t\big) s_{3} 
+\epsilon  i+13/40 \cis\big(2 t\big) s_{3} \epsilon +11/40 \cis\big(2 t
+\big) s_{1}^{2} i-3/40 \cis\big(2 t\big) s_{1}^{2}-3 s_{4} s_{3}-s_{2} s
+_{1}\big)+\cis\big(-2 t\big) s_{4} i-\cis\big(-2 t\big) s_{4}-\cis\big(2
+ t\big) s_{3} i-\cis\big(2 t\big) s_{3}
+\end{math}\par
+ 
+\paragraph{Centre manifold ODEs} 
+
+\begin{math}
+\dot s_{1}=\varepsilon ^{2} \big(-1/130 s_{4} s_{3} s_{1} i+1/26 s_{4} s
+_{3} s_{1}-92/28275 s_{2} s_{1}^{2} i-4/1885 s_{2} s_{1}^{2}-1/8 s_{1} a
+^{2} i\big)+1/2 \varepsilon  s_{1} a
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon ^{2} \big(1/130 s_{4} s_{3} s_{2} i+1/26 s_{4} s_
+{3} s_{2}+92/28275 s_{2}^{2} s_{1} i-4/1885 s_{2}^{2} s_{1}+1/8 s_{2} a
+^{2} i\big)+1/2 \varepsilon  s_{2} a
+\end{math}\par
+
+\begin{math}
+\dot s_{3}=\varepsilon ^{2} \big(-223/204 s_{4} s_{3}^{2} i-167/68 s_{4}
+ s_{3}^{2}-1/2 s_{3} s_{2} s_{1} i-s_{3} s_{2} s_{1}-1/16 s_{3} 
+\epsilon ^{2} i-1/4 s_{1}^{2} a-1/16 s_{1}^{2} \epsilon \big)+
+\varepsilon  \big(1/2 s_{3} \epsilon +1/2 s_{1}^{2} i\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{4}=\varepsilon ^{2} \big(223/204 s_{4}^{2} s_{3} i-167/68 s_{4}
+^{2} s_{3}+1/2 s_{4} s_{2} s_{1} i-s_{4} s_{2} s_{1}+1/16 s_{4} 
+\epsilon ^{2} i-1/4 s_{2}^{2} a-1/16 s_{2}^{2} \epsilon \big)+
+\varepsilon  \big(1/2 s_{4} \epsilon -1/2 s_{2}^{2} i\big)
+\end{math}
+
+
+
+
+
+
+\subsection{Fudge an oscillatory mode}
+With frequency two, with a system with one slow mode.
+Couple them with something ad hoc.
+
+\begin{math}
+\dot u_{1}=\varepsilon  \big(u_{4} u_{1}+u_{2} u_{1}\big)-2 u_{3}-2 u_{2
+}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=-2 u_{3}-3 u_{2}+u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{3}=2 u_{3}+3 u_{2}+u_{1}
+\end{math}\par
+
+\begin{math}
+\dot u_{4}=\varepsilon  \big(-u_{4}^{2}-u_{2} u_{1}\big)+u_{5}-u_{4}
+\end{math}\par
+
+\begin{math}
+\dot u_{5}=\varepsilon  u_{5}^{2}-u_{5}+u_{4}
+\end{math}
+
+\begin{reduce}
+if thecase=oscmeanflow then begin
+ff_:=tp mat((
+    -2*u2-2*u3+u4*u1+u1*u2,
+    u1-3*u2-2*u3,
+    u1+3*u2+2*u3,
+    -u4+u5-u4^2-u1*u2,
+    +u4-u5+u5^2
+    ));
+freqm_:=mat((2,-2,0));
+ee_:=tp mat((1,1,-1-i,0,0),(1,1,-1+i,0,0)
+  ,(0,0,0,1,1));
+zz_:=tp mat((1,-i,-i,0,0),(1,+i,+i,0,0)
+  ,(0,0,0,1,1));
+end;
+\end{reduce}
+
+\paragraph{The centre manifold} 
+
+\begin{math}
+u_{1}=\varepsilon  \big(1/3 \cis\big(-4 t\big) s_{2}^{2} i+1/8 \cis\big(
+-2 t\big) s_{3} s_{2} i-1/3 \cis\big(4 t\big) s_{1}^{2} i-1/8 \cis\big(2
+ t\big) s_{3} s_{1} i\big)+\cis\big(-2 t\big) s_{2}+\cis\big(2 t\big) s_
+{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=\varepsilon  \big(5/51 \cis\big(-4 t\big) s_{2}^{2} i-1/17 \cis
+\big(-4 t\big) s_{2}^{2}-11/40 \cis\big(-2 t\big) s_{3} s_{2} i-1/5 \cis
+\big(-2 t\big) s_{3} s_{2}-5/51 \cis\big(4 t\big) s_{1}^{2} i-1/17 \cis
+\big(4 t\big) s_{1}^{2}+11/40 \cis\big(2 t\big) s_{3} s_{1} i-1/5 \cis
+\big(2 t\big) s_{3} s_{1}-2 s_{2} s_{1}\big)+\cis\big(-2 t\big) s_{2}+
+\cis\big(2 t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{3}=\varepsilon  \big(-5/51 \cis\big(-4 t\big) s_{2}^{2} i-11/102 \cis
+\big(-4 t\big) s_{2}^{2}+11/40 \cis\big(-2 t\big) s_{3} s_{2} i+13/40 
+\cis\big(-2 t\big) s_{3} s_{2}+5/51 \cis\big(4 t\big) s_{1}^{2} i-11/102
+ \cis\big(4 t\big) s_{1}^{2}-11/40 \cis\big(2 t\big) s_{3} s_{1} i+13/40
+ \cis\big(2 t\big) s_{3} s_{1}+3 s_{2} s_{1}\big)+\cis\big(-2 t\big) s_{
+2} i-\cis\big(-2 t\big) s_{2}-\cis\big(2 t\big) s_{1} i-\cis\big(2 t
+\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{4}=\varepsilon  \big(-9/40 \cis\big(-4 t\big) s_{2}^{2} i-1/20 \cis
+\big(-4 t\big) s_{2}^{2}+9/40 \cis\big(4 t\big) s_{1}^{2} i-1/20 \cis
+\big(4 t\big) s_{1}^{2}-1/2 s_{3}^{2}-1/2 s_{2} s_{1}\big)+s_{3}
+\end{math}\par
+
+\begin{math}
+u_{5}=\varepsilon  \big(-1/40 \cis\big(-4 t\big) s_{2}^{2} i+1/20 \cis
+\big(-4 t\big) s_{2}^{2}+1/40 \cis\big(4 t\big) s_{1}^{2} i+1/20 \cis
+\big(4 t\big) s_{1}^{2}+1/2 s_{3}^{2}+1/2 s_{2} s_{1}\big)+s_{3}
+\end{math}\par
+ 
+\paragraph{Centre manifold ODEs} 
+
+\begin{math}
+\dot s_{1}=\varepsilon ^{2} \big(-1/16 s_{3}^{2} s_{1} i-1/4 s_{3}^{2} s
+_{1}-421/4080 s_{2} s_{1}^{2} i-887/680 s_{2} s_{1}^{2}\big)+1/2 
+\varepsilon  s_{3} s_{1}
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon ^{2} \big(1/16 s_{3}^{2} s_{2} i-1/4 s_{3}^{2} s_
+{2}+421/4080 s_{2}^{2} s_{1} i-887/680 s_{2}^{2} s_{1}\big)+1/2 
+\varepsilon  s_{3} s_{2}
+\end{math}\par
+
+\begin{math}
+\dot s_{3}=\varepsilon ^{2} \big(s_{3}^{3}+6/5 s_{3} s_{2} s_{1}\big)-
+\varepsilon  s_{2} s_{1}
+\end{math}
+
+
+
+Used this system for a benchmark to compare several ways of handling matrices and vectors.
+This analysis using \verb|e_| as basis for matrices and vectors takes about a second or two in the following five iterations.
+\begin{verbatim}
+lengthres := 10
+Time: 20 ms
+lengthres := 124
+Time: 120 ms
+lengthres := 289
+Time: 420 ms
+lengthres := 169
+Time: 580 ms
+lengthres := 1
+Time: 420 ms
+SUCCESS: converged to an expansion
+\end{verbatim}
+
+
+
+
+
+
+\subsection{Modulate Duffing oscillation}
+
+Tests that this code generates complex amplitude model for purely oscillating dynamics.
+Here model the frequency correction in the Duffing oscillator \(\ddot u+u-u^3=0\).  
+Code for \(u_1=u\) and \(u_2=\dot u\).
+
+\begin{math}
+\dot u_{1}=u_{2}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=\varepsilon  u_{1}^{3}-u_{1}
+\end{math}
+
+\begin{reduce}
+if thecase=modulateduffing then begin
+ff_:=tp mat((u2,-u1+u1^3-small*2*u2));
+freqm_:=mat((1,-1));
+ee_:=tp mat((1,i),(1,-i));
+zz_:=tp mat((1,i),(1,-i));
+%maxiter_:=2; %%%%%%%%%%%%% for testing
+end;
+\end{reduce}
+
+Find the coordinate transform is 
+\begin{math}
+u_{1}=\varepsilon  \big(-1/8 \cis\big(-3 t\big) s_{2}^{3}+3/4 \cis\big(-
+t\big) s_{2}^{2} s_{1}-1/8 \cis\big(3 t\big) s_{1}^{3}+3/4 \cis\big(t
+\big) s_{2} s_{1}^{2}\big)+\cis\big(-t\big) s_{2}+\cis\big(t\big) s_{1}
+\end{math}
+where the amplitudes evolve according to
+\begin{math}
+\dot s_{1}=-51/16 \varepsilon ^{2} s_{2}^{2} s_{1}^{3} i-3/2 
+\varepsilon  s_{2} s_{1}^{2} i
+\end{math}
+and its complex conjugate.  This correctly predicts the frequency shift in the Duffing oscillator.
+
+
+
+
+
+
+\subsection{Modulate another oscillation}
+
+Retest that this code generates complex amplitude model for purely oscillating dynamics.
+Here model the frequency correction in the oscillator \(\ddot u+u+\dot u^3=0\).  
+Code for \(u_1=u\) and \(u_2=\dot u\).
+
+\begin{math}
+\dot u_{1}=u_{2}
+\end{math}\par
+
+\begin{math}
+\dot u_{2}=-\varepsilon  u_{2}^{3}-u_{1}
+\end{math}
+
+\begin{reduce}
+if thecase=modulateoscillator then begin
+ff_:=tp mat((u2,-u1-u2^3));
+freqm_:=mat((1,-1));
+ee_:=tp mat((1,i),(1,-i));
+zz_:=tp mat((1,i),(1,-i));
+end;
+\end{reduce}
+
+The coordinate transform \begin{math}
+u_{1}=\cis\big(-t\big) s_{2}+\cis\big(t
+\big) s_{1}
++\varepsilon  \big(1/8 \cis\big(-3 t\big) s_{2}^{3} i+3/4 \cis\big(
+-t\big) s_{2}^{2} s_{1} i-1/8 \cis\big(3 t\big) s_{1}^{3} i-3/4 \cis
+\big(t\big) s_{2} s_{1}^{2} i\big)
+\end{math}
+looks fine; although note that here higher orders do differ to other work due to the orthogonality I build in.
+The evolution seems appropriate:
+\begin{math}
+\dot s_{1}=-3/2 \varepsilon  s_{2} s_{1}^{2}
+-27/16 \varepsilon ^{2} s_{2}^{2} s_{1}^{3} i
+\end{math}
+
+
+
+
+
+\subsection{An example from Iulian Stoleriu}
+Consider the case \cite{Stoleriu2012} calls \((3\pi/4,k^2/2)\).
+Use Taylor expansions for trigonometric functions in the \ode{}s.
+Eigenvalues are $\pm 1$~and~$\pm i$, so we find the centre manifold among stable and unstable modes.
+Sometimes we can have a parameter (here~\(\sigma\)) in the linear operator, but may need to specify its real and imaginary parts.
+
+\begin{reduce}
+if thecase=StoleriuOne then begin
+let {repart(sigma)=>sigma,impart(sigma)=>0};
+ff_:=tp mat((
+    u2,
+    sigma*u3+u1^2/2-small*u1^4/24,
+    u4,
+    u1/sigma+u3*u1+(u3+1/sigma)*(-small*u1^3/6)
+    ));
+freqm_:=mat((1,-1));
+ee_:=tp mat((sigma,i*sigma,-1,-i),(sigma,-i*sigma,-1,+i));
+zz_:=tp mat((+i,-1,-i*sigma,sigma),(-i,-1,+i*sigma,sigma));
+end;
+\end{reduce}
+
+A centre manifold is \begin{math}
+x=u_{1}=\varepsilon  \big(-1/5 \cis\big(-2 t\big) s_{2}^{2} \sigma ^{2}-1/
+5 \cis\big(2 t\big) s_{1}^{2} \sigma ^{2}+2 s_{2} s_{1} \sigma ^{2}\big)
++\cis\big(-t\big) s_{2} \sigma +\cis\big(t\big) s_{1} \sigma 
+\end{math} and \begin{math}
+y=u_{3}=\varepsilon  \big(3/10 \cis\big(-2 t\big) s_{2}^{2} \sigma +3/10 
+\cis\big(2 t\big) s_{1}^{2} \sigma -s_{2} s_{1} \sigma \big)-\cis\big(-t
+\big) s_{2}-\cis\big(t\big) s_{1}
+\end{math}.
+On this centre manifold the oscillations have a frequency shift, but no amplitude evolution (to this order nor the next): \begin{math}
+\dot s_{1}=-6/5 \varepsilon ^{2} s_{2} s_{1}^{2} i \sigma ^{2}
+\end{math}.
+Remember the system is unstable due to the unstable mode.
+
+
+
+
+\subsection{An second example from Iulian Stoleriu}
+Consider the case \cite{Stoleriu2012} calls \((\pi/2,0)\).
+Use Taylor expansions for trigonometric functions in the \ode{}s.
+Eigenvalues are~$\pm i$, multiplicity two, so we find modulation equations for coupled oscillators.
+
+The system is
+\begin{itemize}
+\item \begin{math}
+\dot u_{1}=u_{2}
+\end{math}
+
+\item \begin{math}
+\dot u_{2}=-1/120 \varepsilon ^{2} u_{1}^{5}+1/6 \varepsilon  u_{1}^{3}+
+u_{3} \sigma -u_{1}
+\end{math}
+
+\item \begin{math}
+\dot u_{3}=u_{4}
+\end{math}
+
+\item \begin{math}
+\dot u_{4}=-1/24 \varepsilon ^{2} u_{3} u_{1}^{4}+1/2 \varepsilon  u_{3}
+ u_{1}^{2}-u_{3}
+\end{math}
+\end{itemize}
+
+
+\begin{reduce}
+if thecase=StoleriuTwo then begin
+ff_:=tp mat((
+    u2,
+    -u1+u1^3/6-small*u1^5/120+sigma*u3,
+    u4,
+    -u3+u3*(u1^2/2-small*u1^4/24)
+    ));
+freqm_:=mat((1,-1,1,-1));
+ee_:=tp mat((1,i,0,0),(1,-i,0,0),(0,0,1,i),(0,0,1,-i));
+zz_:=tp mat((1,i,0,0),(1,-i,0,0),(0,0,1,i),(0,0,1,-i));
+toosmall:=3;
+end;
+\end{reduce}
+
+This used to take five iterates to construct the coordinate transform and modulation equations, but now less as the off-diagonal term is made small by the linear adjustment.  
+The original variables are approximately
+\begin{itemize}
+\item \begin{math}
+x=u_{1}=1/4 \cis\big(-t\big) s_{4} \sigma +\cis\big(-t\big) s_{2}+1/4 \cis
+\big(t\big) s_{3} \sigma +\cis\big(t\big) s_{1}
+\end{math}
+\item  
+\begin{math}
+y=u_{3}=\cis\big(-t\big) s_{4}+\cis\big(t\big) s_{3}
+\end{math}
+\end{itemize}
+The modulation equations are the following, and their complex conjugates: 
+\begin{itemize}
+\item \begin{math}
+\dot s_{1}=\varepsilon  \big(-1/64 s_{4} s_{3}^{2} i \sigma ^{3}-3/32 s_
+{4} s_{3} s_{1} i \sigma ^{2}-1/8 s_{4} s_{1}^{2} i \sigma -5/64 s_{3}^{
+2} s_{2} i \sigma ^{2}-1/4 s_{3} s_{2} s_{1} i \sigma -1/4 s_{2} s_{1}^{
+2} i\big)-1/2 s_{3} i \sigma 
+\end{math};
+\item \begin{math}
+\dot s_{3}=\varepsilon  \big(-3/64 s_{4} s_{3}^{2} i \sigma ^{2}-1/4 s_{
+4} s_{3} s_{1} i \sigma -1/4 s_{4} s_{1}^{2} i-1/8 s_{3}^{2} s_{2} i 
+\sigma -1/2 s_{3} s_{2} s_{1} i\big)
+\end{math}.
+\end{itemize}
+Since every term is multiplied by~$i$ one expects there to be just frequency shifts, but there are oscillator interaction terms as well.
+These should be equivalent to the averaging method, but more easily extended to higher order (just change parameter \verb|toosmall|).
+
+
+
+
+
+
+
+\subsection{Periodic chronic myelogenous leukemia}
+
+\cite{Ion2012} explored Hopf bifurcations in a delay differential equation modelling leukaemia:%
+\footnote{Their parameter~$\beta_0$ is absorbed in a time scaling.}
+\begin{equation*}
+\dot x=-\frac {x(t)}{1+x(t)^n}-\delta x(t)+\frac{kx(t-r)}{1+x(t-r)^n}
+\end{equation*}
+For simplicity we fix upon parameters $n=2$\,, $\delta\approx 1/8$\,, $k=3/2$ and time delay $r=64/3$\,; that is,
+\begin{equation*}
+\dot x=-\frac {x(t)}{1+x(t)^2}-(\rat18+\delta')x(t)+\frac{\rat32x(t-r)}{1+x(t-r)^2}
+\end{equation*}
+Near these parameters the equilibrium $x=X=\sqrt3$ perhaps undergoes a Hopf bifurcation.
+`Perhaps' because instead of a precise time delay, we model~$x(t-r)$ via two intermediaries in the system, after defining $x(t)=X+u_1(t)$,
+\begin{eqnarray*}
+\dot u_1&=&-\frac {(X+u_1)}{1+(X+u_1)^2}-(\rat18+\delta')(X+u_1)+\frac{\rat32 (X+u_3)}{1+(X+u_3)^2}\,,
+\\\dot u_2&=&\frac3{32}(u_1-u_2),
+\\\dot u_3&=&\frac3{32}(u_2-u_3).
+\end{eqnarray*}
+This system does undergo a Hopf bifurcation as~$\delta'$ decreases through zero.
+My code only analyses multinomial forms, so Taylor expand the rational function:
+\begin{align*}
+\frac{X+u}{1+(X+u)^2}
+&=\frac{X}{1+X^2}
+ +\frac{1-X^2}{(1+X^2)^2}u
+ +\frac{X(X^2-3)}{(1+X^2)^3}u^2
+ +\frac{-1+6X^2-X^4}{(1+X^2)^4}u^3
+ +\cdots
+\\&=\frac{\sqrt3}{4}
+ -\frac{1}{8}u
+ +0u^2
+ +\frac{1}{32}u^3
+ +\cdots \quad\text{at }X=\sqrt3\,.
+\end{align*}
+
+
+\begin{reduce}
+if thecase=delayprolif then begin
+ff_:=tp mat((
+    -3/16*u3-u1^3/32-small*delta*(sqrt(3)+u1)+3/64*u3^3,
+    3/32*u1-3/32*u2,
+    3/32*u2-3/32*u3    
+    ));
+freqm_:=mat((3/32,-3/32));
+ee_:=tp mat((1,1/2-i/2,-i/2),(1,1/2+i/2,+i/2));
+zz_:=tp mat((1,-i,-1-i),(1,+i,-1+i));
+toosmall:=2;
+factor delta,s;
+end;
+\end{reduce}
+
+\paragraph{The specified dynamical system}
+\begin{math}
+\end{math}\par
+\begin{math}
+\dot u_{1}=\varepsilon  \big(-\sqrt {3} \delta +3/64 u_{
+3}^{3}-1/32 u_{1}^{3}-u_{1} \delta \big)-3/16 u_{3}
+\end{math}\par
+\begin{math}
+\dot u_{2}=-3/32 u_{2}+3/32 u_{1}
+\end{math}\par
+\begin{math}
+\dot u_{3}=-3/32 u_{3}+3/32 u_{2}
+\end{math}\par
+
+\paragraph{The centre manifold}
+\begin{math}
+\end{math}\par
+\begin{math}
+u_{1}=\cis\big(-3 t/32\big) s_{2}+\cis\big(3 t/32
+\big) s_{1}
+\end{math}\par
+\begin{math}
+u_{2}=1/2 \cis\big(-3 t/32\big) s_{2} i+1/2 \cis\big(-3 t
+/32\big) s_{2}-1/2 \cis\big(3 t/32\big) s_{1} i+1/2 \cis
+\big(3 t/32\big) s_{1}
+\end{math}\par
+\begin{math}
+u_{3}=1/2 \cis\big(-3 t/32\big) s_{2} i-1/2 \cis\big(3 t
+/32\big) s_{1} i
+\end{math}\par
+
+\paragraph{Centre manifold ODEs}
+\begin{math}
+\end{math}\par
+\begin{math}
+\dot s_{1}=\varepsilon  \big(3/256 s_{2} s_{1}^{2} i-21/512 s_{2} s_{1}
+^{2}+1/5 s_{1} \delta  i-2/5 s_{1} \delta \big)
+\end{math}\par
+\begin{math}
+\dot s_{2}=\varepsilon  \big(-3/256 s_{2}^{2} s_{1} i-21/512 s_{2}^{2} s
+_{1}-1/5 s_{2} \delta  i-2/5 s_{2} \delta \big)
+\end{math}\par
+
+These indicate that $\vec s=\vec 0$ is stable for $\delta'\geq0$\,.  For parameter $\delta'<0$ there is a stable limit cycle of amplitude $|s_j|=16\sqrt{\frac{-2\delta'}{105}}$.
+ 
+
+
+\subsubsection{Delayed version}
+
+Return to the original system linearised about \(x=\sqrt3\), the following finds the spectrum and identifies a Hopf bifurcation of frequency~\(3/16\).
+\begin{verbatim}
+% linearised about x=sqrt3, freq is 3/16
+delta=1/8, k=1+4*delta, r=8/3*pi
+ce=@(z) -z+1/8-delta-k/8*exp(-r*z)
+lams=fsolve(ce,randn(100,2)*[1;3*i]/2)
+plot(real(lams),imag(lams),'o')
+\end{verbatim}
+
+The following works only by careful use of smallness.
+
+\begin{reduce}
+if thecase=delayedprolif then begin
+r3:=sqrt(3);
+delta:=1/8; k:=1+4*delta; r:=8/3*pi;
+ff_:=tp mat((
+    -r3*(1/4-3/8/r3*u1+1/8*u1^2-3/32/r3*u1^3*small)
+    -u1*(1/4-3/8/r3*u1+1/8*u1^2*small)
+%    -(r3+u1)*(1/4-3/8/r3*u1+1/8*u1^2-3/32/r3*small^2*u1^3)
+    -delta*(r3+u1)
+    +k*r3*(1/4-3/8/r3*u1(r)+1/8*u1(r)^2-3/32/r3*u1(r)^3*small)
+    +k*u1(r)*(1/4-3/8/r3*u1(r)+1/8*u1(r)^2*small)
+%    +k*(r3+u1(r))*(1/4-3/8/r3*u1(r)+1/8*u1(r)^2-small^2*3/32/r3*u1(r)^3)
+    ));
+freqm_:=mat((3/16,-3/16));
+ee_:=tp mat((1),(1));
+zz_:=tp mat((1),(1));
+toosmall:=4;
+factor s;
+end;
+\end{reduce}
+
+\paragraph{The specified dynamical system}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot u_{1}=\varepsilon ^{2} \big(3/64 D_{t,\big(8 \pi \big)/3}\big(u_{1}
+\big)^{3}-1/32 u_{1}^{3}\big)-3/16 D_{t,\big(8 \pi \big)/3}\big(u_{1}
+\big)
+\end{math}
+
+\paragraph{The centre manifold}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+u_{1}=s_{2}^{3} \varepsilon ^{2} \big(-1/24 \cis\big(\big(-9 t\big)/16
+\big) i+1/16 \cis\big(\big(-9 t\big)/16\big)\big)+s_{2} \cis\big(\big(-3
+ t\big)/16\big)+s_{1}^{3} \varepsilon ^{2} \big(1/24 \cis\big(\big(9 t
+\big)/16\big) i+1/16 \cis\big(\big(9 t\big)/16\big)\big)+s_{1} \cis\big(
+\big(3 t\big)/16\big)
+\end{math}\par
+
+
+\paragraph{Centre manifold ODEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot s_{1}=s_{2} s_{1}^{2} \varepsilon ^{2} \big(3/16 i \pi -9/16 i-9/32
+ \pi -3/8\big)/\big(\pi ^{2}+4\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=s_{2}^{2} s_{1} \varepsilon ^{2} \big(-3/16 i \pi +9/16 i-9/
+32 \pi -3/8\big)/\big(\pi ^{2}+4\big)
+\end{math}
+
+
+\subsection{Nonlinear normal modes}
+
+\cite{Renson2012} explored finite element construction of the nonlinear normal modes of a pair of coupled oscillators. 
+Defining two new variables one of their example systems is
+\begin{eqnarray*}
+&&\dot x_1=x_3\,,
+\\&&\dot x_2=x_4\,,
+\\&&\dot x_3=-2x_1+x_2-\rat12x_1^3+\rat3{10}(-x_3+x_4)\,,
+\\&&\dot x_4=x_1-2x_2+\rat3{10}(x_3-2x_4)\,.
+\end{eqnarray*}
+In the following code, force the linear damping to be effectively small (which then makes it small squared); consequently scale the smallness of the cubic nonlinearity.
+
+\begin{reduce}
+if thecase=normalmodes then begin
+r3:=sqrt(3);
+ff_:=tp mat((
+    u3,
+    u4,
+    -2*u1+u2-small*u1^3/2+small*3/10*(-u3+u4),
+    u1-2*u2+small*3/10*(u3-2*u4)
+    ));
+freqm_:=mat((1,-1,r3,-r3));
+ee_:=tp mat((1,1,+i,+i),(1,1,-i,-i)
+          ,(1,-1,i*r3,-i*r3),(1,-1,-i*r3,i*r3));
+zz_:=tp mat((1,1,+i,+i),(1,1,-i,-i)
+          ,(-i*r3,+i*r3,1,-1),(+i*r3,-i*r3,1,-1));
+toosmall:=3;
+end;
+\end{reduce}
+
+The square root frequencies do not cause any trouble (although may need to reformat the LaTeX of the cis operator).
+In the model, observe that $s_1=s_2=0$ is invariant, as is $s_3=s_4=0$.  
+These are the nonlinear normal modes.
+
+\paragraph{The centre manifold}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+u_{1}=\cis\big(-\sqrt {3} t\big) s_{4}+\cis\big(-t\big) s_{2}+\cis\big(
+\sqrt {3} t\big) s_{3}+\cis\big(t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{2}=-\cis\big(-\sqrt {3} t\big) s_{4}+\cis\big(-t\big) s_{2}-\cis\big(
+\sqrt {3} t\big) s_{3}+\cis\big(t\big) s_{1}
+\end{math}\par
+
+\begin{math}
+u_{3}=-\sqrt {3} \cis\big(-\sqrt {3} t\big) s_{4} i-\cis\big(-t\big) s_{
+2} i+\sqrt {3} \cis\big(\sqrt {3} t\big) s_{3} i+\cis\big(t\big) s_{1} i
+\end{math}\par
+
+\begin{math}
+u_{4}=\sqrt {3} \cis\big(-\sqrt {3} t\big) s_{4} i-\cis\big(-t\big) s_{2
+} i-\sqrt {3} \cis\big(\sqrt {3} t\big) s_{3} i+\cis\big(t\big) s_{1} i
+\end{math}\par
+
+\paragraph{Centre manifold ODEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot s_{1}=\varepsilon  \big(3/4 s_{4} s_{3} s_{1} i+3/8 s_{2} s_{1}^{2}
+ i-3/40 s_{1}\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{2}=\varepsilon  \big(-3/4 s_{4} s_{3} s_{2} i-3/8 s_{2}^{2} s_{1
+} i-3/40 s_{2}\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{3}=\varepsilon  \big(1/8 \sqrt {3} s_{4} s_{3}^{2} i+1/4 \sqrt {
+3} s_{3} s_{2} s_{1} i-3/8 s_{3}\big)
+\end{math}\par
+
+\begin{math}
+\dot s_{4}=\varepsilon  \big(-1/8 \sqrt {3} s_{4}^{2} s_{3} i-1/4 
+\sqrt {3} s_{4} s_{2} s_{1} i-3/8 s_{4}\big)
+\end{math}\par
+
+
+
+
+
+
+
+\subsection{Periodically forced van der Pol oscillator}
+
+Hinvi et al. (2013) used renormalisation group to explore periodically forced van der Pol oscillator
+\begin{equation*}
+\ddot x+x-\epsilon(1-ax^2-b\dot x^2)\dot x=\epsilon c\sin \Omega t\,.
+\end{equation*}
+Introducing \(u_1=x\), rewrite as the system
+\begin{eqnarray*}
+&&\dot u_1=u_2\,,
+\\&&\dot u_2=-u_1+\epsilon(1-au_1^2-bu_2^2)u_2+\epsilon cu_3\,,
+\\&&\dot u_3=\Omega u_4\,,
+\\&&\dot u_4=-\Omega u_3\,.
+\end{eqnarray*}
+This system has eigenvalues~\(\pm i\) and~\(\pm i\Omega\) so we seek the modulation equations of the oscillations.
+
+Only the directly resonant case appears to be interesting, so set \(\Omega=1\), and then perturb it in the equations.
+
+\begin{reduce}
+if thecase=forcedvdp then begin
+om:=1;
+ff_:=tp mat((
+    +u2,
+    -u1+small*(1-a*u1^2-b*u2^2)*u2+small*c*u3,
+    +om*u4*(1+small*omega),
+    -om*u3*(1+small*omega)
+    ));
+freqm_:=mat((1,-1,om,-om));
+ee_:=tp mat((1,+i,0,0),(1,-i,0,0)
+          ,(0,0,1,+i),(0,0,1,-i));
+zz_:=tp mat((1,+i,0,0),(1,-i,0,0)
+          ,(0,0,1,+i),(0,0,1,-i));
+toosmall:=4;
+end;
+\end{reduce}
+
+
+
+
+\subsection{Slow manifold of Lorenz 1986 model}
+In this case we actually construct the slow sub-centre manifold, analogous to quasi-geostrophy, in order to disentangle the slow dynamics from fast oscillations, analogous to gravity waves.
+The algorithm still works.
+The normals to the isochrons determine `balancing' onto the slow manifold.
+
+\begin{reduce}
+if thecase=lorenz86slow then begin
+factor b;
+ff_:=tp mat((-u2*u3+b*u2*u5
+    ,u1*u3-b*u1*u5
+    ,-u1*u2
+    ,-u5
+    ,+u4+b*u1*u2));
+freqm_:=mat((0,0,0));
+ee_:=zz_:=tp mat((1,0,0,0,0),(0,1,0,0,0),(0,0,1,0,0));
+toosmall:=4;
+end;
+\end{reduce}
+
+\paragraph{The centre manifold}
+These give the location of the centre manifold in
+terms of parameters~\(s\sb j\).
+\(
+\)\par
+
+\(u_{1}=s_{1}
+\)\par
+
+\(u_{2}=s_{2}
+\)\par
+
+\(u_{3}=s_{3}
+\)\par
+
+\(u_{4}=-b \eps s_{2} s_{1}
+\)\par
+
+\(u_{5}=b \eps^{2} \big(-s_{3} s_{2}^{2}+s_{3} s_{1}^{2}\big)
+\)\par
+
+\(
+\)
+\paragraph{Centre manifold ODEs}
+The system evolves on the centre manifold such
+that the parameters evolve according to these ODEs.
+\(
+\)\par
+
+\(\dot s_{1}=b^{2} \eps^{3} \big(-s_{3} s_{2}^{3}+s_{3} s_{2} s_{1}^{2}
+\big)-\eps s_{3} s_{2}
+\)\par
+
+\(\dot s_{2}=b^{2} \eps^{3} \big(s_{3} s_{2}^{2} s_{1}-s_{3} s_{1}^{3}
+\big)+\eps s_{3} s_{1}
+\)\par
+
+\(\dot s_{3}=-\eps s_{2} s_{1}
+\)\par
+
+\(
+\)
+\paragraph{Normals to isochrons at the slow manifold}
+The normal vector \(\vec z\sb j:=(z\sb{j1},\ldots,z\sb{jn}\
+)\)
+\(
+\)\par
+
+\(z_{11}=b^{2} \eps^{2} s_{2}^{2}+1
+\)\par
+
+\(z_{12}=b^{2} \eps^{2} s_{2} s_{1}
+\)\par
+
+\(z_{13}=0
+\)\par
+
+\(z_{14}=b^{3} \eps^{3} \big(s_{2}^{3}-s_{2} s_{1}^{2}\big)+b \eps^{3} 
+\big(-s_{2}^{3}+s_{2} s_{1}^{2}\big)+b \eps s_{2}
+\)\par
+
+\(z_{15}=0
+\)\par
+
+\(z_{21}=-b^{2} \eps^{2} s_{2} s_{1}
+\)\par
+
+\(z_{22}=-b^{2} \eps^{2} s_{1}^{2}+1
+\)\par
+
+\(z_{23}=0
+\)\par
+
+\(z_{24}=b^{3} \eps^{3} \big(-s_{2}^{2} s_{1}+s_{1}^{3}\big)+b \eps^{3} 
+\big(s_{2}^{2} s_{1}-s_{1}^{3}\big)-b \eps s_{1}
+\)\par
+
+\(z_{25}=0
+\)\par
+
+\(z_{31}=0
+\)\par
+
+\(z_{32}=0
+\)\par
+
+\(z_{33}=1
+\)\par
+
+\(z_{34}=-4 b \eps^{3} s_{3} s_{2} s_{1}
+\)\par
+
+\(z_{35}=b \eps^{2} \big(-s_{2}^{2}+s_{1}^{2}\big)
+\)\par
+
+ 
+
+
+\subsection{Check the dimensionality of specified system}
+Extract dimension information from the specification of the dynamical system: seek $m$D~centre manifold of an $n$D~system.
+
+\begin{reduce}
+if thecase=myweb then begin
+  out "cmsyso.txt"$
+  ODE_function:=ff_; 
+  centre_frequencies:=freqm_;
+  centre_eigenvectors:=ee_; 
+  adjoint_eigenvectors:=zz_;
+end;
+\end{reduce}
+
+\begin{reduce}
+write "total no. of modes  ",
+n:=part(length(ee_),1);
+write "no. of centre modes ",
+m:=part(length(ee_),2);
+if {length(freqm_),length(zz_),length(ee_),length(ff_)}
+  ={{1,m},{n,m},{n,m},{n,1}} 
+  then write "Input dimensions are OK" 
+  else <<write "INCONSISTENT INPUT DIMENSIONS, I QUIT"; 
+      quit>>;
+\end{reduce}
+
+For the moment limit to a maximum of nine components.
+\begin{reduce}
+if n>9 then <<write "SORRY, TOO MANY ODEs FOR ME, I QUIT"; 
+    quit>>;
+\end{reduce}
+
+Need an \(m\times m\)~identity matrix for normalisation of the isochron projection.
+\begin{reduce}
+eyem_:=for j:=1:m sum e_(j,j)$
+\end{reduce}
+
+
+\section{Dissect the linear part}
+
+Define complex exponential $\verb|cis|(u)=e^{iu}$.
+Do not (yet) invoke the simplification of $\verb|cis|(0)$ as I want it to label modes of no oscillation, zero frequency.
+
+\begin{reduce}
+operator cis;
+let { df(cis(~u),t) => i*df(u,t)*cis(u)
+    , cis(~u)*cis(~v) => cis(u+v)
+    , cis(~u)^~p => cis(p*u)
+    };
+\end{reduce}
+
+Need function~\verb|conj_| to do parsimonious complex conjugation.
+\begin{reduce}
+operator cis__;
+procedure conj_(a)$    
+    ((a where {i=>i__, cis(~b)=>cis__(b) })
+        where {i__=>-i,cis__(~b)=>cis(-b)})$
+\end{reduce}
+
+Make another array of frequencies for simplicity.
+
+\begin{reduce}
+array freq(m);
+for j:=1:m do freq(j):=freqm_(1,j);
+\end{reduce}
+
+
+
+\subsection{Normalise the adjoint eigenvectors}
+When we include delay differential equations, then we need to account for the history of the eigenvector as well.
+Hence multiply each eigenvector by its oscillating factor,~\(e^{i\omega t}\), and then take the mean.
+This multiplication by its oscillating factor should not make any difference for non-delay equations by the natural orthogonality of left and right eigenvectors of different eigenvalues.
+Reduce implements \verb|conj| via \verb|repart| and \verb|impart|, so let \verb|repart| do the conjugation of the cis factors.
+
+Note: the `left eigenvectors' have to be the eigenvectors of the complex conjugate transpose, and for the complex conjugate frequency.
+This seems best: for example, when the linear operator is \(\begin{bmatrix} 0&1\\-1&0 \end{bmatrix}\) then the adjoint and the right eigenvectors are the same.
+
+For un/stable manifolds we have to cope with complex frequencies.  
+Seems to need \verb|zz_| to have complex conjugated frequency so store in~\verb|ccis_|---which is the same as \verb|dcis_| for real frequencies.
+
+\begin{reduce}
+matrix aa_(m,m),dcis_(m,m),ccis_(m,m);
+for j:=1:m do dcis_(j,j):=cis(freq(j)*t);
+for j:=1:m do ccis_(j,j):=cis(conj_(freq(j))*t);
+aa_:=(tp map(conj_(~b),ee_*dcis_)*zz_*ccis_ )$
+write "Normalising the left-eigenvectors:";
+aa_:=(aa_ where {cis(0)=>1, cis(~a)=>0 when a neq 0})$
+if det(aa_)=0 then << write
+    "ORTHOGONALITY ERROR IN EIGENVECTORS; I QUIT"; quit>>;
+zz_:=zz_*aa_^(-1);
+\end{reduce}
+
+
+\subsection{Operator to represent delays}
+
+Introduce an operator to represent delay factors more conveniently for analysis.
+
+\begin{reduce}
+operator d_; linear d_;
+let { d_(~a^~p,t,~dt)=>d_(a,t,dt)^p
+    , d_(~a*~b,t,~dt)=>d_(a,t,dt)*d_(b,t,dt)
+    , d_(cis(~a),t,~dt)=>cis(a)
+        *sub(t=-dt,cos(a)+i*sin(a))
+    , df(d_(~a,t,~dt),~b)=>d_(df(a,b),t,dt)
+    , d_(~a,t,0)=>a
+    , d_(d_(~a,t,~dta),t,~dtb)=>d_(a,t,dta+dtb)
+    };
+\end{reduce}
+
+Now rewrite the (delay) factors in terms of this operator.
+Need to say that the symbol~\verb|u| depends upon time; later we write things into~\verb|u| and this dependence would be forgotten.
+For the moment limit to a maximum of nine \ode{}s.
+
+\begin{reduce}
+somerules:={}$
+depend u1,t;somerules:=(u1(~dt)=d_(u1,t,dt)).somerules$
+depend u2,t;somerules:=(u2(~dt)=d_(u2,t,dt)).somerules$
+depend u3,t;somerules:=(u3(~dt)=d_(u3,t,dt)).somerules$
+depend u4,t;somerules:=(u4(~dt)=d_(u4,t,dt)).somerules$
+depend u5,t;somerules:=(u5(~dt)=d_(u5,t,dt)).somerules$
+depend u6,t;somerules:=(u6(~dt)=d_(u6,t,dt)).somerules$
+depend u7,t;somerules:=(u7(~dt)=d_(u7,t,dt)).somerules$
+depend u8,t;somerules:=(u8(~dt)=d_(u8,t,dt)).somerules$
+depend u9,t;somerules:=(u9(~dt)=d_(u9,t,dt)).somerules$
+ff_:=(ff_ where somerules)$
+\end{reduce}
+
+\subsection{Linearise at the origin}
+Assume the equilibrium is at the origin.
+Find the linear operator at the equilibrium.
+Include \verb|small=0| as we notionally adjoin it in the list of variables.
+Do not need to here make small any non-zero forcing at the equilibrium as it gets multiplied by \verb|small| later??
+For some reason using \verb|mkid(u,k)=>0| does not resolve the mkid, but \verb|mkid(u,k)=0| does; however, not clear if it is a problem??
+
+\begin{reduce}
+matrix ll_(n,n);
+uzero:=(for k:=1:n collect (mkid(u,k)=0))$
+equilibrium:=(small=0).uzero$
+for j:=1:n do for k:=1:n do begin 
+  ll_(j,k):=df(ff_(j,1),mkid(u,k));
+  ll_(j,k):=sub(equilibrium,ll_(j,k));
+end;
+write "Find the linear operator is";
+ll_:=ll_;
+\end{reduce}
+
+We need a vector of unknowns for a little while.
+Should call this plain u??
+
+\begin{reduce}
+matrix uvec(n,1);
+for j:=1:n do uvec(j,1):=mkid(u,j);
+\end{reduce}
+
+
+\subsection{Eigen-check}
+
+%Force slow variable dynamics to be small.  
+%Should not be necessary for Jordan form linear operator, but I do not think we can risk it in general.
+Variable \verb|aa_| appears here as the diagonal matrix of frequencies.
+Check that the frequencies and eigenvectors are specified correctly.
+
+\begin{reduce}
+write "Check centre subspace linearisation ";
+for j:=1:m do for k:=1:m do aa_(j,k):=0;
+for j:=1:m do aa_(j,j):=i*freq(j);
+reslin:=(ll_*(ee_*dcis_)-(ee_*dcis_)*aa_
+    where cis(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(a)+i*sin(a))*cis(a) )$ 
+ok_:=1$
+for j:=1:n do for k:=1:m do 
+    ok_:=if reslin(j,k)=0 then ok_ else 0$
+if ok_ then write "Linearisation is OK";
+\end{reduce}
+
+Try to find a correction of the linear operator that is `close'.
+Multiply by the adjoint eigenvectors and then average over time: operator \(\cL_{\text{new}}:=\cL-\cL_{\text{adj}}\) should now have zero residual.
+Lastly, correspondingly adjust the \ode{}s, since \verb|lladj| does not involve delays we do not need delay operator transforms in the product.
+
+\begin{reduce}
+if not ok_ then begin
+write "WARNING: I NEED TO ADJUST LINEAR OPERATOR";
+lladj:=reslin*tp map(conj_(~b),zz_*ccis_);
+write
+lladj:=(lladj where {cis(0)=>1, cis(~a)=>0 when a neq 0});
+write
+ll_:=ll_-lladj;
+reslin:=(ll_*(ee_*dcis_)-(ee_*dcis_)*aa_
+    where cis(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(a)+i*sin(a))*cis(a) ); 
+for j:=1:n do for k:=1:m do 
+    if reslin(j,k) neq 0 then << write
+    "OOPS, INCONSISTENT EIGENVALUES, EIGENVECTORS AND OPERATOR.
+    EMAIL ME; I QUIT"; quit >>; 
+end;
+\end{reduce}
+
+
+
+
+\subsection{Ameliorate the nonlinearity}
+
+Anything not in the linear operator gets multiplied by \verb|small| to be treated as small in the analysis.
+The feature of the second alternative is that when a user invokes~\verb|small| then the power of smallness is not then changed; however, causes issues in the relative scaling of some terms, so restore to the original version.
+
+This might need reconsidering ??  but the if always chooses the first simple alternative.
+\begin{reduce}
+somerules:=for j:=1:n collect 
+  (d_(1,t,~dt)*mkid(u,j)=d_(mkid(u,j),t,dt))$
+ff_:=(if 1 then small*ff_
+    else ff_-(1-small)*sub(small=0,ff_)) +(1-small)
+    *(ll_*uvec where somerules)$
+\end{reduce}
+
+Any constant term in the equations~\verb|ff_| has to be multiplied by~\verb|cis(0)|.
+
+\begin{reduce}
+ff_:=ff_+(cis(0)-1)*(ff_ where uzero)$
+\end{reduce}
+
+From the matrix versions of the equations, create algebraic form using the matrix basis.
+
+\begin{reduce}
+rhsfn_:=for i:=1:n sum e_(i,1)*ff_(i,1)$
+\end{reduce}
+
+Also, create the algebraic form of the jacobian transpose using the matrix basis: take the conjugate later when used.
+
+\begin{reduce}
+rhsjact_:=for i:=1:n sum for j:=1:n sum 
+    e_(j,i)*df(ff_(i,1),mkid(u,j))$
+\end{reduce}
+
+
+
+
+\subsection{Store centre manifold frequencies}
+Extract all the frequencies in the centre manifold, and the set of all the corresponding modes in the centre manifold variables.
+The slow modes are accounted for as having zero frequency.
+Remember the frequency set is not in the `correct' order.
+Array \verb|modes| stores the set of indices of all the modes of a given frequency.
+
+\begin{reduce}
+array freqs(m),modes(m); 
+nfreq:=0$ freqset:={}$ 
+for j:=1:m do if not(freq(j) member freqset) then begin
+  nfreq:=nfreq+1; 
+  freqs(nfreq):=freq(j);
+  freqset:=freq(j).freqset;
+  modes(nfreq):=for k:=j:m join 
+    if freq(j)=freq(k) then {k} else {};
+end;
+\end{reduce}
+
+Set a flag for the case of a slow manifold when all frequencies are zero, as then we compute the isochron projection.
+The next challenge is to get this isochron code working for the case of non-slow centre manifolds.
+\begin{reduce}
+itisSlowMan_:=if freqset={0} then 1 else 0$
+if trace_ then write itisSlowMan_:=itisSlowMan_;
+\end{reduce}
+
+Put in the non-singular general case as the zero entry of the arrays.
+
+\begin{reduce}
+freqs(0):=genfreq$
+modes(0):={}$
+\end{reduce}
+ 
+\subsection{Precompute matrices for updates}
+
+Precompute matrices to solve for updates for each of the critical frequencies, and the general case $\verb|k|=0$.
+The matrix 
+\begin{equation*}
+\verb|llzz| = \begin{bmatrix} -\cL+\partial_t & \cE_0 
+\\ \adj\cZ_0 & 0 \end{bmatrix}
+\end{equation*}
+and then put its inverse in place.
+Subsequently, extract the blocks for the generalised inverses and solvability condition into \verb|linvs| and~\verb|ginvs|.
+
+\begin{reduce}
+matrix llzz(n+m,n+m);
+array linvs(nfreq),ginvs(nfreq);
+array l1invs(nfreq),g1invs(nfreq),l2invs(nfreq),g2invs(nfreq);
+operator sp_; linear sp_;
+for k:=0:nfreq do begin
+\end{reduce}
+
+Code the operator \(\cL\hat v\) where the delay is to only act on the oscillation part.
+
+\begin{reduce}
+  for ii:=1:n do for jj:=1:n do llzz(ii,jj):=(
+      -sub(small=0,ll_(ii,jj))
+      where d_(1,t,~dt)=>cos(freqs(k)*dt)-i*sin(freqs(k)*dt));
+\end{reduce}
+
+Code the operator \(\D t{\hat v}\) where it only acts on the oscillation part.
+
+\begin{reduce}
+  for j:=1:n do llzz(j,j):=i*freqs(k)+llzz(j,j);
+\end{reduce}
+
+Now code the part leading to the solvability condition which arises from allowing the (oscillation) amplitude to evolve.
+Use operator \verb|sp_| to extract the delay parts that subtly affect the updates of the evolution.
+
+\begin{reduce}
+  for j:=1:length(modes(k)) do 
+    for ii:=1:n do llzz(ii,n+j):=ee_(ii,part(modes(k),j))
+     +(for jj:=1:n sum 
+       sp_(ll_(ii,jj)*ee_(jj,part(modes(k),j)),d_)
+       where { sp_(1,d_)=>0
+             , sp_(d_(1,t,~dt),d_)=>dt*(
+               cos(freqs(k)*dt)-i*sin(freqs(k)*dt))
+             });
+\end{reduce}
+
+Force the updates to be orthogonal to the left-eigenvectors in the complex conjugate transpose adjoint.,
+
+\begin{reduce}
+  for i:=1:length(modes(k)) do 
+    for j:=1:n do llzz(n+i,j):=conj_(zz_(j,part(modes(k),i)));
+\end{reduce}
+
+Set the bottom-right corner of the matrix to zero.
+
+\begin{reduce}
+  for i:=1:length(modes(k)) do 
+    for j:=1:m do llzz(n+i,n+j):=0;
+\end{reduce}
+
+Add some trivial rows and columns to make the matrix up to the same size for all frequencies.
+
+\begin{reduce}
+  for i:=length(modes(k))+1:m do begin 
+    for j:=1:n+i-1 do llzz(n+i,j):=llzz(j,n+i):=0;
+    llzz(n+i,n+i):=1;
+  end;
+\end{reduce}
+
+Invert the matrix and unpack into arrays ready for use by the inversion operators.
+
+\begin{reduce}
+if trace_ then write llzz:=llzz; 
+  llzz:=llzz^(-1);
+if trace_ then write llzz:=llzz;
+  linvs(k):=for i:=1:n sum for j:=1:n sum e_(i,j)*llzz(i,j);
+  ginvs(k):=for i:=1:length(modes(k)) sum 
+    for j:=1:n sum e_(part(modes(k),i),j)*llzz(i+n,j);
+\end{reduce}
+
+Unpack the conjugate transpose for inverse operators used for the isochrons.  
+A difference here is that the orthogonality condition is non-trivial (in the slow manifold we assumed amplitudes were exactly orthogonal to the left-eigenvectors), so we need to remember more parts of the inverse of the matrix.
+Will it need to be more subtle for the un/stable manifolds case??
+
+\begin{reduce}
+%  realgenfreq:={repart(genfreq)=>genfreq, impart(genfreq)=>0}$
+  l1invs(k):=for i:=1:n sum for j:=1:n sum 
+      e_(i,j)*conj_(llzz(j,i));
+  l2invs(k):=for i:=1:n sum for j:=1:length(modes(k)) sum 
+      e_(i,part(modes(k),j))*conj_(llzz(j+n,i));
+  g1invs(k):=for i:=1:length(modes(k)) sum for j:=1:n sum 
+      e_(part(modes(k),i),j)*conj_(llzz(j,i+n));
+  g2invs(k):=
+    for i:=1:length(modes(k)) sum for j:=1:length(modes(k)) sum 
+      e_(part(modes(k),i),part(modes(k),j))*conj_(llzz(j+n,i+n));
+end;
+\end{reduce}
+
+
+\subsection{Define operators that invoke these inverses}
+Decompose residuals into parts, and operate on each.
+First for the centre manifold.
+But making \verb|e_| non-commutative means that it does not get factored out of these linear operators: must post-multiply by~\verb|e_| because the linear inverse is a premultiply.
+
+\begin{reduce}
+operator linv; linear linv;
+let linv(e_(~j,~k)*cis(~a),cis)=>linvproc(a/t)*e_(j,k);
+procedure linvproc(a);
+  if a member freqset
+  then << k:=0; 
+    repeat k:=k+1 until a=freqs(k);
+    linvs(k)*cis(a*t) >>
+  else sub(genfreq=a,linvs(0))*cis(a*t)$
+\end{reduce}
+
+Second for the evolution on the centre manifold.
+
+\begin{reduce}
+operator ginv; linear ginv;
+let ginv(e_(~j,~k)*cis(~a),cis)=>ginvproc(a/t)*e_(j,k);
+procedure ginvproc(a); 
+  if a member freqset
+  then << k:=0; 
+    repeat k:=k+1 until a=freqs(k);
+    ginvs(k) >>
+  else sub(genfreq=a,ginvs(0))$
+\end{reduce}
+
+Copy and adjust the above for the projection.
+But first define the generic procedure.
+Perhaps use conjugate\slash negative of the frequency when applying to the general case of oscillations---but it might already have been accounted for??
+\begin{reduce}
+procedure invproc(a,invs);
+  if a member freqset
+  then << k:=0; 
+    repeat k:=k+1 until a=freqs(k);
+    invs(k)*cis(a*t) >>
+  else sub(genfreq=a,invs(0))*cis(a*t)$
+\end{reduce}
+
+Then define operators that we use to update the projection.
+\begin{reduce}
+operator l1inv; linear l1inv;
+operator l2inv; linear l2inv;
+operator g1inv; linear g1inv;
+operator g2inv; linear g2inv;
+let { l1inv(e_(~j,~k)*cis(~a),cis)=>invproc(a/t,l1invs)*e_(j,k)
+    , l2inv(e_(~j,~k)*cis(~a),cis)=>invproc(a/t,l2invs)*e_(j,k)
+    , g1inv(e_(~j,~k)*cis(~a),cis)=>invproc(a/t,g1invs)*e_(j,k)
+    , g2inv(e_(~j,~k)*cis(~a),cis)=>invproc(a/t,g2invs)*e_(j,k)
+    };
+\end{reduce}
+
+
+
+
+
+
+
+
+This section writes to various files so the output to \verb|cmsyso.txt| must be redone afterwards.
+
+\input{latexinit2}
+\begin{reduce}
+in_tex "latexinit2.tex"$
+\end{reduce}
+
+
+
+
+\section{Linear approximation to the centre manifold}
+
+But first, and if for the web, open the output file and write out the possibly adjusted nonlinear right-hand side function.
+According to the manual, this will append to the earlier output to the file.
+
+\begin{reduce}
+if thecase=myweb then out "cmsyso.txt"$
+\end{reduce}
+
+\begin{reduce}
+write "Analyse ODE/DDE system du/dt = ",ff_;
+\end{reduce}
+
+Parametrise the centre manifold in terms of these amplitudes.
+
+\begin{reduce}
+operator s; depend s,t;
+let df(s(~j),t)=>coeffn(gg_,e_(j,1),1);
+\end{reduce}
+
+
+Invoke the following procedure to substitute whatever the current approximation is into (nonlinear) expressions.
+
+\begin{reduce}
+procedure manifold_;
+    for j:=1:n collect mkid(u,j)=coeffn(uu_,e_(j,1),1)$
+\end{reduce}
+
+
+The linear approximation to the centre manifold must be the following corresponding to the frequencies down the diagonal (even if zero).
+The amplitudes~$s_j$ are slowly evolving as they are either slow modes, or the complex amplitudes of oscillating modes.
+
+\begin{reduce}
+uu_:=for j:=1:m sum s(j)*cis(freq(j)*t)
+  *(for k:=1:n sum e_(k,1)*ee_(k,j))$
+gg_:=0$
+\end{reduce}
+
+For some temporary trace printing??
+\begin{reduce}
+procedure matify(a,m,n)$
+  begin matrix z(m,n);
+    for i:=1:m do for j:=1:n do z(i,j):=coeffn(a,e_(i,j),1);
+    return (z where {cis(0)=>1,small=>s}); 
+    end$
+\end{reduce}
+
+For the isochron may need to do something different with frequencies, but this should work as the inner product is complex conjugate transpose.
+The \verb|pp_| matrix is proposed to place the projection residuals in the range of the isochron. 
+\begin{reduce}
+zs_:=for j:=1:m sum cis(freq(j)*t)
+  *(for k:=1:n sum e_(k,j)*zz_(k,j))$
+pp_:=0$
+\end{reduce}
+
+
+
+
+\section{Iteratively construct the centre manifold}
+
+But first establish the Taylor series in any delay factors of slow amplitudes.
+\begin{reduce}
+let d_(s(~k),t,~dt)=>s(k)+(for n:=1:toosmall sum 
+        (-dt)^n*df(s(k),t,n)/factorial(n));
+\end{reduce}
+
+Truncate expansions to specified order of error, and start the iteration.
+\begin{reduce}
+for j:=toosmall:toosmall do let small^j=>0;
+write "Start iterative construction of centre manifold";
+for iter:=1:maxiter_ do begin
+if trace_ then write "
+ITERATION = ",iter,"
+-------------";
+\end{reduce}
+
+Compute residual vector (matrix) of the dynamical system \cite{Roberts96a}.
+\begin{reduce}
+resde_:=-df(uu_,t)+sub(manifold_(),rhsfn_);
+if trace_ then write "resde_=",matify(resde_,n,1);
+\end{reduce}
+
+Get the local directions of the coordinate system on the curving manifold: store transpose as \(m\times n\)~matrix.
+\begin{reduce}
+est_:=tpe_(for j:=1:m sum df(uu_,s(j))*e_(1,j),e_);
+est_:=conj_(est_);
+if trace_ then write "est_=",matify(est_,m,n);
+\end{reduce}
+
+Compute residual matrix for the isochron projection \cite{Roberts89b, Roberts97b}. 
+But for the moment, only do it if the \verb|freqset| is for slow manifolds.
+\begin{reduce}
+if itisSlowMan_ then begin
+    jacadj_:=conj_(sub(manifold_(),rhsjact_));
+if trace_ then write "jacadj_=",matify(jacadj_,n,n);
+    resd_:=df(zs_,t)+jacadj_*zs_+zs_*pp_;
+if trace_ then write "resd_=",matify(resd_,n,m);
+\end{reduce}
+
+Compute residual of the normalisation of the projection.
+\begin{reduce}
+    resz_:=est_*zs_-eyem_*cis(0);
+if trace_ then write "resz_=",matify(resz_,m,m);
+end else resd_:=resz_:=0; % for when not slow manifold
+\end{reduce}
+
+Write lengths of residuals as a trace print (remember that the expression~$0$ has length one).
+\begin{reduce}
+write lengthRes:=map(length(~a),{resde_,resd_,resz_});
+\end{reduce}
+
+Solve for updates---all the hard work is already encoded in the operators.
+\begin{reduce}
+uu_:=uu_+linv(resde_,cis);
+gg_:=gg_+ginv(resde_,cis);
+if trace_ then write "gg_=",matify(gg_,m,1);
+if trace_ then write "uu_=",matify(uu_,n,1);
+\end{reduce}
+
+Now update the isochron projection, with normalisation.
+\begin{reduce}
+if itisSlowMan_ then begin
+zs_:=zs_+l1inv(resd_,cis)-l2inv(resz_,cis);
+pp_:=pp_-g1inv(resd_,cis)+youshouldnotseethis*g2inv(resz_,cis);
+if trace_ then write "zs_=",matify(zs_,n,m);
+if trace_ then write "pp_=",matify(pp_,m,m);
+end;
+\end{reduce}
+
+
+Terminate the loop once residuals are zero.
+
+\begin{reduce}
+showtime;
+if {resde_,resd_,resz_}={0,0,0} then write iter:=iter+10000;
+end;
+\end{reduce}
+
+Only proceed to print if terminated successfully.
+
+\begin{reduce}
+if {resde_,resd_,resz_}={0,0,0} 
+  then write "SUCCESS: converged to an expansion"
+  else <<write "FAILED TO CONVERGE; I QUIT";
+    if thecase=myweb then <<shut "cmsyso.txt"; 
+    quit >> >>;
+\end{reduce}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{reduce}
+%write "Temporarily halt here";end;
+\end{reduce}
+
+
+\section{Output text version of results}
+
+Once construction is finished, simplify \verb|cis(0)|.
+
+\begin{reduce}
+let cis(0)=>1;
+\end{reduce}
+
+Invoking switch \verb|complex| improves some of the output of the complex numbers, but wrecks other parts of the output.  Best left off.
+%\begin{reduce}
+%on complex;
+%\end{reduce}
+
+
+Write text results.
+\begin{reduce}
+write "The centre manifold is (to one order lower)";
+for j:=1:n do write "u",j," = ",
+  coeffn(small*uu_,e_(j,1),1)/small;
+write "The evolution of the real/complex amplitudes";
+for j:=1:m do write "ds(",j,")/dt = ",
+  coeffn(gg_,e_(j,1),1);
+\end{reduce}
+
+Optionally write the projection vectors.
+\begin{reduce}
+if itisSlowMan_ then begin
+  write "The normals to the isochrons at the slow manifold.
+Use these vectors: to project initial conditions
+onto the slow manifold; to project non-autonomous
+forcing onto the slow evolution; to predict the
+consequences of modifying the original system; in
+uncertainty quantification to quantify effects on
+the model of uncertainties in the original system.";
+  for j:=1:m do write "z",j," = ",
+    for i:=1:n collect coeffn(zs_,e_(i,j),1);
+end;
+\end{reduce}
+
+Write text results numerically evaluated when expressions are long.
+\begin{reduce}
+if length(gg_)>30 then begin
+on rounded; print_precision 4;
+write "Numerically, the centre manifold is (to one order lower)";
+for j:=1:n do write "u",j," = ",
+  coeffn(small*uu_,e_(j,1),1)/small;
+write "Numerically, the evolution of the real/complex amplitudes";
+for j:=1:m do write "ds(",j,")/dt = ",
+  coeffn(gg_,e_(j,1),1);
+if itisSlowMan_ then begin
+  write "Numerically, normals to isochrons at slow manifold.";
+  for j:=1:m do write "z",j," = ",
+    for i:=1:n collect coeffn(zs_,e_(i,j),1);
+end;
+off rounded;
+end;
+\end{reduce}
+
+\begin{reduce}
+if thecase=myweb then shut "cmsyso.txt"$
+\end{reduce}
+
+
+There is an as yet unresolved problem in the typesetting when the argument of \verb|cis| (frequency) is a rational number instead of integer:
+the numerator has an extra pair of parentheses which then makes the typesetting wrong;
+maybe we need a pre-\LaTeX\ filter??
+
+
+\input{latexout2}
+\begin{reduce}
+in_tex "latexout2.tex"$
+\end{reduce}
+
+\section{Fin}
+
+That's all folks. 
+
+\begin{reduce}
+write "Finished constructing centre manifold of ODE/DDE"; 
+\end{reduce}
+
+\begin{reduce}
+if thecase=myweb then begin
+quit;
+end;
+\end{reduce}
+
+\begin{reduce}
+%end;%loop over cases
+end;
+\end{reduce}
+
+
+
+\bibliographystyle{agsm}
+\bibliography{bib,ajr}
+
+\end{document}
