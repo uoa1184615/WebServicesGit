@@ -1,0 +1,2770 @@
+\documentclass[11pt,a5paper]{article}
+
+\title{Computer algebra derives normal forms of general stochastic and non-autonomous differential equations}
+
+\author{A.~J. Roberts\thanks{School of Mathematical Sciences, University of Adelaide, South Australia~5005, \textsc{Australia}.
+\url{http://www.maths.adelaide.edu.au/anthony.roberts/}}}
+
+\date{November 19, 2008; modified \today}
+
+
+
+\usepackage[]{euler,amsmath,natbib,defns,reducecode}
+\let\harvardurl\url
+\IfFileExists{ajr.sty}{\usepackage{ajr}}{}
+
+\allowdisplaybreaks
+\def\ou\big(#1,#2,#3\big){{e^{\if#31\else#3\fi t}\star}#1\,}
+\newcommand{\Z}[1]{e^{#1t}{\star}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\res}{\operatorname{Res}}
+\newcommand{\pdf}{\textsc{pdf}}
+\newcommand{\ssm}{\textsc{ssm}}
+
+\begin{document}
+
+\maketitle
+
+%\footnotetext{\url{http://eprints.usq.edu.au/archive/00001873} stores the first version of this technical report.}
+
+\begin{abstract}
+Modelling stochastic systems has many important applications.
+Stochastic coordinate transforms to a normal form is a powerful way of disentangling emergent long term dynamics.
+Since the analysis involves classic calculus, then the approach also applies to a wide class of non-autonomous dynamical systems.
+Further, cater for deterministic autonomous systems by simply omitting the time dependence in the system.
+For generality, this approach now caters for unstable modes, and for differential equation systems with a rational right-hand side.
+Use this code via the website\footnote{\url{http://www.maths.adelaide.edu.au/anthony.roberts/sdenf.php}}.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+Construct stochastic normal form of a wide class of non-autonomous or stochastic differential equations (\sde{}s), based upon earlier research~\cite[]{Cox91, Chao95, Roberts06k}.
+Interpret all \sde{}s in the Stratonovich sense so the analysis applies to deterministic differential equations, both non-autonomous and autonomous.
+To construct normal forms of deterministic autonomous differential equations, simply omit specifying any noise.
+This article documents code designed for an interactive web site~\cite[]{Roberts07d} that is available to all to use.
+
+
+In the following, assign \verb|thecase:=webpage;| for the web service (or to read a system from file \verb|sdeb.red|), otherwise assign \verb|thecase| to be any of the example dynamical systems in set~\verb|thecases|.
+\begin{reduce}
+%% Execute in reduce with  in_tex "cadnfgsde.tex"
+%% See cadnfgsde.pdf for detailed explanation.
+thecase:=webpage;
+thecases:={sdesimple, oderat, sdemulti, sdebif, sdelac,
+sdemom, sderadek, sdehyper, sdeduan, sdehifour, sdeMona1,
+sdeMona2, sdeMona3, sdeMona4, sdeMonaSS, sdeMajda3m,
+sdeMajda3a, sdePRLorenz, sdehe, sdehebc, sdeheqr, sdemmh,
+sdePRKdV }$
+\end{reduce}
+
+
+
+
+Define default parameters for the iteration:
+\verb|maxiter_|~is the maximum number of allowed iterations;
+\verb|toosmall|~is the order of errors in the analysis in terms of the parameter~\verb|small|.
+Specific problems may override these defaults.
+The code cannot handle any higher order in noise amplitude~\verb|sigma|.
+\begin{reduce}
+maxiter_:=29$
+factor small; 
+toosmall:=3$
+let sigma^3=>0;
+\end{reduce}
+
+
+
+
+\section{Choose the SDEs}
+
+For an \sde\ with $m$~slow modes, $n_y$~fast stable modes (quickly decaying), and/or \(n_z\)~fast unstable modes (quickly growing), you must denote the slow modes by \verb|x(1)| through to~\verb|x(m)|, the stable fast modes by \verb|y(1)| through to~\verb|y(ny)|, and the unstable fast modes by \verb|z(1)| through to~\verb|z(nz)|.
+Each Stratonovich white noise, derivative of a Stratonovich Wiener process, must be denoted by~\verb|w(.)| where the dot denotes almost any label you care to choose: simple numbers such as \verb|w(1)| and/or \verb|w(2)| are the usual choices; but other labels for the noise can be used.
+The \sde{}s must be linearly diagonalised.\footnote{Although a Jordan form is also acceptable, there are issues in the error control.}  
+
+Load the reduce to \LaTeX\ package so we can also generate a nicer version of the output via \LaTeX.
+Load now so that a canny definition of the \sde{}s can invoke some of the options.  
+\begin{reduce}
+load_package rlfi;
+\end{reduce}
+
+First, define the operators to be used in the specification of the \sde{}s.  
+\begin{reduce}
+operator x;
+operator y;
+operator z;
+operator w;
+\end{reduce}
+
+Cater for rational function \sde{}s by allowing time dependence in these variables at specification.  
+Then users must multiply each \sde\ by a common denominator, and put on the right-hand side the nonlinear terms involving the time derivative: see examples in sections~\ref{sec:oderat} and~\ref{sec:mona1sn}.
+\begin{reduce}
+depend x,t;
+depend y,t;
+depend z,t;
+\end{reduce}
+
+
+
+Use the \textsc{rhs} part of an \sde\ to specify an \sde.  
+Form the \textsc{rhs}s into lists to specify the system of \sde{}s.  
+Set trivial defaults for the \sde{}s in case I forget.
+\begin{reduce}
+xrhs:=yrhs:=zrhs:={}$
+\end{reduce}
+
+
+
+
+In the case \verb|webpage|, get the \sde{}s from the file \verb|sdeb.red| which is where the web script writes a user specified system.
+\begin{reduce}
+if thecase=webpage then in "sdeb.red"$
+\end{reduce}
+
+
+
+
+\subsection{Simple pair of SDEs}
+
+A classically simple pair of fast/slow \sde{}s is
+\begin{equation}
+\dot x=-xy \qtq{and} \dot y=-y+x^2-2y^2+\sigma w(t),
+\end{equation}
+where lowercase~$w(t)$ denotes the formal derivative~$dW/dt$ of a Stratonovich Wiener process~$W(t,\omega)$.
+Parameter~$\sigma$ controls the strength of the noise.
+Use \verb|x(1)| to denote variable~$x$, \verb|y(1)| to denote variable~$y$, and \verb|w(1)| to denote Stratonovich noise~$w$.
+Alternatively, \(w(t)\)~could denote some non-autonomous deterministic forcing, control or other extrinsic input.
+
+Specify the slow $x$~\sde\ by allocating the one element list of its right-hand side to the variable~\verb|xrhs|.
+\begin{reduce}
+if thecase=sdesimple then begin
+xrhs:={-x(1)*y(1)};
+\end{reduce}
+
+Specify the nonlinear and noise terms of the $y$~\sde\ as the one element list assigned to \verb|yrhs|.
+\begin{reduce}
+yrhs:={-y(1)+x(1)^2-2*y(1)^2+w(1)};
+\end{reduce}
+
+There are no unstable modes. 
+\begin{reduce}
+zrhs:={};
+\end{reduce}
+
+The code automatically multiplies the noise factors by a parameter~\verb|sigma| so there is no need include the parameter~$\sigma$ in the specification of the problem (unless you particularly want to), as it will be done for you.
+The code uses the parameter~\verb|small| to control truncation in nonlinearity; just ignore parameter~\verb|small| wherever it appears.
+\begin{reduce}
+factor small,sigma;
+end;
+\end{reduce}
+
+\paragraph{The stochastic coordinate transform}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+y_{1}=
+Y_{1}
++X_{1}^{2}+2 Y_{1}^{2}
++\sigma \ou\big(w_{1},tt,-\big)(1+4  Y_{1})
+\end{math}\par
+
+\begin{math}
+x_{1}=
+X_{1}
++X_{1} Y_{1}
++\sigma  \ou\big(w_{1},tt,-\big) X_{1}
+\end{math}\par
+
+
+
+\paragraph{Result normal form SDEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot Y_{1}=
+-Y_{1}
+-2 X_{1}^{2} Y_{1}
+-4 \sigma  w_{1} Y_{1}
++8 \sigma ^{2}  w_{1}\ou\big(w_{1},tt,-\big) Y_{1}
+\end{math}\par
+
+\begin{math}
+\dot X_{1}=
+-X_{1}^{3}
+-\sigma  w_{1} X_{1}
++2 \sigma ^{2} w_{1}\ou\big(w_{1},tt,-\big)  X_{1}
+\end{math}\par
+
+
+\paragraph{Easy stochastic bifurcation} For example, modifying the $x$~equation to $\dot x=ax-xy$ induces a stochastic bifurcation as parameter~$a$ crosses zero.
+Construct the stochastic normal form for this by simply changing to
+\begin{verbatim}
+    xrhs:={small*a*x(1)-x(1)*y(1)};
+\end{verbatim}
+The extra factor of \verb|small| causes only low powers of parameter~$a$ to be retained, as appropriate for such a bifurcation.
+Some may like to consider it analogous to scaling~$a$ with~$\epsilon^2$ and scaling~$x$ with~$\epsilon$.
+
+
+
+
+\subsection{Simple rational ODEs}
+\label{sec:oderat}
+
+A simple system of fast/slow \ode{}s in rational functions is
+\begin{equation}
+\dot x=-\frac{xy}{1+z}\,,\quad
+\dot y=-\frac y{1+2y}+x^2,\quad
+\dot z=2\frac z{1+3x}\,.
+\end{equation}
+Use \verb|x(1)| to denote variable~$x$, \verb|y(1)| to denote variable~$y$, and \verb|z(1)| to denote~$z$.
+Multiply each \ode\ by the denominator for the \ode\ and shift the nonlinear~\(d/dt\) terms to the right-hand side.
+\begin{reduce}
+if thecase=oderat then begin
+xrhs:={-x(1)*y(1)-z(1)*df(x(1),t)};
+yrhs:={-y(1)+x(1)^2*(1+2*y(1))-2*y(1)*df(y(1),t)};
+zrhs:={2*z(1)-3*x(1)*df(z(1),t)};
+\end{reduce}
+
+Truncate to one higher order because it is a simple system.
+\begin{reduce}
+toosmall:=4;
+end;
+\end{reduce}
+
+\paragraph{Time dependent coordinate transform}
+\begin{math}
+\end{math}\par
+ 
+\begin{math}
+z_{1}=6 X_{1} Y_{1} Z_{1} \varepsilon ^{2}+Z_{1}
+\end{math}\par
+
+\begin{math}
+y_{1}=2 X_{1}^{4} \varepsilon ^{2}-4 X_{1}^{2} Y_{1}^{2} \varepsilon ^{2
+}+X_{1}^{2} \varepsilon +6 Y_{1}^{3} \varepsilon ^{2}-2 Y_{1}^{2} 
+\varepsilon +Y_{1}
+\end{math}\par
+
+\begin{math}
+x_{1}=2 X_{1}^{3} Y_{1} \varepsilon ^{2}-1/2 X_{1} Y_{1}^{2} 
+\varepsilon ^{2}+X_{1} Y_{1} Z_{1} \varepsilon ^{2}+X_{1} Y_{1} 
+\varepsilon +X_{1}
+\end{math}
+
+
+\paragraph{Result normal form DEs}
+For example, from this form we see the slow manifold is \(Y_1=Z_1=0\).\par
+
+\begin{math}
+\dot Z_{1}=-54 X_{1}^{3} Z_{1} \varepsilon ^{3}+18 X_{1}^{2} Z_{1} 
+\varepsilon ^{2}-6 X_{1} Z_{1} \varepsilon +2 Z_{1}
+\end{math}\par
+
+\begin{math}
+\dot Y_{1}=8 X_{1}^{4} Y_{1} \varepsilon ^{3}+4 X_{1}^{2} Y_{1} 
+\varepsilon ^{2}+2 X_{1}^{2} Y_{1} \varepsilon -Y_{1}
+\end{math}\par
+
+\begin{math}
+\dot X_{1}=-2 X_{1}^{5} \varepsilon ^{3}-X_{1}^{3} \varepsilon ^{2}-2 X_
+{1} Y_{1}^{2} Z_{1} \varepsilon ^{3}
+\end{math}
+
+
+
+\subsection{Future noise in the transform}
+
+An interesting pair of fast/slow \sde{}s derived from stochastic advection\slash dispersion is
+\begin{equation}
+\dot x=-\sigma yw(t) \qtq{and} \dot y=-y+\sigma x w(t)\,,
+\end{equation}
+where lowercase~$w(t)$ denotes the formal derivative~$dW/dt$ of a Stratonovich Wiener process~$W(t,\omega)$.
+Parameter~$\sigma$ controls the strength of the noise.
+In stochastic advection\slash dispersion parameter~$\sigma$ represents the lateral wavenumber of the concentration profile.  
+
+Use \verb|x(1)| to denote variable~$x$, \verb|y(1)| to denote variable~$y$, and \verb|w(1)| to denote Stratonovich noise~$w$.
+Specify the slow $x$~\sde\ by allocating the one element list of its right-hand side to the variable~\verb|xrhs|.
+Specify the nonlinear and noise terms of the $y$~\sde\ as the one element list assigned to \verb|yrhs|.
+\begin{reduce}
+if thecase=sdemulti then begin
+factor small,sigma;
+xrhs:={-y(1)*w(1)};
+yrhs:={-y(1)+x(1)*w(1)};
+zrhs:={};
+end;
+\end{reduce}
+
+The code automatically multiplies the noise factors by a parameter~\verb|sigma| so there is no need include the parameter~$\sigma$ in the specification of the problem (unless you particularly want to), as it will be done for you.
+
+Via the coordinate transform
+\begin{equation*}
+x\approx X+\sigma Y\Z{}w\qtq{and}
+y\approx Y+\sigma X\Z-w\,,
+\end{equation*}
+the resultant normal form is
+\begin{equation*}
+\dot X\approx 
+-\sigma^2Xw\Z-w
+\qtq{and}
+\dot Y\approx 
+-Y+\sigma^2Yw\Z{}w
+ \,.
+\end{equation*}
+One of the interesting aspects of this example is the quickness with which we could go to higher order noise interactions, higher orders in~$\sigma$.
+However, I do not compute such higher order terms in this code.
+
+
+
+\subsection{Other methodologies fail}
+
+Consider for small parameter~$\epsilon$
+\begin{eqnarray}
+\text{slow mode}&& \dot x=\epsilon x+x^3-(1-\sigma w)xy\,,\\
+\text{fast mode}&& \dot y= -y+x^2+y^2+\sigma yw\,.
+\end{eqnarray}
+Deterministically, there is a bifurcation to two equilibria for small $\epsilon>0$\,.
+The noise~$w$ affects this bifurcation somehow.
+
+Why is this tricky? Cross-sectional averaging is simply projection onto the slow space $y=0$ which predicts instability of subcritical bifurcation $\dot x=\epsilon x+x^3$\,.
+Whereas adiabatic approximation, singular perturbation and multiple scales set $\dot y=0$ whence $y\approx x^2$ and thus predict linear growth of $\dot x= \epsilon x$\,.
+Normal form transforms get the deterministic dynamics correctly.
+But what happens for stochastic dynamics?
+
+Multiply a nonlinear term in the $x$~\sde\ in order to get cancellation when the right-hand sides are multiplied by~\verb|small|.
+Multiply the bifurcation parameter by~\verb|small^2| in order to make small. 
+\begin{reduce}
+if thecase=sdebif then begin
+xrhs:={small*eps*x(1)+small*x(1)^3-x(1)*y(1)*(1-small*w(1))};
+\end{reduce}
+
+Insert the noise in a rather special way so that its dominant effects cancel.
+\begin{reduce}
+yrhs:={-y(1)+x(1)^2+y(1)^2+y(1)*w(1)};
+\end{reduce}
+
+There are no unstable modes. 
+\begin{reduce}
+zrhs:={};
+\end{reduce}
+
+Truncate to higher order in the amplitudes in order to discern the subtle bifurcation.
+\begin{reduce}
+toosmall:=5;
+factor small,sigma;
+end;
+\end{reduce}
+
+The coordinate transform is very messy, but dominantly (dropping subscripts for simplicity)
+\begin{eqnarray}
+x&\approx&X
++XY +2X^3Y 
+\nonumber\\&&{}
++\sigma\left[ (-XY^2+3X^3Y)\Z+ +(XY^2+XY^3)\Z2 
+\right.\nonumber\\&&\quad\left.{}
++X^3\Z--XY^3\Z3 \right]w
+\,,\\
+y&\approx&
+Y-Y^2+Y^3-Y^4+X^2-7X^2Y^2+X^4
+\nonumber\\&&{}
++\sigma\left[ (-Y+2Y^3-3Y^4-10X^2Y^2 -4X^2Y^2\Z+)\Z+ 
+\right.\nonumber\\&&\quad\left.{}
++(X^2-2X^2Y+3X^2Y^2+X^4 +4X^4\Z-)\Z- 
++2X^2Y^2\Z2 \right]w\,.\quad{}
+\end{eqnarray}
+In these coordinates the slow mode \sde\ becomes the normal form
+\begin{eqnarray}
+\dot X &\approx& \epsilon X-X^5-2\sigma X^5 w -3\sigma^2 X^5 w\Z-w 
+\,,\\
+\dot Y&\approx& (-1+4X^2+6X^4)Y
++\sigma(1+2X^2+22X^4)Yw \,.
+\end{eqnarray}
+The `drift' of the quadratic noise in~$\dot X$ should also be nonlinearly stabilising.
+
+
+\subsection{Levy area contraction: off-diagonal example}
+
+\cite{Pavliotis07} assert the following system of five coupled \sde{}s are interesting.
+\begin{eqnarray}&&
+dx_1=\epsilon y_1\,dt \,,\\&&
+dx_2=\epsilon y_2\,dt \,,\\&&
+dx_3=\epsilon (x_1y_2-x_2y_1)dt \,,\\&&
+dy_1=(-y_1-\alpha y_2)dt +dW_1 \,,\\&& 
+dy_2=(+\alpha y_1-y_2)dt +dW_2 \,.
+\end{eqnarray}
+This stochastic system has two noise sources.
+I presume~$W_i(t,\omega)$ are Stratonovich Wiener processes.
+Use \verb|x(i)| to denote variable~$x_i$, \verb|y(i)| to denote variable~$y_i$, and \verb|w(i)| to denote noise~$dW_i/dt$.
+
+Let \verb|eps| denote parameter~$\epsilon$.
+Thus specify the slow dynamics via this three component list allocated to \verb|xrhs|.
+\begin{reduce}
+if thecase=sdelac then begin
+factor small,sigma,eps;
+toosmall:=4;
+xrhs:={eps*y(1),eps*y(2),eps*(x(1)*y(2)-x(2)*y(1))};
+\end{reduce}
+
+For the fast modes, specify the linear parts separately from the rest of the \sde.
+Here the linear part has an off-diagonal component parametrised by~$\alpha$.
+This code cannot exactly analyse such systems.
+Thus analyse with the $\alpha$~moderated terms when treated as a perturbation of the decay at rate one.
+Specify the dynamics of the $y$~\sde\ as the two element list assigned to \verb|yrhs|.
+\begin{reduce}
+yrhs:={-y(1)-a*y(2)+w(1),-y(2)+a*y(1)+w(2)};
+\end{reduce}
+
+There are no unstable modes. 
+\begin{reduce}
+zrhs:={};
+end;
+\end{reduce}
+
+The stochastic normal form is
+\begin{eqnarray*}&&
+\dot X_1\approx 
+\epsilon \sigma w_1 - \epsilon \sigma w_2a
+\,,\\&&
+\dot X_2\approx 
+\epsilon \sigma w_2 + \epsilon \sigma w_1a
+\,,\\&&
+\dot X_3\approx 
+\epsilon \sigma ( - w_1X_2 + w_2X_1) + \epsilon \sigma (w_1
+X_1a + w_2X_2a) 
+\\&&\quad{}+ \epsilon ^2\sigma ^2(w_1\Z{-}w_2 - 
+w_2\Z{-}w_1)
+\,,\\&&
+\dot Y_1\approx 
+ - Y_1 - Y_2a
+\,,\\&&
+\dot Y_2\approx 
+ - Y_2 + Y_1a
+\,.
+\end{eqnarray*}
+
+
+
+\subsection{Position-momentum: the Jordan form}
+
+
+Suppose you want to analyse the semi-mechanical system of \sde{}s 
+\begin{equation}
+\ddot x=-xy \qtq{and} \dot y=-2y+x^2+{\dot x}^2+\sigma w(t)\,,
+\end{equation}
+where $w(t)$ denotes the formal derivative~$dW/dt$ of a Stratonovich Wiener process~$W(t,\omega)$.
+Parameter~$\sigma$ controls the strength of the noise.
+Introduce $x_1=x$\,, $x_2=\dot x$ and $y_1=y$ to convert to the system of three coupled \sde{}s
+\begin{eqnarray}&&
+\dot x_1=x_2 \,, \\&&
+\dot x_2=-x_1y_1 \,, \\&&
+\dot y_1=-2y_1+x_1^2+x_2^2+\sigma w(t)\,.
+\end{eqnarray}
+
+Specify the slow $x$~\sde{}s by allocating the two element list of its right-hand side to the variable~\verb|xrhs|.
+Divide the $x_1$~term by~\verb|small| on the right-hand side of $\dot x_2$ in order to overcome the automatic multiplication of the right-hand side by~\verb|small|.
+Iteration still works for this Jordan form system: but I am not responsible for anyone who divides by \verb|small| or~\verb|sigma|.
+\begin{reduce}
+if thecase=sdemom then begin
+xrhs:={x(2)/small,-x(1)*y(1)};
+yrhs:={-2*y(1)+x(1)^2+x(2)^2+w(y)};
+factor small,sigma;
+\end{reduce}
+
+Note: the code automatically multiply the noise factors by a parameter~\verb|sigma| so there is no need include the parameter~$\sigma$ in the specification of the problem.
+
+There are no unstable modes. 
+\begin{reduce}
+zrhs:={};
+end;
+\end{reduce}
+
+
+The resultant normal form is
+\begin{eqnarray*}&&
+\dot X_1\approx 
+X_2 + \sigma (\rat{1}{4}wX_1 + \rat{1}{4}wX_2) 
+\\&&\quad{}
++ 
+\sigma ^2( - \rat{3}{32}wX_1\Z{-2}w - \rat{3}{64}wX_2 \Z{-2}w)
+\\&&
+\dot X_2\approx 
+\sigma ( - \rat{1}{2}wX_1 - \rat{1}{4}wX_2) + ( - \rat12X_1^3 + \rat{1}{2}X_2X_1^2 - \rat{3}{4}X_2^2X_1) 
+\\&&\quad{}
++ \sigma ^2(\rat{1}{8}wX_1\Z{-2}w + \rat{3}{32}wX_2\Z{-2}w)
+\\&&
+\dot Y_1\approx 
+- 2Y_1 + ( - \rat{1}{2}X_1^2Y_1 + \rat{1}{2}X_2X_1Y_1 + \rat{1}{2}X_2^2Y_1)
+\end{eqnarray*}
+
+
+
+\subsection{Radek's slow oscillation with fast noise}
+
+Consider Radek's system
+\begin{displaymath}
+\dot x=-\epsilon xz\,,\quad
+ \dot y=+\epsilon yz \qtq{and} 
+ \dot z=-(z-1)+\sigma w(t)\,.
+\end{displaymath}
+Transform to our standard form by
+\begin{displaymath}
+x=x_1 \,,\quad
+y=x_2 \qtq{and}
+z=1+y_1\,.
+\end{displaymath}
+Then obtain the stochastic normal form with the following code.
+\begin{reduce}
+if thecase=sderadek then begin
+yrhs:={-y(1)+w(1)};
+xrhs:={-eps*x(2)*(1+y(1)),eps*x(1)*(1+y(1))};
+factor small,sigma,eps;
+zrhs:={};
+end;
+\end{reduce}
+
+The normal form equations are
+\begin{eqnarray*}&&
+\dot X_1\approx -\epsilon(1+\sigma w)X_2
+\,,\\&&
+\dot X_2\approx +\epsilon(1+\sigma w)X_1
+\,,\\&&
+\dot Y_1\approx -Y_1\,.
+\end{eqnarray*}
+The dynamics clearly oscillate in~$(X_1,X_2)$ with phase angle $\theta=\epsilon (t+\sigma W(t,\omega))$\,.
+This normal form arises from the coordinate transform
+\begin{eqnarray*}&&
+x_1\approx X_1 +\epsilon X_2Y_1 +\epsilon\sigma X_2\Z-w -\rat12\epsilon^2X_1Y_1^2
+\,,\\&&
+x_2\approx X_2 -\epsilon X_1Y_1 -\epsilon\sigma X_1\Z-w -\rat12\epsilon^2X_2Y_1^2
+\,,\\&&
+y_1=Y_1+\sigma\Z-w\,.
+\end{eqnarray*}
+
+Different analysis has to be done for the case of fast oscillation in this system.
+
+
+\subsection{Simple hyperbolic system}
+
+\begin{align*}&
+\dot y_{1}=w_{1} z_{1} \sigma -y_{1}
+\\&
+\dot z_{1}=w_{1} y_{1} \sigma +z_{1}
+\end{align*}
+\begin{reduce}
+if thecase=sdehyper then begin
+yrhs:={-y(1)+z(1)*w(1)};
+xrhs:={};
+zrhs:={+z(1)+y(1)*w(1)};
+end;
+\end{reduce}
+
+\paragraph{The stochastic coordinate transform}
+
+\begin{math}
+z_{1}=-\ou\big(w_{1},tt,2\big) Y_{1} \sigma +Z_{1}
+\end{math}\par
+
+\begin{math}
+y_{1}=\ou\big(w_{1},tt,-2\big) Z_{1} \sigma +Y_{1}
+\end{math}\par
+
+\paragraph{Result normal form SDEs}
+
+\begin{math}
+\dot Z_{1}=\ou\big(w_{1},tt,-2\big) w_{1} Z_{1} \sigma ^{2}+Z_{1}
+\end{math}\par
+
+\begin{math}
+\dot Y_{1}=-\ou\big(w_{1},tt,2\big) w_{1} Y_{1} \sigma ^{2}-Y_{1}
+\end{math}
+
+
+
+\subsection{Duan's hyperbolic system for foliation}
+
+Used as an example by~\cite{Sun2011}.
+
+\begin{math}
+\dot y_{1}=w_{1} y_{1} \sigma -y_{1}
+\end{math}
+
+\begin{math}
+\dot z_{1}=w_{1} z_{1} \sigma +y_{1}^{2} \varepsilon +z_{1}
+\end{math}
+\begin{reduce}
+if thecase=sdeduan then begin
+yrhs:={-y(1)+y(1)*w(1)};
+xrhs:={};
+zrhs:={+z(1)+y(1)^2+z(1)*w(1)};
+end;
+\end{reduce}
+
+\paragraph{The stochastic coordinate transform}\ 
+
+\begin{math}
+z_{1}=-1/3 \ou\big(w_{1},tt,3\big) Y_{1}^{2} \sigma -1/3 Y_{1}^{2}+Z_{1}
+\end{math}
+
+\begin{math}
+y_{1}=Y_{1}
+\end{math}
+
+\paragraph{Result normal form SDEs}\ 
+
+\begin{math}
+\dot Z_{1}=w_{1} Z_{1} \sigma +Z_{1}
+\end{math}\par
+
+\begin{math}
+\dot Y_{1}=w_{1} Y_{1} \sigma -Y_{1}
+\end{math}
+
+
+\subsection{A four mode hyperbolic system}
+
+\begin{math}
+\dot x_{1}=w_{2} y_{1} \sigma +w_{1} z_{1} \sigma +y_{1} z_{2} 
+\varepsilon 
+\end{math}
+
+\begin{math}
+\dot y_{1}=w_{1} z_{1} \sigma -y_{1}
+\end{math}
+
+\begin{math}
+\dot z_{1}=w_{1} y_{1} \sigma +z_{1}
+\end{math}
+
+\begin{math}
+\dot z_{2}=w_{2} y_{1} \sigma +2 z_{2}
+\end{math}
+\begin{reduce}
+if thecase=sdehifour then begin
+yrhs:={-y(1)+z(1)*w(1)};
+xrhs:={y(1)*w(2)+z(1)*w(1)+y(1)*z(2)};
+zrhs:={+z(1)+y(1)*w(1)
+,+2*z(2)+y(1)*w(2)};
+end;
+\end{reduce}
+
+\paragraph{The stochastic coordinate transform}\ 
+
+\begin{math}
+z_{1}=-\ou\big(w_{1},tt,2\big) Y_{1} \sigma +Z_{1}
+\end{math}
+
+\begin{math}
+z_{2}=-\ou\big(w_{2},tt,3\big) Y_{1} \sigma +Z_{2}
+\end{math}
+
+\begin{math}
+y_{1}=\ou\big(w_{1},tt,-2\big) Z_{1} \sigma +Y_{1}
+\end{math}
+
+\begin{math}
+x_{1}=-\ou\big(w_{2},tt,3\big) Y_{1}^{2} \sigma +\ou\big(w_{2},tt,2\big)
+ Y_{1}^{2} \sigma -\ou\big(w_{2},tt,1\big) Y_{1} \sigma +\ou\big(w_{1},
+tt,-1\big) Z_{1} \sigma +\ou\big(w_{1},tt,-2\big) Z_{2} Z_{1} \sigma -
+\ou\big(w_{1},tt,-3\big) Z_{2} Z_{1} \sigma +X_{1}+Y_{1} Z_{2}
+\end{math}
+
+\paragraph{Result normal form SDEs}\ 
+
+\begin{math}
+\dot Z_{1}=\ou\big(w_{1},tt,-2\big) w_{1} Z_{1} \sigma ^{2}+Z_{1}
+\end{math}
+
+\begin{math}
+\dot Z_{2}=2 Z_{2}
+\end{math}
+
+\begin{math}
+\dot Y_{1}=-\ou\big(w_{1},tt,2\big) w_{1} Y_{1} \sigma ^{2}-Y_{1}
+\end{math}
+
+\begin{math}
+\dot X_{1}=\ou\big(w_{2},tt,3\big) w_{1} Y_{1} Z_{1} \sigma ^{2}-2 \ou
+\big(w_{1},tt,-2\big) w_{2} Y_{1} Z_{1} \sigma ^{2}
+\end{math}
+
+
+
+\subsection{Monahan's four examples}
+
+\cite{Monahan2011} discuss stochastic averaging and give four examples in an appendix which I also analyse here.
+They also give a couple of interesting examples in the body of the article which I may also explore at some time.
+I contend that they really need my approach as ``a large separation often does not exist in atmosphere or ocean dynamics'' between the fast and slow time scales.
+
+\subsubsection{Example four: `three' time scales}
+
+\cite{Monahan2011} comment that this linear system has three time scales.
+But I do not see that: I only see varying strength interactions.
+And as a linear system, it is the simplest.
+They consider
+\begin{equation*}
+\de tx=-x+\frac a{\sqrt\tau}y
+\qtq{and}
+\de t y=\frac1{\sqrt\tau}x-\frac1\tau y+\frac b{\sqrt{\tau}}\dot W.
+\end{equation*}
+Let $\tau=\epsilon^2$ and rescale time, $t=\tau t'=\epsilon^2t'$  so that $\de t{}=\frac1\tau\de{t'}{}$ and $\dot W=\frac1{\sqrt{\tau}}\de {t'}W$.
+Then, dropping dashes, the \sde\ system is
+\begin{equation*}
+\de tx=-\epsilon^2x+ a\epsilon y
+\qtq{and}
+\de t y=\epsilon x- y+b\dot W.
+\end{equation*}
+Using the default inbuilt parametrisation of noise by \verb|sigma| to represent parameter~$b$, and using \verb|small| in the $x$-\sde\ so that it counts the numbers of small~$\epsilon$, code these as the following.
+\begin{reduce}
+if thecase=sdeMona4 then begin
+xrhs:={eps*a*y(1)-eps^2*small*x(1)}; 
+yrhs:={eps*x(1)-y(1)+w(1)}; 
+zrhs:={ };
+toosmall:=4; 
+factor small,sigma,eps,yy,y,w,ou;
+end;
+\end{reduce}
+
+\paragraph{The stochastic coordinate transform}\ 
+
+\begin{math}
+y_{1}=-\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) \epsilon ^{2} \sigma 
+ a-\ou\big(w_{1},tt,-1\big) \epsilon ^{2} \sigma  a+\ou\big(w_{1},tt,-1
+\big) \sigma +Y_{1}+\epsilon  X_{1}
+\end{math}
+
+\begin{math}
+x_{1}=-\ou\big(w_{1},tt,-1\big) \epsilon  \sigma  a-Y_{1} \epsilon  a+X_
+{1}
+\end{math}
+
+\paragraph{Result normal form SDEs}\ 
+
+\begin{math}
+\dot Y_{1}=-Y_{1} \epsilon ^{2} a-Y_{1}
+\end{math}
+
+\begin{math}
+\dot X_{1}=w_{1} \epsilon ^{3} \sigma  \big(-2 a^{2}+a\big)+w_{1} 
+\epsilon  \sigma  a+\epsilon ^{2} \big(X_{1} a-X_{1}\big)
+\end{math}
+
+\cite{Monahan2011} derive the last two terms in the $X$-equation, but not the first as it is too small for their averaging analysis.
+They comment that $a>1$ is some sort of difficulty; but I have no problem with $a>1$ (until $X$~growth invalidates the linearity), especially as the decay rate to the stochastic slow manifold, the $Y$-\sde, is $(1+\epsilon a)$ which gets stronger with parameter~$a$.
+
+
+
+\subsubsection{Example one: simple nonlinear}
+\label{sec:mona1sn}
+
+\cite{Monahan2011} first consider the example
+\begin{equation*}
+\de tx=-x+\Sigma(x)y \qtq{and}
+\de ty=-\frac1\tau y+\frac1{\sqrt\tau}\dot W,
+\end{equation*}
+for general smooth functions~$\Sigma(x)$.
+Rescale time, $t=\tau t'$  so that $\de t{}=\frac1\tau\de{t'}{}$ and $\dot W=\frac1{\sqrt{\tau}}\de {t'}W$.
+Then, dropping dashes, the \sde\ is
+\begin{equation*}
+\de tx=-\tau x+\tau\Sigma(x)y
+\qtq{and}
+\de ty=- y+\dot W.
+\end{equation*}
+Restricting to a rational function $\Sigma=(a_0+a_1x+a_2x^2)/(1+b_1x+b_2x^2)$, code these as the following (multiply through by the  denominator).
+\begin{reduce}
+if thecase=sdeMona1 then begin
+operator a; defindex a(down);
+operator b; defindex b(down);
+xrhs:={-tau*x(1)*(1+b(1)*x(1)+b(2)*x(1)^2)
+  -(b(1)*x(1)+b(2)*x(1)^2)*df(x(1),t)
+  +tau*y(1)*(a(0)+a(1)*x(1)+a(2)*x(1)^2) }; 
+yrhs:={-y(1)+w(1)}; 
+zrhs:={ };
+toosmall:=3; 
+factor small,sigma,tau,yy,y,w,ou;
+end;
+\end{reduce}
+
+\paragraph{The stochastic coordinate transform}
+In the following expressions, recall that $\sigma$~parametrises the noise; for comparison with the modelling of \cite{Monahan2011}, take $\sigma=1$\,.  
+Also recall that a rational represents the function~$\Sigma$.
+
+\begin{math}
+y_{1}=\ou\big(w_{1},tt,-1\big) \sigma +Y_{1}
+\end{math}
+
+\begin{math}
+x_{1}=\ou\big(w_{1},tt,-1\big) \sigma  \varepsilon  \tau  \big(-a_{2} X_
+{1}^{2}-a_{1} X_{1}-a_{0}\big)+Y_{1} \varepsilon  \tau  \big(-a_{2} X_{1
+}^{2}-a_{1} X_{1}-a_{0}\big)+X_{1}
+\end{math}
+
+
+\paragraph{Result normal form SDEs}\
+
+\begin{math}
+\dot Y_{1}=-Y_{1}
+\end{math}
+
+\begin{math}
+\dot X_{1}=w_{1} \sigma  \varepsilon ^{2} \tau ^{2} \big(a_{2} b_{2} X_{
+1}^{4}-a_{2} X_{1}^{2}+2 a_{1} b_{2} X_{1}^{3}+a_{1} b_{1} X_{1}^{2}+3 a
+_{0} b_{2} X_{1}^{2}+2 a_{0} b_{1} X_{1}+a_{0}\big)+w_{1} \sigma  
+\varepsilon ^{2} \tau  \big(-a_{2} b_{2} X_{1}^{4}-a_{2} b_{1} X_{1}^{3}
+-a_{1} b_{2} X_{1}^{3}-a_{1} b_{1} X_{1}^{2}-a_{0} b_{2} X_{1}^{2}-a_{0}
+ b_{1} X_{1}\big)+w_{1} \sigma  \varepsilon  \tau  \big(a_{2} X_{1}^{2}+
+a_{1} X_{1}+a_{0}\big)+\varepsilon ^{2} \tau  \big(b_{2}^{2} X_{1}^{5}+2
+ b_{2} b_{1} X_{1}^{4}+b_{2} X_{1}^{3}+b_{1}^{2} X_{1}^{3}+b_{1} X_{1}^{
+2}\big)+\varepsilon  \tau  \big(-b_{2} X_{1}^{3}-b_{1} X_{1}^{2}-X_{1}
+\big)
+\end{math}
+
+\cite{Monahan2011} derive some of this $X$~equation.  
+The others here are higher order terms that become significant at finite parameter values.  
+For example, the next correction to their analysis, $w_{1}  \tau ^{2} 
+(-3 a_{4} X_{1}^{4}-2 a_{3} X_{1}^{3}-a_{2} X_{1}^{2}+a_{0})$, is probably derivable as $\tau^2(\Sigma-x\Sigma')\dot W$ (when rescaled).
+
+
+\subsubsection{Example three: many fast modes}
+
+\cite{Monahan2011} third considered the example
+\begin{equation*}
+\de tx=-x+\Sigma(x)\|\vec y\| \qtq{and}
+\de t{\vec y}=-\frac1\tau \vec y+\sqrt{\frac2\tau}\dot{\vec W},
+\end{equation*}
+for general smooth functions~$\Sigma(x)$.
+As before, rescale time, $t=\tau t'$  so that $\de t{}=\frac1\tau\de{t'}{}$ and $\dot W=\frac1{\sqrt{\tau}}\de {t'}W$.
+Here I also cheat: they have $\|\vec y\|$ in the slow equation; but $\|\vec y\|$ is not a smooth multinomial and so my generic program cannot apply; instead I replace $\|\vec y\|$ with $\|\vec y\|^2$ which has the same symmetry but is multinomial.
+Then, upon the rescaling of time, and dropping dashes, the \sde\ is
+\begin{equation*}
+\de tx=-\tau x+\tau\Sigma(x)\|\vec y\|^2
+\qtq{and}
+\de t{\vec y}=- \vec y+\sigma\dot{\vec W}.
+\end{equation*}
+Restricting to the general quartic $\Sigma=a_0+a_1x+\cdots+a_4x^4$, code these as the following (the generic program automatically inserts the~$\sigma$ in the noise).
+Currently restrict to just a two component~$\vec y$ as I do not see any reason for any more and \cite{Monahan2011} do not appear to specify.
+\begin{reduce}
+if thecase=sdeMona3 then begin
+operator a; defindex a(down);
+xrhs:={-tau*x(1)+tau*(y(1)^2+y(2)^2)
+*(a(0)+a(1)*x(1)+a(2)*x(1)^2+a(3)*x(1)^3+a(4)*x(1)^4) }; 
+yrhs:={-y(1)+w(1),-y(2)+w(2)}; 
+zrhs:={ };
+toosmall:=3; 
+factor small,sigma,tau,yy,y,w,ou;
+end;
+\end{reduce}
+
+\paragraph{The stochastic coordinate transform}
+In the following expressions, recall that $\sigma$~parametrises the noise; for comparison with the modelling of \cite{Monahan2011}, you might take $\sigma=\sqrt2$ but as I changed the \sde\ somewhat an exact comparison is not possible.
+Also recall that a general quartic represents the function~$\Sigma$.
+
+\begin{math}
+y_{1}=\ou\big(w_{1},tt,-1\big) \sigma +Y_{1}
+\end{math}
+
+\begin{math}
+y_{2}=\ou\big(w_{2},tt,-1\big) \sigma +Y_{2}
+\end{math}
+
+\begin{math}
+x_{1}=\ou\big(w_{2},tt,1\big) Y_{2} \sigma  \tau  \big(-a_{4} X_{1}^{4}-
+a_{3} X_{1}^{3}-a_{2} X_{1}^{2}-a_{1} X_{1}-a_{0}\big)+\ou\big(w_{2},tt,
+-1\big) Y_{2} \sigma  \tau  \big(-a_{4} X_{1}^{4}-a_{3} X_{1}^{3}-a_{2} 
+X_{1}^{2}-a_{1} X_{1}-a_{0}\big)+\ou\big(w_{1},tt,1\big) Y_{1} \sigma  
+\tau  \big(-a_{4} X_{1}^{4}-a_{3} X_{1}^{3}-a_{2} X_{1}^{2}-a_{1} X_{1}-
+a_{0}\big)+\ou\big(w_{1},tt,-1\big) Y_{1} \sigma  \tau  \big(-a_{4} X_{1
+}^{4}-a_{3} X_{1}^{3}-a_{2} X_{1}^{2}-a_{1} X_{1}-a_{0}\big)+Y_{2}^{2} 
+\tau  \big(-1/2 a_{4} X_{1}^{4}-1/2 a_{3} X_{1}^{3}-1/2 a_{2} X_{1}^{2}-
+1/2 a_{1} X_{1}-1/2 a_{0}\big)+Y_{1}^{2} \tau  \big(-1/2 a_{4} X_{1}^{4}
+-1/2 a_{3} X_{1}^{3}-1/2 a_{2} X_{1}^{2}-1/2 a_{1} X_{1}-1/2 a_{0}\big)+
+X_{1}
+\end{math}
+
+
+\paragraph{Result normal form SDEs}\ 
+
+\begin{math}
+\dot Y_{1}=-Y_{1}
+\end{math}
+
+\begin{math}
+\dot Y_{2}=-Y_{2}
+\end{math}
+
+\begin{math}
+\dot X_{1}=\ou\big(w_{2},tt,-1\big) w_{2} \sigma ^{2} \tau ^{2} \big(-3/
+2 a_{4} X_{1}^{4}-a_{3} X_{1}^{3}-1/2 a_{2} X_{1}^{2}+1/2 a_{0}\big)+\ou
+\big(w_{2},tt,-1\big) w_{2} \sigma ^{2} \tau  \big(a_{4} X_{1}^{4}+a_{3}
+ X_{1}^{3}+a_{2} X_{1}^{2}+a_{1} X_{1}+a_{0}\big)+\ou\big(w_{1},tt,-1
+\big) w_{1} \sigma ^{2} \tau ^{2} \big(-3/2 a_{4} X_{1}^{4}-a_{3} X_{1}
+^{3}-1/2 a_{2} X_{1}^{2}+1/2 a_{0}\big)+\ou\big(w_{1},tt,-1\big) w_{1} 
+\sigma ^{2} \tau  \big(a_{4} X_{1}^{4}+a_{3} X_{1}^{3}+a_{2} X_{1}^{2}+a
+_{1} X_{1}+a_{0}\big)-\tau  X_{1}
+\end{math}
+
+In this modelling for~$X$, the three terms linear in~$\tau$ are the leading order, and rewritten are
+\begin{equation*}
+\dot X\approx-\tau X+\tau\Sigma(X)\sigma^2(w_1\ou\big(w_{1},tt,-\big)+
+w_2\ou\big(w_{2},tt,-\big))
+\end{equation*}
+Such quadratic terms in the noise generate both fluctuations and mean drift~\cite[]{Chao95}: the mean drift effect from each is $\sigma^2/2$, so their mean sum is just~$\sigma^2$.
+Hence the mean part of this model reduces to the form of~(A33) \cite[]{Monahan2011}.
+
+The fluctuations in~$w_1\ou\big(w_{1},tt,-\big)$ are skewed, on finite times, and so should contribute to the skewness commented on by \cite{Monahan2011}.
+A generalisation of the Fokker--Planck analysis of \cite{Chao95} suggests that such skewness decays algebraically in the scale separation~$\tau$: such algebraic decay in~$\tau$ makes skewness much more noticeable at finite~$\tau$ than other modelling approximations which decay exponentially in the scale separation. 
+
+
+
+
+\subsubsection{Example two: irregular slow manifold}
+
+\cite{Monahan2011} second consider the example
+\begin{equation*}
+\de tx=x-x^3+\Sigma(x)y \qtq{and}
+\de ty=-\frac1{x\tau} y+\frac1{\sqrt\tau}\dot W,
+\end{equation*}
+for general smooth functions~$\Sigma(x)$.
+Since the $y$-dynamics are at least exponentially unstable for negative~$x$, we restrict attention to $x>0$\,.
+Even for positive~$x$ the system is singular as $x\to0$ so the slow manifold is irregular in some sense (although `singular' in a good way in that the scale separation between fast and slow becomes infinite).
+Here I think we have to be more sophisticated in rescaling time: let's choose the new fast time~$t'$ so that $dt=x\tau\, dt'$\,; that is, $t'=\int (x\tau)^{-1}dt$ which would not be explicitly known until after a solution~$x(t')$ is found.
+I presume that the noise then transforms as $\dot W=\frac1{\sqrt{x\tau}}\de {t'}W$ (needs checking).
+Then, dropping dashes, the \sde\ is
+\begin{equation*}
+\de tx=\tau \left[x^2-x^4+x\Sigma(x)y\right]
+\qtq{and}
+\de ty=- y+\sqrt x\dot W.
+\end{equation*}
+Now the $\sqrt x$ is a problem in my generic computer algebra which requires multinomial systems so transform to $x=\xi^2$ so that $2\xi\, d\xi=dx$\,.
+Then the \sde\ system takes on a multinomial form
+\begin{equation*}
+\de t{\xi}=\frac12\tau \left[\xi^3-\xi^7+\xi\Sigma(\xi^2)y\right]
+\qtq{and}
+\de ty=- y+\xi\dot W.
+\end{equation*}
+The Stratonovich and Ito versions of the above \sde\ are still the same (an unresolved question is whether the non-uniform time scaling introduces a difference).
+Restricting to the general linear $\Sigma=a_0+a_1x$, code the \sde\ system as the following (remember $\verb|x(1)|=\xi=\sqrt x$).
+\begin{reduce}
+if thecase=sdeMona2 then begin
+operator a; defindex a(down);
+xrhs := {1/2*tau*(x(1)^3-x(1)^7+x(1)*(a(0)+a(1)*x(1)^2)*y(1))}$
+yrhs := { -y(1)+x(1)*w(1) }$
+zrhs := {}$
+factor small,sigma,tau,yy,y,w,ou;
+end;
+\end{reduce}
+
+\paragraph{The stochastic coordinate transform}
+In the following expressions, recall that $\sigma$~parametrises the noise; for comparison with the modelling of \cite{Monahan2011}, take $\sigma=1$\,.  
+
+\begin{math}
+y_{1}=\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) \sigma  \tau  \big(1/2
+ X_{1}^{7}-1/2 X_{1}^{3}\big)+\ou\big(w_{1},tt,-1\big) \sigma  X_{1}+Y_{
+1}
+\end{math}\par
+
+\begin{math}
+x_{1}=\ou\big(w_{1},tt,-1\big) \sigma  \tau  \big(-1/2 a_{1} X_{1}^{4}-1
+/2 a_{0} X_{1}^{2}\big)+Y_{1} \tau  \big(-1/2 a_{1} X_{1}^{3}-1/2 a_{0} 
+X_{1}\big)+X_{1}
+\end{math}
+
+
+\paragraph{Result normal form SDEs}\ 
+
+{\raggedright
+\begin{math}
+\dot Y_{1}=\ou\big(w_{1},tt,1\big) w_{1} Y_{1} \sigma ^{2} \tau ^{2} 
+\big(1/4 a_{1}^{2} X_{1}^{6}+1/2 a_{1} a_{0} X_{1}^{4}+1/4 a_{0}^{2} X_{
+1}^{2}\big)+\ou\big(w_{1},tt,-1\big) w_{1} Y_{1} \sigma ^{2} \tau ^{2} 
+\big(3/4 a_{1}^{2} X_{1}^{6}+a_{1} a_{0} X_{1}^{4}+1/4 a_{0}^{2} X_{1}^{
+2}\big)+w_{1} Y_{1} \sigma  \tau ^{2} \big(-a_{1} X_{1}^{9}-3/2 a_{0} X_
+{1}^{7}+1/2 a_{0} X_{1}^{3}\big)+w_{1} Y_{1} \sigma  \tau  \big(-1/2 a_{
+1} X_{1}^{3}-1/2 a_{0} X_{1}\big)-Y_{1}
+\end{math}
+
+
+\begin{math}
+\dot X_{1}=\ou\big(w_{1},tt,-1\big) w_{1} \sigma ^{2} \tau ^{2} \big(-1/
+4 a_{1}^{2} X_{1}^{7}-1/2 a_{1} a_{0} X_{1}^{5}-1/4 a_{0}^{2} X_{1}^{3}
+\big)+w_{1} \sigma  \tau ^{2} \big(a_{1} X_{1}^{10}+3/2 a_{0} X_{1}^{8}-
+1/2 a_{0} X_{1}^{4}\big)+w_{1} \sigma  \tau  \big(1/2 a_{1} X_{1}^{4}+1/
+2 a_{0} X_{1}^{2}\big)+\tau  \big(-1/2 X_{1}^{7}+1/2 X_{1}^{3}\big)
+\end{math}
+}
+
+Using just the leading order terms, the ones linear in~$\tau$, and recalling $X_1\approx \xi=\sqrt x$\,, the last \sde\ gives the model
+\begin{equation*}
+\de{t'}x\approx \tau\left[ x^2-x^4+x^{3/2}\Sigma(x)\sigma \de{t'} W\right].
+\end{equation*}
+But recall that $dt'=dt/(x\tau)$ (although one should be more careful as $X_1\approx \sqrt x$\,, not exact equality) and similarly $\de{t'}W=\sqrt{x\tau}\dot W$ so that this model becomes
+\begin{equation*}
+\de{t}x\approx x-x^3+\sqrt{\tau}x \Sigma(x)\sigma \de{t} W\,.
+\end{equation*}
+This agrees with the Stratonovich part of~(A28) by \cite{Monahan2011}.
+But again, the above derivation has the systematic higher order corrections that are needed for finite scale separation~$\tau$ (such corrections appear to be of the same order as the difference between the Ito and Stratonovich versions of this model).
+
+
+\subsubsection{Idealised Stommel-like model of meridional overturning circulation}
+
+\cite{Monahan2011} also analyse the Idealised Stommel-like model
+\begin{align*}
+&\de tx=\mu-|y-x|x+\sigma_A\dot W_1\,,
+\\&\de ty=+\frac1\tau(1-y)-|y-x|y+\sqrt{\frac2\tau}\sigma_M\dot W_2\,.
+\end{align*}
+The mod-functions do not fit into my generic computer algebra so replace them with squares to at least preserve the symmetry.
+As before, introduce $\epsilon^2=\tau$ and rescale time, $t=\tau t'=\epsilon^2t'$  so that $\de t{}=\frac1\tau\de{t'}{}$ and $\dot W_j=\frac1{\sqrt{\tau}}\de {t'}{W_j}=\frac1{\epsilon}\de {t'}{W_j}$.
+Since for small~$\tau$, the fast variable~$y$ is strongly attracted to one, change the reference point for~$y$ by setting $y=1+y'(t)$.
+Then the \sde{}s becomes akin to
+\begin{align*}
+&\de {t'}x=\epsilon^2\left[\mu-(1+y'-x)^2x\right]+\epsilon\sigma_A\de{t'}{W_1}\,,
+\\&\de {t'}{y'}=-y'-\epsilon^2(1+y'-x)^2(1+y')+\sqrt{2}\sigma_M\de{t'}{W_2}\,.
+\end{align*}
+Let $\rho=\sigma_A/(\sqrt2\sigma_M)$\,, use the inbuilt $\sigma=\sqrt2\sigma_M$\,, and invoke \verb|small| to correctly count the number of small~$\epsilon$s in the analysis.
+Code the above dynamics as the following.
+\begin{reduce}
+if thecase=sdeMonaSS then begin
+xrhs := {small*eps^2*(mu-(1+y(1)-x(1))^2*x(1))
+    +small*eps*rho*w(1)}$
+yrhs := { -y(1)-small*eps^2*(1+y(1)-x(1))^2*(1+y(1))+w(2) }$
+zrhs := {}$
+factor small,sigma,eps,rho,yy,y,w,ou;
+toosmall:=4;
+end;
+\end{reduce}
+
+{\raggedright
+\paragraph{The stochastic coordinate transform}\
+
+\begin{math}
+y_{1}=\ou\big(\ou\big(w_{2},tt,-1\big),tt,-1\big) \epsilon ^{2} \sigma  
+\big(-X_{1}^{2}+4 X_{1}-3\big)+3/2 \ou\big(w_{2},tt,1\big) Y_{1}^{2} 
+\epsilon ^{2} \sigma +3/2 \ou\big(w_{2},tt,-1\big) Y_{1}^{2} \epsilon ^{
+2} \sigma +\ou\big(w_{2},tt,-1\big) Y_{1} \epsilon ^{2} \sigma  \big(-4 
+X_{1}+6\big)+\ou\big(w_{2},tt,-1\big) \sigma +1/2 Y_{1}^{3} \epsilon ^{2
+}+Y_{1}^{2} \epsilon ^{2} \big(-2 X_{1}+3\big)+Y_{1}+\epsilon ^{2} \big(
+-X_{1}^{2}+2 X_{1}-1\big)
+\end{math}\par
+
+\begin{math}
+x_{1}=\ou\big(w_{2},tt,1\big) Y_{1} \epsilon ^{2} \sigma  X_{1}+\ou\big(
+w_{2},tt,-1\big) Y_{1} \epsilon ^{2} \sigma  X_{1}+\ou\big(w_{2},tt,-1
+\big) \epsilon ^{2} \sigma  \big(-2 X_{1}^{2}+2 X_{1}\big)+1/2 Y_{1}^{2}
+ \epsilon ^{2} X_{1}+Y_{1} \epsilon ^{2} \big(-2 X_{1}^{2}+2 X_{1}\big)+
+X_{1}
+\end{math}
+}
+
+\paragraph{Result normal form SDEs}\
+
+\begin{math}
+\dot Y_{1}=-3 \ou\big(w_{2},tt,-1\big) w_{2} Y_{1} \epsilon ^{2} \sigma 
+^{2}+4 \ou\big(w_{2},tt,-1\big) w_{1} Y_{1} \epsilon ^{3} \rho  \sigma 
+^{2}+w_{2} Y_{1} \epsilon ^{2} \sigma  \big(4 X_{1}-6\big)+Y_{1} 
+\epsilon ^{2} \big(-X_{1}^{2}+4 X_{1}-3\big)-Y_{1}
+\end{math}\par
+
+\begin{math}
+\dot X_{1}=-\ou\big(w_{2},tt,-1\big) w_{2} \epsilon ^{2} \sigma ^{2} X_{
+1}+\ou\big(w_{2},tt,-1\big) w_{1} \epsilon ^{3} \rho  \sigma ^{2} \big(4
+ X_{1}-2\big)+w_{2} \epsilon ^{2} \sigma  \big(2 X_{1}^{2}-2 X_{1}\big)+
+w_{1} \epsilon  \rho  \sigma +\epsilon ^{2} \big(-X_{1}^{3}+2 X_{1}^{2}-
+X_{1}+\mu \big)
+\end{math}
+
+Deterministically, this model has multiple equilibria for small~$\mu$, but only one equilibria for $\mu>4/27$\,, at finite amplitude.
+The noise~$\dot W_1$ causes transitions between such multiple equilibria, and the multiplicative noise~$\dot W_2$ contributes as well.
+But the same order of smallness is the first term in the $X_1$~\sde\ above which is a quadratic noise that has a mean drift effect that should enhance the stability of the small~$x$ equilibrium.
+
+
+\subsection{Majda's triad models}
+
+\cite{Majda02} investigated averaging in two 3D \sde\ systems.
+I also looked at these in 2003.\footnote{\emph{Centre manifold analysis of stochastic multiplicative triad model}, technical report.}  Let's look at the stochastic normal form.
+
+\subsubsection{Multiplicative triad model}
+
+The multiplicative triad model of \cite{Majda02} consists of three modes, $v_1$, $v_2$~and~$v_3$.
+These evolve in time according to
+\begin{equation}
+	\frac{dv_1}{dt}=b_1v_2v_3\,,\quad
+	\frac{dv_2}{dt}=b_2v_1v_3\,,\quad
+	\frac{dv_3}{dt}=-v_3+b_3v_1v_2+\sigma\dot W\,,
+	\label{eq:triad}
+\end{equation}
+where $b_i$~and~$\sigma$ are some constants and the noise forces the third mode.
+Here I have already scaled the equations so that the rate of decay of the third mode is one.
+Thus on long time scales we expect the third mode to be essentially negligible and the system to be modelled by the relatively slow evolution of the first two modes.
+\begin{reduce}
+if thecase=sdeMajda3m then begin
+operator b; defindex b(down);
+xrhs := {b(1)*x(2)*y(1),b(2)*x(1)*y(1)}$
+yrhs := { -y(1)+b(3)*x(1)*x(2)+w(3) }$
+zrhs := {}$
+factor small,sigma,yy,y,w,ou;
+toosmall:=5;
+end;
+\end{reduce}
+
+\paragraph{The stochastic coordinate transform}
+\ 
+
+\begin{math}
+y_{1}=\ou\big(\ou\big(w_{3},tt,-1\big),tt,-1\big) \sigma  \big(-b_{3} b_
+{2} X_{1}^{2}-b_{3} b_{1} X_{2}^{2}\big)-4 \ou\big(w_{3},tt,-1\big) Y_{1
+} \sigma  b_{3} b_{2} b_{1} X_{2} X_{1}+\ou\big(w_{3},tt,-1\big) \sigma 
+ \big(-b_{3} b_{2} X_{1}^{2}-b_{3} b_{1} X_{2}^{2}+1\big)-2 Y_{1}^{2} b_
+{3} b_{2} b_{1} X_{2} X_{1}+Y_{1}-b_{3}^{2} b_{2} X_{2} X_{1}^{3}-b_{3}
+^{2} b_{1} X_{2}^{3} X_{1}+b_{3} X_{2} X_{1}
+\end{math}\par
+
+\begin{math}
+x_{1}=\ou\big(\ou\big(w_{3},tt,-1\big),tt,-1\big) \sigma  \big(b_{3} b_{
+2} b_{1} X_{2} X_{1}^{2}+b_{3} b_{1}^{2} X_{2}^{3}\big)-1/2 \ou\big(w_{3
+},tt,-1\big) Y_{1}^{2} \sigma  b_{2} b_{1}^{2} X_{2}+\ou\big(w_{3},tt,-1
+\big) Y_{1} \sigma  b_{2} b_{1} X_{1}+\ou\big(w_{3},tt,-1\big) \sigma  
+\big(2 b_{3} b_{2} b_{1} X_{2} X_{1}^{2}+2 b_{3} b_{1}^{2} X_{2}^{3}-b_{
+1} X_{2}\big)-1/6 Y_{1}^{3} b_{2} b_{1}^{2} X_{2}+1/2 Y_{1}^{2} b_{2} b_
+{1} X_{1}+Y_{1} \big(b_{3} b_{2} b_{1} X_{2} X_{1}^{2}+b_{3} b_{1}^{2} X
+_{2}^{3}-b_{1} X_{2}\big)+X_{1}
+\end{math}\par
+
+\begin{math}
+x_{2}=\ou\big(\ou\big(w_{3},tt,-1\big),tt,-1\big) \sigma  \big(b_{3} b_{
+2}^{2} X_{1}^{3}+b_{3} b_{2} b_{1} X_{2}^{2} X_{1}\big)-1/2 \ou\big(w_{3
+},tt,-1\big) Y_{1}^{2} \sigma  b_{2}^{2} b_{1} X_{1}+\ou\big(w_{3},tt,-1
+\big) Y_{1} \sigma  b_{2} b_{1} X_{2}+\ou\big(w_{3},tt,-1\big) \sigma  
+\big(2 b_{3} b_{2}^{2} X_{1}^{3}+2 b_{3} b_{2} b_{1} X_{2}^{2} X_{1}-b_{
+2} X_{1}\big)-1/6 Y_{1}^{3} b_{2}^{2} b_{1} X_{1}+1/2 Y_{1}^{2} b_{2} b_
+{1} X_{2}+Y_{1} \big(b_{3} b_{2}^{2} X_{1}^{3}+b_{3} b_{2} b_{1} X_{2}^{
+2} X_{1}-b_{2} X_{1}\big)+X_{2}
+\end{math}
+
+
+\paragraph{Result normal form SDEs}
+\ 
+
+\begin{math}
+\dot Y_{1}=\ou\big(w_{3},tt,-1\big) w_{3} Y_{1} \sigma ^{2} \big(2 b_{3}
+ b_{2}^{2} b_{1} X_{1}^{2}+2 b_{3} b_{2} b_{1}^{2} X_{2}^{2}\big)+4 w_{3
+} Y_{1} \sigma  b_{3} b_{2} b_{1} X_{2} X_{1}+Y_{1} \big(b_{3}^{2} b_{2}
+^{2} X_{1}^{4}+2 b_{3}^{2} b_{2} b_{1} X_{2}^{2} X_{1}^{2}+b_{3}^{2} b_{
+1}^{2} X_{2}^{4}-b_{3} b_{2} X_{1}^{2}-b_{3} b_{1} X_{2}^{2}-1\big)
+\end{math}
+
+\begin{math}
+\dot X_{1}=-2 \ou\big(w_{3},tt,-1\big) w_{3} \sigma ^{2} b_{3} b_{2} b_{
+1}^{2} X_{2}^{2} X_{1}+w_{3} \sigma  \big(-2 b_{3} b_{2} b_{1} X_{2} X_{
+1}^{2}-2 b_{3} b_{1}^{2} X_{2}^{3}+b_{1} X_{2}\big)-b_{3}^{2} b_{2} b_{1
+} X_{2}^{2} X_{1}^{3}-b_{3}^{2} b_{1}^{2} X_{2}^{4} X_{1}+b_{3} b_{1} X_
+{2}^{2} X_{1}
+\end{math}
+
+\begin{math}
+\dot X_{2}=-2 \ou\big(w_{3},tt,-1\big) w_{3} \sigma ^{2} b_{3} b_{2}^{2}
+ b_{1} X_{2} X_{1}^{2}+w_{3} \sigma  \big(-2 b_{3} b_{2}^{2} X_{1}^{3}-2
+ b_{3} b_{2} b_{1} X_{2}^{2} X_{1}+b_{2} X_{1}\big)-b_{3}^{2} b_{2}^{2} 
+X_{2} X_{1}^{4}-b_{3}^{2} b_{2} b_{1} X_{2}^{3} X_{1}^{2}+b_{3} b_{2} X_
+{2} X_{1}^{2}
+\end{math}
+
+\cite{Majda02} predicts, their equation~(52), the two leading order terms in the deterministic part and the linear noise part.
+I suspect their first term in each equation is an Ito version of my Stratonovich modelling.
+All the higher order terms here are missed by their averaging.
+
+
+\subsubsection{Additive triad model}
+
+The additive triad model of \cite{Majda02} consists of three modes, 
+$v_1$, $v_2$~and~$v_3$, as before.
+However, these now evolve in time according to
+\begin{eqnarray}
+	\frac{dv_1}{dt}&=&b_1v_2v_3\,,\nonumber\\
+	\frac{dv_2}{dt}&=&-v_2+b_2v_1v_3+\sigma_2\dot W_2\,,
+	\label{eq:triada}\\
+	\frac{dv_3}{dt}&=&-v_3+b_3v_1v_2+\sigma_3\dot W_3\,,
+	\nonumber
+\end{eqnarray}
+where $b_i$~and~$\sigma_i$ are some constants, and there is independent stochastic forcing of the second and third modes.
+Here I have already scaled the equations so that the rate of decay of  \emph{both} the second and third mode is one.\footnote{In contrast,  \cite{Majda02} set the two modes to have different decay rates.
+I do not  expect much difference in using the same decay rate, it is just more  convenient that the memory convolutions are then identical for the two  modes rather than being different.
+Having the decay rates the same is  also closer to my expected application to spatial problems.} Thus on  long time scales we expect the second and third modes to be  essentially negligible and the system to be modelled by the relatively  slow evolution of the first mode.
+This section constructs the  stochastic normal form of its centre manifold model as the basis for a  model over long time scales with new noise processes.
+\begin{reduce}
+if thecase=sdeMajda3a then begin
+operator b; defindex b(down);
+xrhs := {b(1)*y(2)*y(1)}$
+yrhs := { -y(1)+b(2)*x(1)*y(2)+b(21)*w(2)
+         ,-y(2)+b(3)*x(1)*y(1)+b(31)*w(3) }$
+zrhs := {}$
+factor small,sigma,yy,y,xx,x;
+toosmall:=3;
+end;
+\end{reduce}
+
+{\raggedright
+\paragraph{The stochastic coordinate transform}
+\ 
+
+\begin{math}
+y_{1}=X_{1} \sigma  b_{31} b_{2} \ou\big(\ou\big(w_{3},tt,-1\big),tt,-1
+\big)+Y_{1}+\sigma  b_{21} \ou\big(w_{2},tt,-1\big)
+\end{math}\par
+
+\begin{math}
+y_{2}=X_{1} \sigma  b_{21} b_{3} \ou\big(\ou\big(w_{2},tt,-1\big),tt,-1
+\big)+Y_{2}+\sigma  b_{31} \ou\big(w_{3},tt,-1\big)
+\end{math}\par
+
+\begin{math}
+x_{1}=X_{1}-1/2 Y_{2} Y_{1} b_{1}+Y_{2} \sigma  \big(-1/2 b_{21} b_{1} 
+\ou\big(w_{2},tt,1\big)-1/2 b_{21} b_{1} \ou\big(w_{2},tt,-1\big)\big)+Y
+_{1} \sigma  \big(-1/2 b_{31} b_{1} \ou\big(w_{3},tt,1\big)-1/2 b_{31} b
+_{1} \ou\big(w_{3},tt,-1\big)\big)
+\end{math}
+
+
+\paragraph{Result normal form SDEs}
+\ 
+
+\begin{math}
+\dot Y_{1}=X_{1} Y_{2} b_{2}+Y_{2} \sigma ^{2} \big(-1/2 b_{31} b_{21} b
+_{2} b_{1} \ou\big(\ou\big(w_{3},tt,-1\big),tt,-1\big) w_{2}-1/2 b_{31} 
+b_{21} b_{2} b_{1} \ou\big(w_{3},tt,-1\big) w_{2}-1/2 b_{31} b_{21} b_{2
+} b_{1} \ou\big(w_{2},tt,-1\big) w_{3}\big)+Y_{1} \sigma ^{2} \big(-1/2 
+b_{31}^{2} b_{2} b_{1} \ou\big(\ou\big(w_{3},tt,-1\big),tt,-1\big) w_{3}
+-1/2 b_{31}^{2} b_{2} b_{1} \ou\big(w_{3},tt,-1\big) w_{3}\big)-Y_{1}
+\end{math}\par
+
+\begin{math}
+\dot Y_{2}=X_{1} Y_{1} b_{3}+Y_{2} \sigma ^{2} \big(-1/2 b_{21}^{2} b_{3
+} b_{1} \ou\big(\ou\big(w_{2},tt,-1\big),tt,-1\big) w_{2}-1/2 b_{21}^{2}
+ b_{3} b_{1} \ou\big(w_{2},tt,-1\big) w_{2}\big)-Y_{2}+Y_{1} \sigma ^{2}
+ \big(-1/2 b_{31} b_{21} b_{3} b_{1} \ou\big(\ou\big(w_{2},tt,-1\big),tt
+,-1\big) w_{3}-1/2 b_{31} b_{21} b_{3} b_{1} \ou\big(w_{3},tt,-1\big) w_
+{2}-1/2 b_{31} b_{21} b_{3} b_{1} \ou\big(w_{2},tt,-1\big) w_{3}\big)
+\end{math}\par
+
+\begin{math}
+\dot X_{1}=X_{1} \sigma ^{2} \big(1/2 b_{31}^{2} b_{2} b_{1} \ou\big(\ou
+\big(w_{3},tt,-1\big),tt,-1\big) w_{3}+1/2 b_{31}^{2} b_{2} b_{1} \ou
+\big(w_{3},tt,-1\big) w_{3}+1/2 b_{21}^{2} b_{3} b_{1} \ou\big(\ou\big(w
+_{2},tt,-1\big),tt,-1\big) w_{2}+1/2 b_{21}^{2} b_{3} b_{1} \ou\big(w_{2
+},tt,-1\big) w_{2}\big)+\sigma ^{2} \big(1/2 b_{31} b_{21} b_{1} \ou
+\big(w_{3},tt,-1\big) w_{2}+1/2 b_{31} b_{21} b_{1} \ou\big(w_{2},tt,-1
+\big) w_{3}\big)
+\end{math}
+
+}
+
+The only terms in the model are the quadratic noise-noise interaction terms. \cite{Majda02} recognise the last, $\sigma^2$~term, but not the first, $X_1\sigma^2$~term.
+They represent it as a mean drift and independent noise (presumably the mean drift comes from the Ito representation of my Stratonovich noise).
+
+
+
+
+
+
+\subsection{Potzsche and Rasmussen deterministic non-autonomous examples}
+
+\cite{Potzsche2006} establish Taylor approximations of various integral manifolds of non-autonomous systems.
+They give two examples.
+
+\subsubsection{Lorenz near the pitchfork bifurcation}
+
+Example~5.1 of \cite{Potzsche2006} is
+\begin{align*}
+&\dot x_1=\sigma_\epsilon(x_2-x_1),\\
+&\dot x_2=\rho_\epsilon x_1-x_2-x_1x_3\,,\\
+&\dot x_3=-\beta_\epsilon x_3+x_1x_2\,.
+\end{align*}
+where parameters are $\sigma_\epsilon=\sigma_0+\epsilon\sigma(t)$, $\rho_\epsilon=1+\rho_0+\epsilon\rho(t)$ and $\beta_\epsilon=\beta_0+\epsilon\beta(t)$.
+When there is no parametric fluctuations, $\epsilon=0$\,, there is a pitchfork bifurcation as~$\rho_0$ crosses zero.
+
+To analyses dynamics at this pitchfork bifurcation in the presence of fluctuations, \cite{Potzsche2006} take a linear transform of the system to variables~$\vec y$ and set $\rho_0=0$\,.
+In the following coding I use $\verb|x(1)|=y_3$, $\verb|y(1)|=y_1$ and $\verb|y(2)|=y_2$\,; there are no unstable modes.
+Also the fluctuations $\epsilon\rho(t)$ are represented in the input by \verb|w(rho)| whereas in the output it is represented by $\sigma w_\rho$, and similarly for the other fluctuating quantities.
+Note that the algorithm automatically multiplies time varying quantities by the `small' parameter~$\sigma$ (distinct from the $\sigma$ in the Lorenz system!) corresponding to their~$\epsilon$.  
+\begin{reduce}
+if thecase=sdePRLorenz then begin
+sig0:=1; bet0:=1; 
+sig1:=sig0/(sig0+1);
+xrhs := {sig0*sig1*y(1)*y(2)-sig1*x(1)*y(2)
+    +sig1*x(1)*w(rho)
+    +(w(sigma)-w(rho)/(sig0+1))*y(1)}$
+yrhs := { -(sig0+1)*y(1)+sig1*y(1)*y(2)-x(1)*y(2)/(sig0+1)
+    +w(rho)/(sig0+1)*x(1)
+    -(w(sigma)+w(rho)/(sig0+1))*y(1)
+    ,-bet0*y(2)-sig0*y(1)^2+(1-sig0)*x(1)*y(1)+x(1)^2
+    -w(beta)*y(2)
+    }$
+zrhs := {}$
+factor small,sigma,yy,y,xx,x;
+toosmall:=3;
+end;
+\end{reduce}
+
+For the general computer algebra I set $\sigma_0$~and~$\beta_0$ to some definite values, here $\sigma_0=\beta_0=1$\,.
+
+\paragraph{The specified dynamical system}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot x_{1}=-1/2 x_{1} y_{2} \varepsilon +1/2 x_{1} \sigma  w_{\rho }+1/2
+ y_{2} y_{1} \varepsilon +y_{1} \sigma  \big(-1/2 w_{\rho }+w_{\sigma }
+\big)
+\end{math}\par
+
+\begin{math}
+\dot y_{1}=-1/2 x_{1} y_{2} \varepsilon +1/2 x_{1} \sigma  w_{\rho }+1/2
+ y_{2} y_{1} \varepsilon +y_{1} \sigma  \big(-1/2 w_{\rho }-w_{\sigma }
+\big)-2 y_{1}
+\end{math}\par
+
+\begin{math}
+\dot y_{2}=x_{1}^{2} \varepsilon -y_{2} \sigma  w_{\beta }-y_{2}-y_{1}^{
+2} \varepsilon 
+\end{math}\par
+
+\paragraph{The stochastic coordinate transform}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+y_{1}=X_{1} Y_{2} \sigma  \big(-1/2 \ou\big(w_{\beta },tt,-1\big)+\ou
+\big(w_{\rho },tt,-1\big)-1/4 \ou\big(w_{\rho },tt,-2\big)+1/2 \ou\big(w
+_{\sigma },tt,-1\big)\big)-1/2 X_{1} Y_{2}+1/2 X_{1} \sigma  \ou\big(w_{
+\rho },tt,-2\big)+Y_{2} Y_{1} \sigma  \big(1/2 \ou\big(w_{\beta },tt,1
+\big)-1/4 \ou\big(w_{\rho },tt,2\big)+1/3 \ou\big(w_{\rho },tt,1\big)+1/
+2 \ou\big(w_{\sigma },tt,2\big)-1/2 \ou\big(w_{\sigma },tt,1\big)\big)-1
+/2 Y_{2} Y_{1}+Y_{1}
+\end{math}\par
+
+\begin{math}
+y_{2}=X_{1}^{2} \sigma  \big(-\ou\big(w_{\beta },tt,-1\big)-\ou\big(w_{
+\rho },tt,-1\big)\big)+X_{1}^{2}+X_{1} Y_{1} \sigma  \big(\ou\big(w_{
+\rho },tt,2\big)-2/3 \ou\big(w_{\rho },tt,1\big)+1/3 \ou\big(w_{\rho },
+tt,-2\big)-2 \ou\big(w_{\sigma },tt,2\big)+2 \ou\big(w_{\sigma },tt,1
+\big)\big)+Y_{2}+Y_{1}^{2} \sigma  \big(1/3 \ou\big(w_{\beta },tt,3\big)
+-1/3 \ou\big(w_{\rho },tt,3\big)-2/3 \ou\big(w_{\sigma },tt,3\big)\big)+
+1/3 Y_{1}^{2}
+\end{math}\par
+
+\begin{math}
+x_{1}=X_{1} Y_{2} \sigma  \big(-1/2 \ou\big(w_{\beta },tt,1\big)-1/3 \ou
+\big(w_{\rho },tt,1\big)-1/12 \ou\big(w_{\rho },tt,-2\big)+1/2 \ou\big(w
+_{\sigma },tt,1\big)\big)+1/2 X_{1} Y_{2}+X_{1}+Y_{2} Y_{1} \sigma  
+\big(1/6 \ou\big(w_{\beta },tt,3\big)-1/3 \ou\big(w_{\rho },tt,3\big)+1/
+4 \ou\big(w_{\rho },tt,2\big)+7/6 \ou\big(w_{\sigma },tt,3\big)-1/2 \ou
+\big(w_{\sigma },tt,2\big)\big)-1/6 Y_{2} Y_{1}+Y_{1} \sigma  \big(1/2 
+\ou\big(w_{\rho },tt,2\big)-\ou\big(w_{\sigma },tt,2\big)\big)
+\end{math}\par
+
+\begin{math}
+\end{math}
+\paragraph{Result normal form SDEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot Y_{1}=X_{1}^{2} Y_{1} \sigma ^{2} \big(1/2 \ou\big(\ou\big(w_{\rho 
+},tt,2\big),tt,2\big) w_{\rho }+1/4 \ou\big(\ou\big(w_{\rho },tt,-2\big)
+,tt,-2\big) w_{\rho }-1/2 \ou\big(\ou\big(w_{\rho },tt,-2\big),tt,-2
+\big) w_{\sigma }-\ou\big(\ou\big(w_{\sigma },tt,2\big),tt,2\big) w_{
+\rho }+1/12 \ou\big(w_{\beta },tt,2\big) w_{\rho }+1/2 \ou\big(w_{\beta 
+},tt,-1\big) w_{\beta }+1/3 \ou\big(w_{\beta },tt,-1\big) w_{\rho }-1/2 
+\ou\big(w_{\beta },tt,-1\big) w_{\sigma }-3/4 \ou\big(w_{\rho },tt,2
+\big) w_{\beta }+13/48 \ou\big(w_{\rho },tt,2\big) w_{\rho }+3/8 \ou
+\big(w_{\rho },tt,2\big) w_{\sigma }+1/3 \ou\big(w_{\rho },tt,1\big) w_{
+\beta }-2/3 \ou\big(w_{\rho },tt,1\big) w_{\rho }-1/3 \ou\big(w_{\rho },
+tt,1\big) w_{\sigma }+1/2 \ou\big(w_{\rho },tt,-1\big) w_{\beta }+1/3 
+\ou\big(w_{\rho },tt,-1\big) w_{\rho }-1/2 \ou\big(w_{\rho },tt,-1\big) 
+w_{\sigma }-1/6 \ou\big(w_{\rho },tt,-2\big) w_{\beta }+7/12 \ou\big(w_{
+\rho },tt,-2\big) w_{\rho }-7/12 \ou\big(w_{\rho },tt,-2\big) w_{\sigma 
+}+3/2 \ou\big(w_{\sigma },tt,2\big) w_{\beta }-3/8 \ou\big(w_{\sigma },
+tt,2\big) w_{\rho }-3/4 \ou\big(w_{\sigma },tt,2\big) w_{\sigma }-\ou
+\big(w_{\sigma },tt,1\big) w_{\beta }+2 \ou\big(w_{\sigma },tt,1\big) w_
+{\rho }+\ou\big(w_{\sigma },tt,1\big) w_{\sigma }\big)+X_{1}^{2} Y_{1} 
+\sigma  \big(-1/2 w_{\beta }-3/4 w_{\rho }-1/4 w_{\sigma }\big)+1/2 X_{1
+}^{2} Y_{1}+X_{1} Y_{2}^{2} \sigma ^{2} \big(-1/8 \ou\big(\ou\big(w_{
+\rho },tt,2\big),tt,2\big) w_{\rho }+1/4 \ou\big(\ou\big(w_{\sigma },tt,
+2\big),tt,2\big) w_{\rho }-1/12 \ou\big(w_{\beta },tt,2\big) w_{\rho }+1
+/4 \ou\big(w_{\beta },tt,1\big) w_{\beta }-1/2 \ou\big(w_{\beta },tt,1
+\big) w_{\rho }-1/4 \ou\big(w_{\beta },tt,1\big) w_{\sigma }+1/4 \ou
+\big(w_{\beta },tt,-1\big) w_{\beta }+1/6 \ou\big(w_{\beta },tt,-1\big) 
+w_{\rho }-1/4 \ou\big(w_{\beta },tt,-1\big) w_{\sigma }+1/96 \ou\big(w_{
+\rho },tt,2\big) w_{\rho }+1/6 \ou\big(w_{\rho },tt,1\big) w_{\beta }-1/
+3 \ou\big(w_{\rho },tt,1\big) w_{\rho }-1/6 \ou\big(w_{\rho },tt,1\big) 
+w_{\sigma }-1/2 \ou\big(w_{\rho },tt,-1\big) w_{\beta }-1/3 \ou\big(w_{
+\rho },tt,-1\big) w_{\rho }+1/2 \ou\big(w_{\rho },tt,-1\big) w_{\sigma }
+-1/12 \ou\big(w_{\rho },tt,-2\big) w_{\beta }+1/96 \ou\big(w_{\rho },tt,
+-2\big) w_{\rho }-1/6 \ou\big(w_{\rho },tt,-2\big) w_{\sigma }-1/6 \ou
+\big(w_{\sigma },tt,2\big) w_{\rho }-1/4 \ou\big(w_{\sigma },tt,1\big) w
+_{\beta }+1/2 \ou\big(w_{\sigma },tt,1\big) w_{\rho }+1/4 \ou\big(w_{
+\sigma },tt,1\big) w_{\sigma }-1/4 \ou\big(w_{\sigma },tt,-1\big) w_{
+\beta }-1/6 \ou\big(w_{\sigma },tt,-1\big) w_{\rho }+1/4 \ou\big(w_{
+\sigma },tt,-1\big) w_{\sigma }\big)+3/4 X_{1} Y_{2}^{2} \sigma  w_{
+\rho }-1/2 X_{1} Y_{2}^{2}+Y_{1} \sigma ^{2} \big(1/4 \ou\big(w_{\rho },
+tt,2\big) w_{\rho }-1/2 \ou\big(w_{\sigma },tt,2\big) w_{\rho }\big)+Y_{
+1} \sigma  \big(-1/2 w_{\rho }-w_{\sigma }\big)-2 Y_{1}
+\end{math}\par
+
+\begin{math}
+\dot Y_{2}=X_{1}^{2} Y_{2} \sigma ^{2} \big(\ou\big(w_{\beta },tt,1\big)
+ w_{\beta }+\ou\big(w_{\beta },tt,1\big) w_{\rho }-1/3 \ou\big(w_{\beta 
+},tt,-1\big) w_{\rho }+\ou\big(w_{\beta },tt,-1\big) w_{\sigma }+2/3 \ou
+\big(w_{\rho },tt,1\big) w_{\beta }+2/3 \ou\big(w_{\rho },tt,1\big) w_{
+\rho }+2/3 \ou\big(w_{\rho },tt,-1\big) w_{\rho }-2 \ou\big(w_{\rho },tt
+,-1\big) w_{\sigma }+1/3 \ou\big(w_{\rho },tt,-2\big) w_{\beta }-13/24 
+\ou\big(w_{\rho },tt,-2\big) w_{\rho }+5/6 \ou\big(w_{\rho },tt,-2\big) 
+w_{\sigma }-\ou\big(w_{\sigma },tt,1\big) w_{\beta }-\ou\big(w_{\sigma }
+,tt,1\big) w_{\rho }+1/3 \ou\big(w_{\sigma },tt,-1\big) w_{\rho }-\ou
+\big(w_{\sigma },tt,-1\big) w_{\sigma }\big)+X_{1}^{2} Y_{2} \sigma  
+\big(-w_{\beta }-1/2 w_{\rho }+w_{\sigma }\big)+X_{1}^{2} Y_{2}-Y_{2} 
+\sigma  w_{\beta }-Y_{2}
+\end{math}\par
+
+\begin{math}
+\dot X_{1}=X_{1}^{3} \sigma ^{2} \big(-1/4 \ou\big(\ou\big(w_{\rho },tt,
+-2\big),tt,-2\big) w_{\rho }+1/2 \ou\big(\ou\big(w_{\rho },tt,-2\big),tt
+,-2\big) w_{\sigma }-1/2 \ou\big(w_{\beta },tt,-1\big) w_{\beta }-1/3 
+\ou\big(w_{\beta },tt,-1\big) w_{\rho }+1/2 \ou\big(w_{\beta },tt,-1
+\big) w_{\sigma }+1/4 \ou\big(w_{\beta },tt,-2\big) w_{\rho }-1/2 \ou
+\big(w_{\beta },tt,-2\big) w_{\sigma }-1/2 \ou\big(w_{\rho },tt,-1\big) 
+w_{\beta }-1/3 \ou\big(w_{\rho },tt,-1\big) w_{\rho }+1/2 \ou\big(w_{
+\rho },tt,-1\big) w_{\sigma }-1/12 \ou\big(w_{\rho },tt,-2\big) w_{
+\beta }-13/48 \ou\big(w_{\rho },tt,-2\big) w_{\rho }+3/8 \ou\big(w_{
+\rho },tt,-2\big) w_{\sigma }-1/8 \ou\big(w_{\sigma },tt,-2\big) w_{
+\rho }+1/4 \ou\big(w_{\sigma },tt,-2\big) w_{\sigma }\big)+X_{1}^{3} 
+\sigma  \big(1/2 w_{\beta }+3/4 w_{\rho }-1/4 w_{\sigma }\big)-1/2 X_{1}
+^{3}+X_{1} \sigma ^{2} \big(-1/4 \ou\big(w_{\rho },tt,-2\big) w_{\rho }+
+1/2 \ou\big(w_{\rho },tt,-2\big) w_{\sigma }\big)+1/2 X_{1} \sigma  w_{
+\rho }
+\end{math}\par
+
+In their analysis \cite{Potzsche2006} explicitly report the last and third-to-last terms above, for these choices of $\sigma_0$~and~$\beta_0$, to deduce their model~(5.3) which here is
+\begin{equation*}
+\dot X\approx\rat12\sigma w_\rho X-\rat12 X^3.
+\end{equation*}
+Nice agreement.
+
+
+
+
+
+
+\subsubsection{Fluctuating kdV example}
+
+\cite{Potzsche2006} [Example~5.4] seek travelling wave solutions, $u(x-ct)$ with wave speed~$c$, of a modified KdV equation.  
+This leads to the following system 
+\begin{equation*}
+\dot x_1=x_2\,,\quad
+\dot x_2=x_3\,,\quad
+\dot x_3=c^2x_2-a(t)x_1^2x_2\,.
+\end{equation*}
+My analysis is for wave speed $c^2=1$\,.
+A transform to diagonalise the linear part into slow variable~$x$, stable~$y$ and unstable~$z$ is then that $x_1=x+y+z$\,, $x_2=z-y$ and $x_3=z+y$\,.
+\begin{reduce}
+if thecase=sdePRKdV then begin
+afn:=w(a)*(x(1)+y(1)+z(1))^2*(z(1)-y(1));
+xrhs := { afn }$
+yrhs := { -y(1)-afn/2 }$
+zrhs := { +z(1)-afn/2 }$
+factor small,sigma,zz,z,yy,y,xx,x;
+toosmall:=3;
+end;
+\end{reduce}
+
+Using \verb|w(a)| to denote the variable coefficient~$a(t)$, it is represented in this output by~$\sigma w_a$.
+
+\paragraph{The specified dynamical system}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot x_{1}=-x_{1}^{2} y_{1} \sigma  w_{a}+x_{1}^{2} z_{1} \sigma  w_{a}-
+2 x_{1} y_{1}^{2} \sigma  w_{a}+2 x_{1} z_{1}^{2} \sigma  w_{a}-y_{1}^{3
+} \sigma  w_{a}-y_{1}^{2} z_{1} \sigma  w_{a}+y_{1} z_{1}^{2} \sigma  w_
+{a}+z_{1}^{3} \sigma  w_{a}
+\end{math}\par
+
+\begin{math}
+\dot y_{1}=1/2 x_{1}^{2} y_{1} \sigma  w_{a}-1/2 x_{1}^{2} z_{1} \sigma 
+ w_{a}+x_{1} y_{1}^{2} \sigma  w_{a}-x_{1} z_{1}^{2} \sigma  w_{a}+1/2 y
+_{1}^{3} \sigma  w_{a}+1/2 y_{1}^{2} z_{1} \sigma  w_{a}-1/2 y_{1} z_{1}
+^{2} \sigma  w_{a}-y_{1}-1/2 z_{1}^{3} \sigma  w_{a}
+\end{math}\par
+
+\begin{math}
+\dot z_{1}=1/2 x_{1}^{2} y_{1} \sigma  w_{a}-1/2 x_{1}^{2} z_{1} \sigma 
+ w_{a}+x_{1} y_{1}^{2} \sigma  w_{a}-x_{1} z_{1}^{2} \sigma  w_{a}+1/2 y
+_{1}^{3} \sigma  w_{a}+1/2 y_{1}^{2} z_{1} \sigma  w_{a}-1/2 y_{1} z_{1}
+^{2} \sigma  w_{a}-1/2 z_{1}^{3} \sigma  w_{a}+z_{1}
+\end{math}\par
+
+\paragraph{Time dependent coordinate transform}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+z_{1}=-1/2 X_{1}^{2} Y_{1} \sigma  \ou\big(w_{a},tt,2\big)-X_{1} Y_{1}^{
+2} \sigma  \ou\big(w_{a},tt,3\big)-X_{1} Z_{1}^{2} \sigma  \ou\big(w_{a}
+,tt,-1\big)-1/2 Y_{1}^{3} \sigma  \ou\big(w_{a},tt,4\big)-1/2 Y_{1}^{2} 
+Z_{1} \sigma  \ou\big(w_{a},tt,2\big)-1/2 Z_{1}^{3} \sigma  \ou\big(w_{a
+},tt,-2\big)+Z_{1}
+\end{math}\par
+
+\begin{math}
+y_{1}=-1/2 X_{1}^{2} Z_{1} \sigma  \ou\big(w_{a},tt,-2\big)-X_{1} Y_{1}
+^{2} \sigma  \ou\big(w_{a},tt,1\big)-X_{1} Z_{1}^{2} \sigma  \ou\big(w_{
+a},tt,-3\big)-1/2 Y_{1}^{3} \sigma  \ou\big(w_{a},tt,2\big)-1/2 Y_{1} Z_
+{1}^{2} \sigma  \ou\big(w_{a},tt,-2\big)+Y_{1}-1/2 Z_{1}^{3} \sigma  \ou
+\big(w_{a},tt,-4\big)
+\end{math}\par
+
+\begin{math}
+x_{1}=X_{1}^{2} Y_{1} \sigma  \ou\big(w_{a},tt,1\big)+X_{1}^{2} Z_{1} 
+\sigma  \ou\big(w_{a},tt,-1\big)+2 X_{1} Y_{1}^{2} \sigma  \ou\big(w_{a}
+,tt,2\big)+2 X_{1} Z_{1}^{2} \sigma  \ou\big(w_{a},tt,-2\big)+X_{1}+Y_{1
+}^{3} \sigma  \ou\big(w_{a},tt,3\big)+Y_{1}^{2} Z_{1} \sigma  \ou\big(w_
+{a},tt,1\big)+Y_{1} Z_{1}^{2} \sigma  \ou\big(w_{a},tt,-1\big)+Z_{1}^{3}
+ \sigma  \ou\big(w_{a},tt,-3\big)
+\end{math}\par
+
+Putting $Z_1=0$ into the coordinate transform gives the centre-stable manifold.
+Then the expression for $z_1$ in the above coordinate transform leads to the same convolutions as those of \cite{Potzsche2006} [pp.453--4].
+Conversely, putting $Y_1=0$ gives the centre-unstable manifold and the expression for~$y_1$ above leads to the same convolutions as those of \cite{Potzsche2006}.
+Presumably the distortions of the other variables have a higher order influence on this nice agreement.
+
+
+
+
+
+\subsection{Local analysis of heat exchanger}
+
+\cite{Roberts2013a} provides novel theoretical support for the method of multiple scales in spatio-temporal systems, and then extends this important method.
+Perhaps the simplest example is the heat exchanger: the non-autonomous slow manifold analysis that is at the heart of the novel methodology is determined here.
+Expand advection-exchange in a heat exchanger in powers of $(x-X)^n/n!$.
+With Taylor Remainder Theorem closing the problem in terms of unknown functions which here are represented by the non-autonomous forcing~$w_i$.
+Note that \(\verb|y(j)|=d_{j-1}\) and \(\verb|x(j)|=c_{j-1}\).  
+Also \(\verb|w(1)|=d_{4X}\eta_x\) and \(\verb|w(2)|=c_{4X}\xi_x\) and evaluate at intensity $\sigma=5$\,.
+\begin{reduce}
+if thecase=sdehe then begin
+xrhs:={y(2),y(3),y(4),y(5),w(1)};
+yrhs:={-y(1)+x(2),-y(2)+x(3),-y(3)+x(4),-y(4)+x(5),-y(5)+w(2)};
+zrhs:={ };
+toosmall:=6;
+factor small,sigma;
+end;
+\end{reduce}
+
+
+\paragraph{Specified dynamical system}
+The above writes the \ode{}s as the following.
+\begin{math}
+\dot x_{1}=\varepsilon  y_{2}
+\end{math},
+\begin{math}
+\dot x_{2}=\varepsilon  y_{3}
+\end{math},
+\begin{math}
+\dot x_{3}=\varepsilon  y_{4}
+\end{math},
+\begin{math}
+\dot x_{4}=\varepsilon  y_{5}
+\end{math},
+\begin{math}
+\dot x_{5}=\sigma  w_{1}
+\end{math},
+\begin{math}
+\dot y_{1}=\varepsilon  x_{2}-y_{1}
+\end{math},
+\begin{math}
+\dot y_{2}=\varepsilon  x_{3}-y_{2}
+\end{math},
+\begin{math}
+\dot y_{3}=\varepsilon  x_{4}-y_{3}
+\end{math},
+\begin{math}
+\dot y_{4}=\varepsilon  x_{5}-y_{4}
+\end{math},
+\begin{math}
+\dot y_{5}=\sigma  w_{2}-y_{5}
+\end{math}.
+
+\paragraph{Time dependent coordinate transform}
+\begin{math}
+y_{1}=\sigma  \varepsilon ^{4} \big(\ou\big(\ou\big(\ou\big(w_{2},tt,-1
+\big),tt,-1\big),tt,-1\big)+2 \ou\big(\ou\big(w_{2},tt,-1\big),tt,-1
+\big)+3 \ou\big(w_{2},tt,-1\big)\big)-\varepsilon ^{3} X_{4}+
+\varepsilon  X_{2}+Y_{1}
+\end{math},
+\begin{math}
+y_{2}=\sigma  \varepsilon ^{3} \big(\ou\big(\ou\big(w_{1},tt,-1\big),tt,
+-1\big)+2 \ou\big(w_{1},tt,-1\big)\big)-\varepsilon ^{3} X_{5}+
+\varepsilon  X_{3}+Y_{2}
+\end{math},
+\begin{math}
+y_{3}=\sigma  \varepsilon ^{2} \big(-\ou\big(\ou\big(w_{2},tt,-1\big),tt
+,-1\big)-\ou\big(w_{2},tt,-1\big)\big)+\varepsilon  X_{4}+Y_{3}
+\end{math},
+\begin{math}
+y_{4}=-\sigma  \varepsilon  \ou\big(w_{1},tt,-1\big)+\varepsilon  X_{5}+
+Y_{4}
+\end{math},
+\begin{math}
+y_{5}=\sigma  \ou\big(w_{2},tt,-1\big)+Y_{5}
+\end{math}.
+
+And the slow variables
+\begin{math}
+x_{1}=\sigma  \varepsilon ^{4} \big(-\ou\big(\ou\big(w_{1},tt,-1\big),tt
+,-1\big)-3 \ou\big(w_{1},tt,-1\big)\big)+\varepsilon ^{3} Y_{4}-
+\varepsilon  Y_{2}+X_{1}
+\end{math},
+\begin{math}
+x_{2}=\sigma  \varepsilon ^{3} \big(\ou\big(\ou\big(w_{2},tt,-1\big),tt,
+-1\big)+2 \ou\big(w_{2},tt,-1\big)\big)+\varepsilon ^{3} Y_{5}-
+\varepsilon  Y_{3}+X_{2}
+\end{math},
+\begin{math}
+x_{3}=\sigma  \varepsilon ^{2} \ou\big(w_{1},tt,-1\big)-\varepsilon  Y_{
+4}+X_{3}
+\end{math},
+\begin{math}
+x_{4}=-\sigma  \varepsilon  \ou\big(w_{2},tt,-1\big)-\varepsilon  Y_{5}+
+X_{4}
+\end{math},
+\begin{math}
+x_{5}=X_{5}
+\end{math}.
+
+
+\paragraph{Result normal form DEs}
+\begin{math}
+\dot Y_{1}=\varepsilon ^{4} Y_{5}-\varepsilon ^{2} Y_{3}-Y_{1}
+\end{math},
+\begin{math}
+\dot Y_{2}=-\varepsilon ^{2} Y_{4}-Y_{2}
+\end{math},
+\begin{math}
+\dot Y_{3}=-\varepsilon ^{2} Y_{5}-Y_{3}
+\end{math},
+\begin{math}
+\dot Y_{4}=-Y_{4}
+\end{math},
+\begin{math}
+\dot Y_{5}=-Y_{5}
+\end{math}.
+
+\begin{math}
+\dot X_{1}=3 \sigma  \varepsilon ^{4} w_{1}-\varepsilon ^{4} X_{5}+
+\varepsilon ^{2} X_{3}
+\end{math},
+\begin{math}
+\dot X_{2}=-2 \sigma  \varepsilon ^{3} w_{2}+\varepsilon ^{2} X_{4}
+\end{math},
+\begin{math}
+\dot X_{3}=-\sigma  \varepsilon ^{2} w_{1}+\varepsilon ^{2} X_{5}
+\end{math},
+\begin{math}
+\dot X_{4}=\sigma  \varepsilon  w_{2}
+\end{math},
+\begin{math}
+\dot X_{5}=\sigma  w_{1}
+\end{math}.
+
+
+\subsubsection{Near the boundary}
+This is for the case of boundary conditions $c+pd=\text{cd}_0(t)$ at $x=0$ for some parameter~$p$.  
+Computer algebra finds boundary conditions on the fields that reduce the dynamics near the boundary to the following with \(\verb|x(1)|=c_1\), \(\verb|x(2)|=c_3\), \(\verb|y(1)|=d_0\), \(\verb|y(2)|=d_2\) and \(\verb|w(1)|=d_{3X}\eta_x\) with \(\sigma=4\).
+Curiously, there is no dependence upon parameter~$p$ in these dynamics.
+\begin{reduce}
+if thecase=sdehebc then begin
+xrhs:={y(2),w(1)};
+yrhs:={-y(1)+x(1),-y(2)+x(2)};
+zrhs:={ };
+toosmall:=6;
+factor small,sigma;
+end;
+\end{reduce}
+
+Again, I believe the following results are exact.
+
+\paragraph{Specified dynamical system}
+\begin{math}
+\dot x_{1}=\varepsilon  y_{2}
+\end{math},
+\begin{math}
+\dot x_{2}=\sigma  w_{1}
+\end{math},
+\begin{math}
+\dot y_{1}=\varepsilon  x_{1}-y_{1}
+\end{math},
+\begin{math}
+\dot y_{2}=\varepsilon  x_{2}-y_{2}
+\end{math}.
+
+\paragraph{Time dependent coordinate transform}
+\begin{math}
+y_{1}=\sigma  \varepsilon ^{3} \big(\ou\big(\ou\big(w_{1},tt,-1\big),tt,
+-1\big)+2 \ou\big(w_{1},tt,-1\big)\big)-\varepsilon ^{3} X_{2}+
+\varepsilon  X_{1}+Y_{1}
+\end{math},
+\begin{math}
+y_{2}=-\sigma  \varepsilon  \ou\big(w_{1},tt,-1\big)+\varepsilon  X_{2}+
+Y_{2}
+\end{math},
+\begin{math}
+x_{1}=\sigma  \varepsilon ^{2} \ou\big(w_{1},tt,-1\big)-\varepsilon  Y_{
+2}+X_{1}
+\end{math},
+\begin{math}
+x_{2}=X_{2}
+\end{math}.
+
+\paragraph{Result normal form DEs}
+\begin{math}
+\dot Y_{1}=-\varepsilon ^{2} Y_{2}-Y_{1}
+\end{math},
+\begin{math}
+\dot Y_{2}=-Y_{2}
+\end{math},
+\begin{math}
+\dot X_{1}=-\sigma  \varepsilon ^{2} w_{1}+\varepsilon ^{2} X_{2}
+\end{math},
+\begin{math}
+\dot X_{2}=\sigma  w_{1}
+\end{math}.
+
+
+
+
+\subsubsection{Heat exchanger with quadratic reaction}
+\label{sec:heqr}
+
+Expand advection-reaction-exchange in a heat exchanger in powers of $(x-X)^n/n!$.  
+The reaction is some quadratic that should generate Burgers' equation model.
+With Taylor Remainder Theorem closing the problem in terms of unknown functions which here are represented by the non-autonomous forcing~$w_i$.
+Note that \(\verb|y(j)|=d_{j-1}\) and \(\verb|x(j)|=c_{j-1}\).  
+Also \(\verb|w(1)|=3d_{2x}\) and \(\verb|w(2)|=3c_{2x}\) and evaluate at intensity $\sigma=1$\,.
+\begin{reduce}
+if thecase=sdeheqr then begin
+xrhs:={y(2)-x(1)*y(1)
+      ,y(3)-x(1)*y(2)-x(2)*y(1)
+      ,small*w(1)-x(1)*y(3)-2*x(2)*y(2)-x(3)*y(1)
+      };
+yrhs:={-y(1)+x(2)-(x(1)^2+y(1)^2)/2
+      ,-y(2)+x(3)-x(1)*x(2)-y(1)*y(2)
+      ,-y(3)+small*w(2)-x(2)^2-x(1)*x(3)-y(2)^2-y(1)*y(3)
+      };
+zrhs:={ };
+toosmall:=4;
+factor small,sigma;
+end;
+\end{reduce}
+
+Alternatively, we could divide the off-diagonal linear terms by~\verb|small| (and remove the multiplication of forcing~\verb|w|), and the algorithm still converges, albeit in more iterations.  
+The resulting asymptotic expressions then do not assume that \(x\)~derivatives are successively smaller.  
+%See result in file \url{sdeheqr.pdf}
+
+The following uses the default scaling which corresponds to successively smaller \(x\)-derivatives provided I also multiply the forcing by~\verb|small|.
+
+\paragraph{Specified dynamical system}
+\begin{math}
+\dot x_{1}=\varepsilon  \big(-x_{1} y_{1}+y_{2}\big)
+\end{math}, \begin{math}
+\dot x_{2}=\varepsilon  \big(-x_{2} y_{1}-x_{1} y_{2}+y_{3}\big)
+\end{math}, \begin{math}
+\dot x_{3}=\sigma  \varepsilon  w_{1}+\varepsilon  \big(-x_{3} y_{1}-2 x
+_{2} y_{2}-x_{1} y_{3}\big)
+\end{math}, \begin{math}
+\dot y_{1}=\varepsilon  \big(x_{2}-1/2 x_{1}^{2}-1/2 y_{1}^{2}\big)-y_{1
+}
+\end{math}, \begin{math}
+\dot y_{2}=\varepsilon  \big(x_{3}-x_{2} x_{1}-y_{2} y_{1}\big)-y_{2}
+\end{math}, \begin{math}
+\dot y_{3}=\sigma  \varepsilon  w_{2}+\varepsilon  \big(-x_{3} x_{1}-x_{
+2}^{2}-y_{3} y_{1}-y_{2}^{2}\big)-y_{3}
+\end{math}
+
+\paragraph{Time dependent coordinate transform}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+y_{1}=1/4 \varepsilon ^{2} Y_{1}^{3}+\varepsilon  \big(X_{2}-1/2 X_{1}^{
+2}+1/2 Y_{1}^{2}\big)+Y_{1}
+\end{math}\par
+
+\begin{math}
+y_{2}=-\sigma  \varepsilon ^{2} \ou\big(w_{1},tt,-1\big)+3/4 
+\varepsilon ^{2} Y_{2} Y_{1}^{2}+\varepsilon  \big(X_{3}-X_{2} X_{1}+Y_{
+2} Y_{1}\big)+Y_{2}
+\end{math}\par
+
+\begin{math}
+y_{3}=\sigma  \varepsilon ^{2} \big(\ou\big(w_{2},tt,-1\big) Y_{1}+\ou
+\big(w_{1},tt,-1\big) X_{1}\big)+\sigma  \varepsilon  \ou\big(w_{2},tt,
+-1\big)+\varepsilon ^{2} \big(3/4 Y_{3} Y_{1}^{2}+3/2 Y_{2}^{2} Y_{1}
+\big)+\varepsilon  \big(-X_{3} X_{1}-X_{2}^{2}+Y_{3} Y_{1}+Y_{2}^{2}
+\big)+Y_{3}
+\end{math}\par
+
+\begin{math}
+x_{1}=\varepsilon ^{2} \big(3/4 X_{1} Y_{1}^{2}-Y_{2} Y_{1}\big)+
+\varepsilon  \big(X_{1} Y_{1}-Y_{2}\big)+X_{1}
+\end{math}\par
+
+\begin{math}
+x_{2}=-\sigma  \varepsilon ^{2} \ou\big(w_{2},tt,-1\big)+\varepsilon ^{2
+} \big(3/4 X_{2} Y_{1}^{2}+3/2 X_{1} Y_{2} Y_{1}-Y_{3} Y_{1}-Y_{2}^{2}
+\big)+\varepsilon  \big(X_{2} Y_{1}+X_{1} Y_{2}-Y_{3}\big)+X_{2}
+\end{math}\par
+
+\begin{math}
+x_{3}=\sigma  \varepsilon ^{2} \big(\ou\big(w_{2},tt,-1\big) X_{1}+\ou
+\big(w_{1},tt,1\big) Y_{1}\big)+\varepsilon ^{2} \big(3/4 X_{3} Y_{1}^{2
+}+3 X_{2} Y_{2} Y_{1}+3/2 X_{1} Y_{3} Y_{1}+3/2 X_{1} Y_{2}^{2}-3/2 Y_{3
+} Y_{2}\big)+\varepsilon  \big(X_{3} Y_{1}+2 X_{2} Y_{2}+X_{1} Y_{3}
+\big)+X_{3}
+\end{math}\par
+
+\paragraph{Result normal form DEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot Y_{1}=\varepsilon ^{2} \big(-1/2 X_{1}^{2} Y_{1}+2 X_{1} Y_{2}-Y_{3
+}\big)-Y_{1}
+\end{math}\par
+
+\begin{math}
+\dot Y_{2}=2 \sigma  \varepsilon ^{3} w_{1} Y_{1}+\varepsilon ^{2} \big(
+-X_{2} X_{1} Y_{1}+2 X_{2} Y_{2}-1/2 X_{1}^{2} Y_{2}+2 X_{1} Y_{3}\big)-
+Y_{2}
+\end{math}\par
+
+\begin{math}
+\dot Y_{3}=\sigma  \varepsilon ^{3} \big(-2 w_{1} X_{1} Y_{1}+2 w_{1} Y_
+{2}\big)-\sigma  \varepsilon ^{2} w_{2} Y_{1}+\varepsilon ^{2} \big(-X_{
+3} X_{1} Y_{1}-X_{3} Y_{2}-X_{2}^{2} Y_{1}-2 X_{2} X_{1} Y_{2}+X_{2} Y_{
+3}-1/2 X_{1}^{2} Y_{3}\big)-Y_{3}
+\end{math}\par
+
+\begin{math}
+\dot X_{1}=-\sigma  \varepsilon ^{3} w_{1}+\varepsilon ^{2} \big(X_{3}-2
+ X_{2} X_{1}+1/2 X_{1}^{3}\big)
+\end{math}\par
+
+\begin{math}
+\dot X_{2}=2 \sigma  \varepsilon ^{3} w_{1} X_{1}+\sigma  \varepsilon ^{
+2} w_{2}+\varepsilon ^{2} \big(-2 X_{3} X_{1}-2 X_{2}^{2}+3/2 X_{2} X_{1
+}^{2}\big)
+\end{math}\par
+
+\begin{math}
+\dot X_{3}=\sigma  \varepsilon ^{3} \big(2 w_{1} X_{2}-w_{1} X_{1}^{2}
+\big)-\sigma  \varepsilon ^{2} w_{2} X_{1}+\sigma  \varepsilon  w_{1}+
+\varepsilon ^{2} \big(-3 X_{3} X_{2}+3/2 X_{3} X_{1}^{2}+3 X_{2}^{2} X_{
+1}\big)
+\end{math}
+
+Hmmm, looks like this generates the slowly varying model that
+\begin{equation*}
+\D tC\approx \DD xC-2C\D xC+\rat12C^3.
+\end{equation*}
+Interestingly there is an extra factor of two in the nonlinear advection, and a net cubic reaction.
+
+
+
+
+
+\subsection{Michaelis--Menten--Henri deterministic model}
+
+\begin{eqnarray*}
+&&\dot x=\epsilon[-x+(x+\kappa-\lambda)y],
+\\&&\dot y=x-(x+\kappa)y.
+\end{eqnarray*}
+A manifold of equilibria occur at \(y=x/(x+\kappa)\) and \(\epsilon=0\)  (also if \(\epsilon\neq 0\) and \(\lambda=0\) but we do not consider this case).
+Let's explore dynamics based at arbitrary point on this equilibrium manifold:
+substitute \(x(t)=x_0+x_1(t)\) and \(y(t)=x_0/(x_0+\kappa)+y_1(t)\), and derive
+\begin{eqnarray*}
+&&\frac1{x_0+\kappa}\dot x_1=\epsilon\left[
+\frac{\kappa(x_1-\lambda)}{(x_0+\kappa)^2}
++\frac{\lambda+\lambda y_1-x_1y_1}{x_0+\kappa}
+-y_1
+\right]
+\\&&\frac1{x_0+\kappa}\dot y_1=-y_1-\frac{x_1y_1}{x_0+\kappa}
++\frac{\kappa x_1}{(x_0+\kappa)^2}
+\end{eqnarray*}
+\begin{reduce}
+if thecase=sdemmh then begin
+% define rkx0=1/(x0+kappa)
+let rkx0*x0=>1-rkx0*kappa;
+xrhs:={eps*(-kappa*lam*rkx0^2+kappa*rkx0^2*x(1)
++lam*rkx0*y(1)+lam*rkx0-rkx0*x(1)*y(1)
+-y(1))};
+yrhs:={kappa*rkx0^2*x(1)-rkx0*x(1)*y(1)-y(1)};
+zrhs:={ };
+toosmall:=4;
+factor small,eps;
+end;
+\end{reduce}
+
+
+
+
+
+
+
+\section{General SDE preliminaries}
+
+Deterministic, autonomous, normal forms are constructed simply by omitting any noise term~\verb|w()| in the differential equations.
+
+The right-hand sides must be multinomial in variables $x_i$, $y_i$, $z_i$~and~$w_i$, but off-hand I do not know an easy way to check for this.
+
+
+\paragraph{Improve appearance}
+Improve appearance of printed output.
+\begin{reduce}
+on div; off allfac; on revpri;
+linelength 70$
+\end{reduce}
+
+
+\paragraph{If for the web, then send text output to file}
+\begin{reduce}
+if thecase=webpage then out "sdeo.txt"$
+\end{reduce}
+
+
+
+
+
+\subsection{Extract and scale slow equations}
+
+The number of slow equations is the number of terms in the list in~\verb|xrhs|.
+\begin{reduce}
+write "no. of slow modes ",m:=length(xrhs);
+\end{reduce}
+
+Multiply all the right-hand sides by~\verb|small| so we can control the truncation of the asymptotic construction through discarding high powers of~\verb|small|.
+Users could use~\verb|small| in their equations for appropriate effects. 
+\begin{reduce}
+xrhs:=for i:=1:m collect small*part(xrhs,i)$
+\end{reduce}
+
+Adjust the noise terms.
+Remove the \verb|small|~multiplication of noise terms, and instead multiply by~\verb|sigma| to empower me to independently control the truncation in noise amplitude.
+\begin{reduce}
+xrhs:=((xrhs where w(~j)=>sigma*w(j,1)/small) 
+             where w(~j,1)=>w(j))$
+\end{reduce}
+
+Section~\ref{sec:dwti} writes the resulting differential equations for information.
+%\begin{reduce}
+%for i:=1:m do write "dx(",i,")/dt = ",1*part(xrhs,i);
+%\end{reduce}
+
+
+\subsection{Extract and scale stable fast equations}
+
+The number of stable fast equations is the number of terms in the list in~\verb|yrhs|.
+\begin{reduce}
+write "no. of stable fast modes ",ny:=length(yrhs);
+\end{reduce}
+
+\paragraph{Extract decay rates}
+Extract the linear decay rates of the fast equations into an array.
+For each expression in the provided set of right-hand sides:
+\begin{reduce}
+array rate(ny);
+for i:=1:ny do begin
+\end{reduce}
+
+For the $i$th right-hand side get the linear dependence upon~\verb|y(i)|, then set other dynamic variables to zero to get just the coefficient.
+\begin{reduce}
+  rate(i):=coeffn(part(yrhs,i),y(i),1);
+  rate(i):=(rate(i) where {x(~j)=>0,y(~j)=>0,z(~j)=>0,w(~j)=>0});
+\end{reduce}
+
+However, the coefficient may depend upon parameters, so if it is not simply a number, but is a sum, then trawl through the sum looking for a simple number to use as the decay rate.
+\begin{reduce}
+  if not numberp(rate(i)) then 
+  if part(rate(i),0)=plus then begin
+    rr:=0;
+    for j:=1:arglength(rate(i)) do 
+      if numberp(part(rate(i),j)) 
+      then rr:=part(rate(i),j);
+    rate(i):=rr;
+  end;
+\end{reduce}
+
+Change sign to make \verb|rate| into positive decay rates, rather than negative growth rates.
+\begin{reduce}
+  rate(i):=-rate(i); 
+\end{reduce}
+
+If all the above has not ended up with a simple number, then exit with an error message. 
+\begin{reduce}
+  if numberp(rate(i))and rate(i)>0 then
+  else begin 
+    write "***** Error *****
+    Linear coeffs of y-decay must be negative numbers";
+    if thecase=wbepage then <<
+      shut "sdeo.txt"; quit >>;
+  end;
+\end{reduce}
+
+End the loop over all right-hand sides.
+\begin{reduce}
+end;
+\end{reduce}
+
+Flag later warning if the linear part not diagonal.
+\begin{reduce}
+offdiag:=0$
+for i:=1:ny do for j:=1:ny do if i neq j then begin
+  jac:=coeffn(part(yrhs,i),y(j),1);
+  if (jac where {x(~k)=>0,y(~k)=>0,z(~k)=>0,w(~k)=>0}) neq 0 
+  then offdiag:=1$
+end;
+\end{reduce}
+
+Multiply all the `nonlinear' terms right-hand sides by~\verb|small| so we control the truncation of the asymptotic construction through discarding high powers of~\verb|small|.
+Leave the identified linear decay terms intact.
+Users could use~\verb|small| in their equations for interesting effects. 
+\begin{reduce}
+yrhs:=for i:=1:ny collect 
+  small*part(yrhs,i)+(1-small)*(-rate(i)*y(i))$
+\end{reduce}
+
+Remove the \verb|small|~multiplication of noise terms, and instead multiply by~\verb|sigma| to empower me to independently control the truncation in noise amplitude.
+\begin{reduce}
+yrhs:=((yrhs where w(~j)=>sigma*w(j,1)/small) 
+  where w(~j,1)=>w(j))$
+\end{reduce}
+
+Section~\ref{sec:dwti} writes the resulting differential equations for information.
+%\begin{reduce}
+%for i:=1:ny do write "dy(",i,")/dt = ",1*part(yrhs,i);
+%\end{reduce}
+
+
+
+\subsection{Extract and scale unstable fast equations}
+
+The number of unstable fast equations is the number of terms in the list in~\verb|zrhs|.
+\begin{reduce}
+write "no. of unstable fast modes ",nz:=length(zrhs);
+\end{reduce}
+
+\paragraph{Extract decay rates}
+Extract the linear decay rates of the fast equations into an array.
+For each expression in the provided set of right-hand sides:
+\begin{reduce}
+array ratf(nz);
+for i:=1:nz do begin
+\end{reduce}
+
+For the $i$th right-hand side get the linear dependence upon~\verb|z(i)|, then set other dynamic variables to zero to get just the coefficient.
+\begin{reduce}
+  ratf(i):=coeffn(part(zrhs,i),z(i),1);
+  ratf(i):=(ratf(i) where {x(~j)=>0,y(~j)=>0,z(~j)=>0,w(~j)=>0});
+\end{reduce}
+
+However, the coefficient may depend upon parameters, so if it is not simply a number, but is a sum, then trawl through the sum looking for a simple number to use as the decay rate.
+\begin{reduce}
+  if not numberp(ratf(i)) then 
+  if part(ratf(i),0)=plus then begin
+    rr:=0;
+    for j:=1:arglength(ratf(i)) do 
+      if numberp(part(ratf(i),j)) 
+      then rr:=part(ratf(i),j);
+    ratf(i):=rr;
+  end;
+\end{reduce}
+
+If all the above has not ended up with a simple number, then exit with an error message. 
+\begin{reduce}
+  if numberp(ratf(i))and ratf(i)>0 then
+  else begin 
+    write "***** Error *****
+    Linear coeffs of z-growth must be positive numbers";
+    if thecase=webpage then <<
+      shut "sdeo.txt"; quit >>;
+  end;
+\end{reduce}
+
+End the loop over all right-hand sides.
+\begin{reduce}
+end;
+\end{reduce}
+
+Flag warning if the linear part not diagonal.
+\begin{reduce}
+for i:=1:nz do for j:=1:nz do if i neq j then begin
+  jac:=coeffn(part(zrhs,i),z(j),1);
+  if (jac where {x(~k)=>0,y(~k)=>0,z(~k)=>0,w(~k)=>0}) neq 0 
+  then offdiag:=1$
+end;
+\end{reduce}
+
+Multiply all the `nonlinear' terms right-hand sides by~\verb|small| so we control the truncation of the asymptotic construction through discarding high powers of~\verb|small|.
+Leave the identified linear decay terms intact.
+Users could use~\verb|small| in their equations for interesting effects. 
+\begin{reduce}
+zrhs:=for i:=1:nz collect 
+  small*part(zrhs,i)+(1-small)*(+ratf(i)*z(i))$
+\end{reduce}
+
+Remove the \verb|small|~multiplication of noise terms, and instead multiply by~\verb|sigma| to empower me to independently control the truncation in noise amplitude.
+\begin{reduce}
+zrhs:=((zrhs where w(~j)=>sigma*w(j,1)/small) 
+  where w(~j,1)=>w(j))$
+\end{reduce}
+
+Section~\ref{sec:dwti} writes the resulting differential equations for information.
+%\begin{reduce}
+%for i:=1:nz do write "dz(",i,")/dt = ",1*part(zrhs,i);
+%\end{reduce}
+
+Turn off output to file while writing \LaTeX.
+\begin{reduce}
+if thecase=webpage then shut "sdeo.txt"$
+\end{reduce}
+
+
+
+
+
+
+\section{Setup LaTeX output using rlfi}
+
+Now setup the rlfi package to write a \LaTeX\ version of the output.  
+It is all a bit tricky and underhand, so hope it works.  
+We override some stuff from \verb|rlfi.red|.\footnote{Find it in \url{reduce-algebra/trunk/packages/misc/rlfi.red}}  
+
+\paragraph{Override some rlfi things}
+First, change \verb|name| to get Big delimiters, not left-right delimiters, so \LaTeX\ can break lines.
+\begin{reduce}
+deflist('((!( !\!b!i!g!() (!) !\!b!i!g!)) (!P!I !\!p!i! )
+         (!p!i !\!p!i! ) (!E !e) (!I !i) (e !e) (i !i)),'name)$
+\end{reduce}
+
+Override the procedure that prints annoying messages about multicharacter symbols.
+It ends the output of one expression.
+This is just a copy from \verb|rlfi.red| with the appropriate if-statement deleted.
+\begin{reduce}
+symbolic procedure prinlaend;
+<<terpri();
+  prin2 "\end{";
+  prin2 mstyle!*;
+  prin2t "}\par";
+  if !*verbatim then
+      <<prin2t "\begin{verbatim}";
+        prin2t "REDUCE Input:">>;
+  ncharspr!*:=0;
+  if ofl!* then linelength(car linel!*)
+    else laline!*:=cdr linel!*;
+  nochar!*:=append(nochar!*,nochar1!*);
+  nochar1!*:=nil >>$
+\end{reduce}
+
+Override the procedure that outputs the \LaTeX\ preamble upon the command \verb|on latex|.
+\begin{reduce}
+symbolic procedure latexon;
+<<!*!*a2sfn:='texaeval;
+  !*raise:=nil;
+  prin2t "\documentclass[11pt,a5paper]{article}";
+  prin2t "\usepackage[a5paper,margin=13mm]{geometry}";
+  prin2t "\usepackage{parskip,time} \raggedright";
+  prin2t "\def\ou\big(#1,#2,#3\big){{e^{\if#31\else#3\fi t}\star}#1\,}";
+  prin2t "\title{Normal form of your dynamical system}";
+  prin2t "\author{A. J. Roberts, University of Adelaide\\";
+  prin2t "\texttt{http://www.maths.adelaide.edu.au/anthony.roberts}}";
+  prin2t "\date{\now, \today}";
+  prin2t "\begin{document}";
+  prin2t "\maketitle";
+  prin2t "\input{sdeo1}";
+  if !*verbatim then
+      <<prin2t "\begin{verbatim}";
+        prin2t "REDUCE Input:">>;
+  put('tex,'rtypefn,'(lambda(x) 'tex)) >>$
+\end{reduce}
+
+Use inline math environment so that long lines, the norm, get line breaks.
+The command \verb|\raggedright| in the \LaTeX\ preamble appears the best option for the line breaking, but \verb|\sloppy| would also work reasonably.
+\begin{reduce}
+mathstyle math;
+\end{reduce}
+
+\paragraph{Define names for \LaTeX\ formatting}
+Define some names I use, so that rlfi translates them to Greek characters in the \LaTeX.
+\begin{reduce}
+%defid sig,name=sigma;
+defid eps,name=epsilon;
+defid small,name=varepsilon;
+\end{reduce}
+
+Should not need these translation definitions but somehow we do in order for users to get the Greek alphabet to appear.
+I am puzzled??
+\begin{reduce}
+defid alpha,name=alpha;
+defid beta,name=beta;
+defid gamma,name=gamma;
+defid delta,name=delta;
+defid epsilon,name=epsilon;
+defid varepsilon,name=varepsilon;
+defid zeta,name=zeta;
+defid eta,name=eta;
+defid theta,name=theta;
+defid vartheta,name=vartheta;
+defid iota,name=iota;
+defid kappa,name=kappa;
+defid lambda,name=lambda;
+defid mu,name=mu;
+defid nu,name=nu;
+defid xi,name=xi;
+defid pi,name=pi;
+defid varpi,name=varpi;
+defid rho,name=rho;
+defid varrho,name=varrho;
+defid sigma,name=sigma;
+defid varsigma,name=varsigma;
+defid tau,name=tau;
+defid upsilon,name=upsilon;
+defid phi,name=phi;
+defid varphi,name=varphi;
+defid chi,name=chi;
+defid psi,name=psi;
+defid omega,name=omega;
+defid Gamma,name=Gamma;
+defid Delta,name=Delta;
+defid Theta,name=Theta;
+defid Lambda,name=Lambda;
+defid Xi,name=Xi;
+defid Pi,name=Pi;
+defid Sigma,name=Sigma;
+defid Upsilon,name=Upsilon;
+defid Phi,name=Phi;
+defid Psi,name=Psi;
+defid Omega,name=Omega;
+\end{reduce}
+
+For the variables names I use, as operators, define how they appear in the \LaTeX, and also define that their arguments appear as subscripts.
+\begin{reduce}
+defindex w(down);
+defindex x(down);
+defindex y(down);
+defindex z(down);
+defid xx,name="X";
+defid yy,name="Y";
+defid zz,name="Z";
+defindex xx(down);
+defindex yy(down);
+defindex zz(down);
+defindex hh(down);
+defindex gg(down);
+defindex ff(down);
+\end{reduce}
+
+First use these for the specified dynamical system, later use them for the normal form equations.
+\begin{reduce}
+defid hh,name="\dot z";
+defid gg,name="\dot y";
+defid ff,name="\dot x";
+\end{reduce}
+
+The Ornstein--Uhlenbeck operator is to translate into a \LaTeX\ command, see the preamble, that typesets the convolution in a reasonable manner.
+The definition of the \LaTeX\ command is a bit dodgy as convolutions of convolutions are not printed in the correct order; however,  convolutions commute so it does not matter.
+\begin{reduce}
+defid ou,name="\ou";
+defindex ou(arg,arg,arg);
+\end{reduce}
+
+
+\paragraph{Write the \LaTeX\ dynamical system}
+
+Because of the way rfli works, to get good quality output to the \LaTeX\ document, I need to write the algebraic expressions to a file, then read them back in again.
+While being read back in, I send the output to the \LaTeX\ file.
+In this convoluted way I avoid extraneous output lines polluting the \LaTeX. 
+
+Temporarily use these arrays for the right-hand sides of the dynamical system.
+\begin{reduce}
+array ff(m),gg(ny),hh(nz);
+\end{reduce}
+
+Write expressions to the file \verb|sdeo.red| for later reading.
+Prepend the expressions with an instruction to write a heading, and surround the heading with anti-math mode to cancel the math environment that rlfi puts in.
+\begin{reduce}
+out "sdeo.red"$
+write "write ""\end{math}
+\paragraph{Specified dynamical system}
+\begin{math}""$";
+for i:=1:m  do write "ff(",i,"):=1*part(xrhs,",i,");"; 
+for i:=1:ny do write "gg(",i,"):=1*part(yrhs,",i,");";
+for i:=1:nz do write "hh(",i,"):=1*part(zrhs,",i,");"; 
+write "end;";
+shut "sdeo.red";
+\end{reduce}
+
+Then switch on \LaTeX\ output before writing to file as this \LaTeX\ file is to be input from the main \LaTeX\ file and hence does not need a header.
+The header here gets sent to the `terminal' instead.
+Then write to \verb|sdeo1.tex| the expressions we stored in \verb|sdeo.red| as nice \LaTeX.
+\begin{reduce}
+on latex$
+out "sdeo1.tex"$
+in "sdeo.red"$
+shut "sdeo1.tex"$
+off latex$
+\end{reduce}
+
+
+
+\section{Delayed write of text info}
+\label{sec:dwti}
+
+Because it is messy to interleave \LaTeX\ and plain output, I delay writing anything much in plain text until here.
+Here start writing to the text output file \verb|sdeo.txt|; finish writing to file upon success, or otherwise, of the iteration.
+\begin{reduce}
+if thecase=webpage then out "sdeo.txt"$
+\end{reduce}
+
+Write the delayed warning message about off-diagonal terms.
+\begin{reduce}
+if offdiag then write "
+***** Warning ****
+Off diagonal linear terms in y- or z- equations assumed
+small.  Answers are rubbish if not asymptotically
+appropriate. "$
+\end{reduce}
+
+Write the plain text versions of the dynamical system.
+\begin{reduce}
+write "no. of slow modes ",m:=length(xrhs);
+for i:=1:m do write "dx(",i,")/dt = ",1*part(xrhs,i);
+write "no. of stable fast modes ",ny:=length(yrhs);
+for i:=1:ny do write "dy(",i,")/dt = ",1*part(yrhs,i);
+write "no. of unstable fast modes ",nz:=length(zrhs);
+for i:=1:nz do write "dz(",i,")/dt = ",1*part(zrhs,i);
+\end{reduce}
+
+
+
+\section{Represent the noise}
+
+The white noises~\verb|w| depend upon time.
+But we find it useful to discriminate upon the notionally fast time fluctuations of the noise processes, and the notionally ordinary time variations of the dynamic variables $x_i$, $y_i$ and~$z_i$.
+Thus introduce a notionally fast time variable~\verb|tt|, which depends upon the ordinary time~\verb|t|.
+Equivalently, view~\verb|tt|, a sort of `partial~$t$', as representing variations in time independent of those in the variables $x_i$, $y_i$ and~$z_i$.
+\begin{reduce}
+depend w,tt;
+depend tt,t,ttyz;
+\end{reduce}
+
+In the construction, convolutions of the noise arise, both backwards over history and forwards to anticipate the noise.
+For any non-zero parameter~$\mu$, define the Ornstein--Uhlenbeck convolution
+\begin{equation}
+    \Z{\mu}\phi=
+    \begin{cases}
+        \int_{-\infty}^t \exp[\mu(t-\tau)]\phi(\tau)\,d\tau\,,
+        &\mu<0\,, \\
+        \int_t^{+\infty} \exp[\mu(t-\tau)]\phi(\tau)\,d\tau\,,
+        &\mu>0\,,             
+    \end{cases}
+    \label{eq:zmuf}
+\end{equation}
+so that the convolution is always with a bounded exponential.
+Five useful properties of this convolution are
+\begin{eqnarray}&&
+    \Z\mu1=\frac1{|\mu|}\,,
+    \label{eq:conv1}\\&&
+    \frac{d\ }{dt}\Z{\mu}\phi=-\sgn\mu\,\phi+\mu\Z{\mu}\phi\,,
+    \label{eq:ddtconv}
+    \\&&
+    E[\Z{\mu}\phi]=\Z{\mu}E[\phi]\,,
+    \label{eq:exz}
+    \\&&
+    E[(\Z{\mu}\phi)^2]=\frac1{2|\mu|}\,,
+    \label{eq:exzz}
+    \\&&
+    \Z\mu\Z\nu=\begin{cases}
+    \frac1{|\mu-\nu|}\big[ \Z\mu+\Z\nu \big]\,, &\mu\nu<0\,, \\
+    \frac{-\sgn\mu}{\mu-\nu}\big[ \Z\mu-\Z\nu \big]\,, 
+    &\mu\nu>0\ \&\ \mu\neq\nu\,.
+    \end{cases}
+    \label{eq:twoconv}
+\end{eqnarray}
+Also remember that although with $\mu<0$ the convolution~$\Z\mu$
+integrates over the past, with $\mu>0$ the convolution~$\Z\mu$ integrates into the future over a time scale of order~$1/\mu$.
+
+The operator~\verb|ou(f,tt,mu)| represents the convolution~$\Z\mu f$ as defined by~\eqref{eq:zmuf}: called \verb|ou| because it is an Ornstein--Uhlenbeck process.
+The operator~\verb|ou| is `linear' over fast time~\verb|tt| as the convolution only arises from solving \pde{}s in the operator
+$\partial_t-\mu$\,.
+Code its derivative~\eqref{eq:ddtconv} and its action upon deterministic terms~\eqref{eq:conv1}:
+\begin{reduce}
+operator ou; linear ou;
+let { df(ou(~f,tt,~mu),t)=>-sign(mu)*f+mu*ou(f,tt,mu)
+    , ou(1,tt,~mu)=>1/abs(mu)
+\end{reduce}
+
+Also code the transform~\eqref{eq:twoconv} that successive convolutions at different rates may be transformed into several single convolutions.
+\begin{reduce}
+    , ou(ou(~r,tt,~nu),tt,~mu) => 
+      (ou(r,tt,mu)+ou(r,tt,nu))/abs(mu-nu) when (mu*nu<0)
+    , ou(ou(~r,tt,~nu),tt,~mu) => 
+      -sign(mu)*(ou(r,tt,mu)-ou(r,tt,nu))/(mu-nu)
+      when (mu*nu>0)and(mu neq nu)
+    };
+\end{reduce}
+
+The above properties are \emph{critical}: they must be correct for the results to be correct.
+
+Second, identify the resonant parts, some of which must be  go into the evolution~\verb|gg(i)|, and some into the transform.
+It depends upon the exponent of~\verb|yz| compared to the decay rate of this mode, here~\verb|r|.
+\begin{reduce}
+operator reso; linear reso;
+let { reso(~a,yz,~r)=>1 when df(a,yz)*yz=r*a
+    , reso(~a,yz,~r)=>0 when df(a,yz)*yz neq r*a
+    };
+\end{reduce}
+
+Lastly, the remaining terms get convolved at the appropriate rate to solve their respective homological equation by the operator~\verb|zres|.
+\begin{reduce}
+depend yz,ttyz;
+operator zres; linear zres;
+let zres(~a,ttyz,~r)=>ou(sign(df(a,yz)*yz/a-r)
+    *sub(yz=1,a),tt,df(a,yz)*yz/a-r);
+\end{reduce}
+
+
+
+
+\section{Solve homological equation with noise}
+
+When solving homological equations of the form $F+\xi_t=\res$ (the resonant case $\mu=0$), we separate the terms in the right-hand side~$\res$ into those that are integrable in fast time, and hence modify the coordinate transform by changing~$\xi$, and those that are not, and hence must remain in the evolution by changing~$F$.  the operator \verb|zint| extracts those parts of a term that we know are integrable; the operator \verb|znon| extracts those parts which are not.
+Note: with more research, more types of terms may be found to be integrable; hence what is extracted by \verb|zint| and what is left by \verb|zint| may change with more research.
+These transforms are not critical: changing the transforms may change intermediate computations, but as long as the iteration converges, the computer algebra results will be algebraically correct.
+\begin{reduce}
+operator zint; linear zint;
+operator znon; linear znon;
+\end{reduce}
+
+First, avoid obvious secularity.
+\begin{reduce}
+let { zint(w(~i),tt)=>0, znon(w(~i),tt)=>w(i)
+, zint(1,tt)=>0, znon(1,tt)=>1
+, zint(w(~i)*~r,tt)=>0, znon(w(~i)*~r,tt)=>w(i)*r
+\end{reduce}
+
+Second, by~\eqref{eq:ddtconv} a convolution may be split into an integrable part, and a part in its argument which in turn may be integrable or not.
+\begin{reduce}
+, zint(ou(~r,tt,~mu),tt)=>ou(r,tt,mu)/mu+zint(r,tt)/abs(mu)
+, znon(ou(~r,tt,~mu),tt)=>znon(r,tt)/abs(mu)
+\end{reduce}
+
+Third, squares of convolutions may be integrated by parts to an integrable term and a part that may have integrable or non-integrable parts.
+\begin{reduce}
+, zint(ou(~r,tt,~mu)^2,tt)=>ou(~r,tt,~mu)^2/(2*mu)
+                          +zint(r*ou(r,tt,mu),tt)/abs(mu)
+, znon(ou(~r,tt,~mu)^2,tt)=>znon(r*ou(r,tt,mu),tt)/abs(mu)
+\end{reduce}
+
+Fourth, different products of convolutions may be similarly separated using integration by parts.  
+\begin{reduce}
+, zint(ou(~r,tt,~mu)*ou(~s,tt,~nu),tt)
+  =>ou(r,tt,mu)*ou(s,tt,nu)/(mu+nu)
+  +zint(sign(mu)*r*ou(s,tt,nu)+sign(nu)*s*ou(r,tt,mu),tt)
+  /(mu+nu) when mu+nu neq 0
+, znon(ou(~r,tt,~mu)*ou(~s,tt,~nu),tt)=>
+  +znon(sign(mu)*r*ou(s,tt,nu)+sign(nu)*s*ou(r,tt,mu),tt)
+  /(mu+nu) when mu+nu neq 0
+\end{reduce}
+
+However, a zero divisor arises when $\mu+\nu=0$ in the above.
+Here code rules to cater for such terms by increasing the depth of convolutions over past history.
+\begin{reduce}
+, zint(ou(~r,tt,~mu)*ou(~s,tt,~nu),tt)=>
+  ou(ou(r,tt,-nu),tt,-nu)*ou(s,tt,nu)
+  +zint(ou(ou(r,tt,-nu),tt,-nu)*s,tt) when (mu+nu=0)and(nu>0)
+, znon(ou(~r,tt,~mu)*ou(~s,tt,~nu),tt)=>
+  znon(ou(ou(r,tt,-nu),tt,-nu)*s,tt) when (mu+nu=0)and(nu>0)
+\end{reduce}
+
+The above handles quadratic products of convolutions.
+Presumably, if we seek cubic noise effects then we may need cubic products of convolutions.
+However, I do not proceed so far and hence terminate the separation rules.
+\begin{reduce}
+};
+\end{reduce}
+
+
+
+
+\section{Initialise approximate transform}
+
+Truncate asymptotic approximation of the coordinate transform depending upon the parameter~\verb|toosmall|, up to a maximum of six.
+Use the `instant evaluation' property of a loop index to define the truncation so that Reduce omits small terms on the fly.
+\begin{reduce}
+for j:=toosmall:toosmall do let small^j=>0;
+\end{reduce}
+
+Variables \verb|x|, \verb|y| and~\verb|z| were operators in the specification of the equations.
+We now want them to store the approximation to the coordinate transform, so clear and reallocate as storage for the normal form expressions.
+\begin{reduce}
+clear x,y,z;
+array x(m),y(ny),z(nz);
+\end{reduce}
+
+Express the normal form in terms of new evolving variables $X_i$,$Y_i$ and~$Z_i$, denoted by operators \verb|xx(i)|, \verb|yy(i)| and~\verb|zz(i)|, which are nonlinear modifications to $x_i$, $y_i$ and~$z_i$.
+The expressions for the normal form \sde{}s are stored in \verb|ff|, \verb|gg| and~\verb|hh|.
+\begin{reduce}
+operator xx; operator yy; operator zz;
+depend xx,t; depend yy,t; depend zz,t;
+let { df(xx(~i),t)=>ff(i) 
+    , df(yy(~i),t)=>gg(i) 
+    , df(zz(~i),t)=>hh(i) };
+\end{reduce}
+
+The first linear approximation is then $x_i\approx X_i$\,, $y_i\approx Y_i$ and $z_i=Z_i$\,, such that $\dot X_i\approx 0$\,, in~\verb|ff(i)|, $\dot Y_i\approx -r_iY_i$\,, in~\verb|gg(i)|, and  $\dot Z_i\approx +r_iZ_i$\,, in~\verb|hh(i)|.
+\begin{reduce}
+for i:=1:m  do begin x(i):=xx(i); ff(i):=0; end;
+for i:=1:ny do begin y(i):=yy(i); gg(i):=-rate(i)*yy(i); end;
+for i:=1:nz do begin z(i):=zz(i); hh(i):=+ratf(i)*zz(i); end;
+\end{reduce}
+
+Update the $Y_i$~evolution \verb|gg(i)| and the $y_i$~transform.
+The residual is of the form of a sum of terms $\prod_{j}Y_j^{q_j}Z_k^{r_k} \in\res$.
+So updates involve dividing by, or convolving with,~$\beta_i-\sum_j\beta_jq_j+\sum_k\gamma_kr_k$.
+First, form the substitutions needed to introduce~\verb|yz| to count the number of variables $Y_i$~and~$Z_i$ in any given term, weighted according to their rate coefficient in the homological equation.
+\begin{reduce}
+y4y:=for i:=1:ny collect yy(i)=yy(i)*yz^rate(i)$
+z4z:=for i:=1:nz collect zz(i)=zz(i)/yz^ratf(i)$
+y4y:=append(y4y,z4z)$
+\end{reduce}
+
+
+
+
+\section{Iterative updates}
+
+We iterate to a solution of the governing \sde{}s to residuals of some order of error.
+For the moment, iterate for a maximum of nineteen iterations and to the pre-specified errors.
+\begin{reduce}
+for it:=1:maxiter_ do begin
+  ok:=1;
+\end{reduce}
+
+
+\subsection{Fast stable modes}
+
+Compute the residual of each of the $y_i$~\sde{}s, updating \verb|ok| to track whether all \sde{}s are satisfied.
+\begin{reduce}
+  for i:=1:ny do begin  
+    res:=-df(y(i),t)+part(yrhs,i);
+    ok:=if res=0 then ok else 0;
+\end{reduce}
+
+Trace print the length of the residuals to check how the iteration is progressing.
+\begin{reduce}
+    write lengthresy:=length(res);
+\end{reduce}
+
+Within the loop: first insert the weighted count of $Y$~and~$Z$ variables;
+then split the residual into two parts of possibly resonant, \verb|res0| and the rest,~\verb|res1|; then allocate to the evolution or the transform.
+\begin{reduce}
+    res:=sub(y4y,res);
+    res0:=reso(res,yz,+rate(i));
+    res1:=res-res0*yz^rate(i);
+    gg(i):=gg(i)+znon(res0,tt);
+    y(i):=y(i) +zint(res0,tt) -zres(res1,ttyz,rate(i));
+  end;
+\end{reduce}
+
+\subsection{Fast unstable modes}
+
+Compute the residual of each of the $z_i$~\sde{}s, updating \verb|ok| to track whether all \sde{}s are satisfied.
+\begin{reduce}
+  for i:=1:nz do begin  
+    res:=-df(z(i),t)+part(zrhs,i);
+    ok:=if res=0 then ok else 0;
+\end{reduce}
+
+Trace print the length of the residuals to check how the iteration is progressing.
+\begin{reduce}
+    write lengthresz:=length(res);
+\end{reduce}
+
+Update the $Z_i$~evolution \verb|hh(i)| and the $z_i$~transform.
+Within the loop: first insert the weighted count of $Y$~and~$Z$ variables;
+then split the residual into two parts of possibly resonant,~\verb|res0|, and the rest,~\verb|res1|; then allocate to the evolution or the transform.
+\begin{reduce}
+    res:=sub(y4y,res);
+    res0:=reso(res,yz,-ratf(i));
+    res1:=res-res0/yz^ratf(i);
+    hh(i):=hh(i)+znon(res0,tt);
+    z(i):=z(i) +zint(res0,tt) -zres(res1,ttyz,-ratf(i));
+  end;
+\end{reduce}
+
+
+
+
+
+\subsection{Slow modes}
+
+Compute the residual of each of the $x$~\sde{}s, updating \verb|ok| to track whether all \sde{}s are satisfied.
+\begin{reduce}
+  for i:=1:m do begin
+    res:=-df(x(i),t) +part(xrhs,i);
+    ok:=if res=0 then ok else 0;
+\end{reduce}
+
+Trace print the length of this residual.
+\begin{reduce}
+    write lengthresx:=length(res);
+\end{reduce}
+
+Update the $X_i$~evolution \verb|ff(i)| and the $x_i$~transform.
+Use the same process as for the fast variables; the difference is that here the mode rate is zero.
+\begin{reduce}
+    res:=sub(y4y,res);
+    res0:=reso(res,yz,0);
+    res1:=res-res0;
+    ff(i):=ff(i)+znon(res0,tt);
+    x(i):=x(i) +zint(res0,tt) -zres(res1,ttyz,0);
+  end;
+\end{reduce}
+
+
+\begin{reduce}
+  showtime;
+  if ok then write "Number of iterations ",
+    it:=1000000+it;
+end;
+\end{reduce}
+
+
+\section{Post-processing}
+
+Terminate if the iteration has not converged.
+\begin{reduce}
+if ok=0 then begin
+    write "*****Error *****
+    Failed to converge in maximum allowed iterations";
+    if thecase=webpage then <<
+      shut "sdeo.txt"; quit >>;
+end;
+\end{reduce}
+
+If converged, then print results.
+ 
+\begin{reduce}
+write "***** Success *****";
+\end{reduce}
+
+\subsection{Plain text output}
+
+Print the resultant coordinate transform: but only print to one lower power in~\verb|small| and~\verb|sigma| in order to keep output relatively small.
+\begin{reduce}
+write "The stochastic/non-autonomous coordinate transform";
+for i:=1:nz do begin z(i):=sigma*small*z(i); 
+               write z(i):=z(i)/small/sigma; end;
+for i:=1:ny do begin y(i):=sigma*small*y(i); 
+               write y(i):=y(i)/small/sigma; end;
+for i:=1:m  do begin x(i):=sigma*small*x(i); 
+               write x(i):=x(i)/small/sigma; end;
+\end{reduce}
+
+Lastly print the normal form \sde{}s: first the fast, second the slow.
+\begin{reduce}
+write "The normal form S/ODEs";
+for i:=1:nz do write "dzz(",i,")/dt = ",hh(i);
+for i:=1:ny do write "dyy(",i,")/dt = ",gg(i);
+for i:=1:m  do write "dxx(",i,")/dt = ",ff(i);
+\end{reduce}
+
+Close the output file and no longer quit but move on to \LaTeX\ output.
+\begin{reduce}
+if thecase=webpage then shut "sdeo.txt"; 
+\end{reduce}
+
+\subsection{\LaTeX\ output}
+
+As before, we have to write expressions to file for later reading so they get printed without extraneous dross in the \LaTeX\ source.
+First open up the temporary file \verb|sdeo.red| again.
+\begin{reduce}
+out "sdeo.red";
+\end{reduce}
+
+Write the stochastic coordinate transform to file, with a heading, and with an anti-math environment to cancel the auto-math of rlfi.
+For some reason we have to keep these writes short as otherwise it generates a spurious fatal blank line in the \LaTeX.
+\begin{reduce}
+write "write ""\end{math}
+\paragraph{Time dependent coordinate transform}
+\begin{math}"";";
+for i:=1:nz do write "z(",i,"):=z(",i,");"; 
+for i:=1:ny do write "y(",i,"):=y(",i,");";
+for i:=1:m  do write "x(",i,"):=x(",i,");"; 
+\end{reduce}
+
+Write the resultant stochastic normal form to file, with a heading, and with an anti-math environment to cancel the auto-math of rlfi.
+\begin{reduce}
+write "write ""\end{math}
+\paragraph{Result normal form DEs}
+\begin{math}"";";
+for i:=1:nz do write "hh(",i,"):=hh(",i,");";
+for i:=1:ny do write "gg(",i,"):=gg(",i,");";
+for i:=1:m  do write "ff(",i,"):=ff(",i,");";
+write "end;";
+\end{reduce}
+
+Shut the temporary output file.
+\begin{reduce}
+shut "sdeo.red";
+\end{reduce}
+
+Get expressions from file and write the main \LaTeX\ file.
+But first redefine how these names get printed, namely as the normal form time derivatives. 
+\begin{reduce}
+defid hh,name="\dot Z";
+defid gg,name="\dot Y";
+defid ff,name="\dot X";
+\end{reduce}
+
+Finally write to the main \LaTeX\ file so switch on latex after starting to write to the file.
+Then write expressions in \verb|sdeo.red| to \verb|sdeo.tex| as nice \LaTeX.
+Switch off latex, to get the end of the document, and finish writing.
+\begin{reduce}
+out "sdeo.tex"$
+on latex$
+in "sdeo.red"$
+off latex$
+shut "sdeo.tex"$
+\end{reduce}
+
+Everything done, so say so and quit.
+\begin{reduce}
+write "***** Finished *****";
+if thecase=webpage then quit;
+\end{reduce}
+
+
+\begin{reduce}
+end;
+\end{reduce}
+
+
+
+
+
+
+\bibliographystyle{agsm}
+\bibliography{ajr,bib}
+
+
+\end{document}
+ 
