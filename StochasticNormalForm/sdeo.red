@@ -8,6 +8,8 @@ y(1):=y(1);
 
 x(1):=x(1);
 
+x(2):=x(2);
+
 write "\end{math}
 \paragraph{Result normal form DEs}
 \begin{math}";
@@ -15,5 +17,7 @@ write "\end{math}
 gg(1):=gg(1);
 
 ff(1):=ff(1);
+
+ff(2):=ff(2);
 
 end;

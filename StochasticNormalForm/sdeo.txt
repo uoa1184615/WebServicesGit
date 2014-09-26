@@ -1,99 +1,85 @@
 
-no. of slow modes m := 1
+no. of slow modes m := 2
 
-                               2             3
-dx(1)/dt = small*y(1)*a + small *(x(1) - x(1) )
+dx(1)/dt = small*( - x(2)*y(1) - x(2)*x(1))
+
+                         2       2
+dx(2)/dt = small*( - y(1)  + x(1) ) - mu*small*x(2)
 
 no. of stable fast modes ny := 1
 
-dy(1)/dt =  - y(1) + w(1)*sigma
-
-                              2                        2
-            + small*(w(1)*y(1) *sigma - df(y(1),t)*y(1) )
+dy(1)/dt =  - y(1) + small*x(2)*x(1) + sigma*w(1)
 
 no. of unstable fast modes nz := 0
 
-lengthresy := 3
+lengthresy := 2
 
-lengthresx := 7
+lengthresx := 4
 
-Time: 0 ms
-
-lengthresy := 19
-
-lengthresx := 17
-
-Time: 10 ms
-
-lengthresy := 20
-
-lengthresx := 7
+lengthresx := 5
 
 Time: 0 ms
 
 lengthresy := 12
 
-lengthresx := 1
+lengthresx := 17
 
-Time: 10 ms
+lengthresx := 5
+
+Time: 0 ms
 
 lengthresy := 1
 
 lengthresx := 1
 
-Time: 0 ms
+lengthresx := 1
 
-Number of iterations it := 1000005
+Time: 10 ms
+
+Number of iterations it := 1000003
 
 ***** Success *****
 
 The stochastic/non-autonomous coordinate transform
 
-                                                  1       3
-y(1) := yy(1) + ou(w(1),tt,-1)*sigma + small*( - ---*yy(1)
-                                                  2
+y(1) := yy(1) + small*xx(2)*xx(1) + sigma*ou(w(1),tt,-1)
 
-               3                      2
-            - ---*ou(w(1),tt,-1)*yy(1) *sigma
-               2
+x(1) := xx(1) + small*xx(2)*yy(1) + sigma*small*ou(w(1),tt,-1)*xx(2)
 
-               3                     2               2   5       5
-            - ---*ou(w(1),tt,1)*yy(1) *sigma) + small *(---*yy(1)
-               2                                         8
+                 1             2
+x(2) := xx(2) + ---*small*yy(1)
+                 2
 
-               25                      4
-            + ----*ou(w(1),tt,-1)*yy(1) *sigma
-               8
-
-               9                     4
-            + ---*ou(w(1),tt,1)*yy(1) *sigma
-               4
-
-               7                     4
-            + ---*ou(w(1),tt,3)*yy(1) *sigma)
-               8
-
-                                                                   2
-x(1) := xx(1) + small*( - yy(1)*a - ou(w(1),tt,-1)*a*sigma) + small *(
-
-            1       3      1                      2
-           ---*yy(1) *a + ---*ou(w(1),tt,-1)*yy(1) *a*sigma
-            6              2
-
-               3                     2
-            + ---*ou(w(1),tt,1)*yy(1) *a*sigma
-               2
-
-                                 2
-            - ou(w(1),tt,2)*yy(1) *a*sigma)
+         + sigma*small*(ou(w(1),tt,-1)*yy(1) + ou(w(1),tt,1)*yy(1))
 
 The normal form S/ODEs
 
-                                                              2
-dyy(1)/dt =  - yy(1) + 3*small*ou(w(1),tt,-1)*w(1)*yy(1)*sigma
+                            2      2
+dyy(1)/dt =  - yy(1) + small *xx(2) *yy(1)
 
-                                      2               3
-dxx(1)/dt = small*w(1)*a*sigma + small *(xx(1) - xx(1) )
+                            2
+             + 2*sigma*small *w(1)*xx(1)*yy(1)
 
-                    3                                2
-             + small *( - w(1)*a*sigma + 3*w(1)*xx(1) *a*sigma)
+                                        2      2
+dxx(1)/dt =  - small*xx(2)*xx(1) - small *xx(2) *xx(1)
+
+             - sigma*small*w(1)*xx(2)
+
+                          2               2             2
+             + sigma*small *( - w(1)*xx(1)  - w(1)*xx(2) )
+
+                1       2      2
+             - ---*sigma *small *ou(w(1),tt,-1)*w(1)*xx(1)
+                2
+
+                             2
+             + mu*sigma*small *w(1)*xx(2)
+
+                       2        2
+dxx(2)/dt = small*xx(1)  - sigma *small*ou(w(1),tt,-1)*w(1)
+
+             - mu*small*xx(2)
+
+                1          2      2
+             - ---*mu*sigma *small *ou(w(1),tt,-1)*w(1)
+                2
