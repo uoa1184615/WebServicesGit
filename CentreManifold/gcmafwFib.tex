@@ -39,7 +39,7 @@ In the following, assign \verb|thecase:=myweb;| for the web service (or to read 
 \begin{reduce}
 % see gcmafwFib.pdf for detailed explanation
 % AJ Roberts, Nov 2013 -- Aug 2014
-thecase:=lorenz86slow; 
+thecase:=myweb; 
 thecases:={onedde, anotherdde, twodde, dde2d, dde2d2ha,
 dde2d2hb, simple2d, simple2ds, fourstatemarkov, another2d,
 another2ds, simple3d, simple3ds, geneigenvec, bifurcate2d,
@@ -1174,6 +1174,7 @@ if thecase=simpleosc then begin
 ff_:=tp mat((u2,-u1-u1*u3,-u3+5*u1^2));
 freqm_:=mat((1,-1));
 ee_:=tp mat((1,+i,0),(1,-i,0));
+ee_:=tp mat((1+1/10,+i,0),(1+1/10,-i,0)); % causes fail, Jan 2015
 zz_:=tp mat((1,+i,0),(1,-i,0));
 end;
 \end{reduce}
@@ -2454,7 +2455,7 @@ Extract dimension information from the specification of the dynamical system: se
 
 \begin{reduce}
 if thecase=myweb then begin
-  out "cmsyso.txt"$
+%  out "cmsyso.txt"$
   ODE_function:=ff_; 
   centre_frequencies:=freqm_;
   centre_eigenvectors:=ee_; 
@@ -2614,6 +2615,7 @@ Check that the frequencies and eigenvectors are specified correctly.
 write "Check centre subspace linearisation ";
 for j:=1:m do for k:=1:m do aa_(j,k):=0;
 for j:=1:m do aa_(j,j):=i*freq(j);
+write %temporary write
 reslin:=(ll_*(ee_*dcis_)-(ee_*dcis_)*aa_
     where cis(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(a)+i*sin(a))*cis(a) )$ 
 ok_:=1$
@@ -2627,20 +2629,29 @@ Multiply by the adjoint eigenvectors and then average over time: operator \(\cL_
 Lastly, correspondingly adjust the \ode{}s, since \verb|lladj| does not involve delays we do not need delay operator transforms in the product.
 
 \begin{reduce}
-if not ok_ then begin
+if not ok_ then for iter:=1:2 do begin
 write "WARNING: I NEED TO ADJUST LINEAR OPERATOR";
+write
 lladj:=reslin*tp map(conj_(~b),zz_*ccis_);
 write
 lladj:=(lladj where {cis(0)=>1, cis(~a)=>0 when a neq 0});
 write
 ll_:=ll_-lladj;
+write
 reslin:=(ll_*(ee_*dcis_)-(ee_*dcis_)*aa_
     where cis(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(a)+i*sin(a))*cis(a) ); 
+%for j:=1:n do for k:=1:m do 
+%    if reslin(j,k) neq 0 then << write
+%    "OOPS, INCONSISTENT EIGENVALUES, EIGENVECTORS AND OPERATOR.
+%    EMAIL ME; I QUIT"; write reslin:=reslin; rederr "aaaaah";quit >>; 
+ok_:=1$
 for j:=1:n do for k:=1:m do 
-    if reslin(j,k) neq 0 then << write
-    "OOPS, INCONSISTENT EIGENVALUES, EIGENVECTORS AND OPERATOR.
-    EMAIL ME; I QUIT"; quit >>; 
+    ok_:=if reslin(j,k)=0 then ok_ else 0$
+if ok_ then iter:=iter+1000;
 end;
+if not ok_ then << write
+    "OOPS, INCONSISTENT EIGENVALUES, EIGENVECTORS AND OPERATOR.
+    EMAIL ME; I QUIT"; rederr "aaaaah";quit >>;
 \end{reduce}
 
 
@@ -2891,7 +2902,7 @@ But first, and if for the web, open the output file and write out the possibly a
 According to the manual, this will append to the earlier output to the file.
 
 \begin{reduce}
-if thecase=myweb then out "cmsyso.txt"$
+%if thecase=myweb then out "cmsyso.txt"$
 \end{reduce}
 
 \begin{reduce}

@@ -1,0 +1,62 @@
+
+total no. of modes  n := 2
+
+no. of centre modes m := 1
+
+Input dimensions are OK
+
+Normalising the left-eigenvectors:
+
+
+       [1]
+zz_ := [ ]
+       [0]
+
+
+Find the linear operator is
+
+
+       [0  0 ]
+ll_ := [     ]
+       [0  -1]
+
+
+Check centre subspace linearisation 
+
+
+          [      0       ]
+          [              ]
+reslin := [    1         ]
+          [ - ----*cis(0)]
+          [    11        ]
+
+
+WARNING: I NEED TO ADJUST LINEAR OPERATOR
+
+
+         [      0         0]
+         [                 ]
+lladj := [    1            ]
+         [ - ----*cis(0)  0]
+         [    11           ]
+
+
+
+          [  cis(0)     0]
+          [              ]
+fudfac := [ 1            ]
+          [----*cis(0)  0]
+          [ 11           ]
+
+
+
+          [ 1    0]
+          [       ]
+fudfac := [ 1     ]
+          [----  0]
+          [ 11    ]
+
+
+***** Singular matrix 
+
+***** Invalid simplification 

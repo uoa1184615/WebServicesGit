@@ -1,0 +1,9 @@
+ff_:=tp mat((
+    -u1*u2,
+    -u2+u1^2
+    ));
+freqm_:=mat((0)); 
+ee_:=tp mat((1,1/11)); 
+zz_:=tp mat((1,1/13)); 
+toosmall:=5;
+end;
