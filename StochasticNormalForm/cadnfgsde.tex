@@ -48,7 +48,7 @@ This article documents code designed for an interactive web site~\cite[]{Roberts
 
 In the following, assign \verb|thecase:=webpage;| for the web service (or to read a system from file \verb|sdeb.red|), otherwise assign \verb|thecase| to be any of the example dynamical systems in set~\verb|thecases|.
 \begin{reduce}
-%% Execute in reduce with  in_tex "cadnfgsde.tex"
+%% Execute in reduce with  in_tex "cadnfgsde.tex"$
 %% See cadnfgsde.pdf for detailed explanation.
 thecase:=webpage;
 thecases:={sdesimple, oderat, sdemulti, sdebif, sdelac,
@@ -2423,7 +2423,7 @@ Also code the transform~\eqref{eq:twoconv} that successive convolutions at diffe
 
 The above properties are \emph{critical}: they must be correct for the results to be correct.
 
-Second, identify the resonant parts, some of which must be  go into the evolution~\verb|gg(i)|, and some into the transform.
+Second, identify the resonant parts, some of which must go into the evolution~\verb|gg(i)|, and some into the transform.
 It depends upon the exponent of~\verb|yz| compared to the decay rate of this mode, here~\verb|r|.
 \begin{reduce}
 operator reso; linear reso;

@@ -1,2 +1,176 @@
+\documentclass[11pt,a5paper]{article}
+\usepackage[a5paper,margin=13mm]{geometry}
+\usepackage{parskip,time} \raggedright
+\def\lPar{\mathchoice{\big(}{\big(}{(}{(}}
+\def\rPar{\mathchoice{\big)}{\big)}{)}{)}}
+\let\FRaC\frac
+\renewcommand{\frac}[2]{\mathchoice%
+    {\FRaC{#1}{#2}}{\FRaC{#1}{#2}}{#1/#2}{#1/#2}}
+\def\exp{\,e}
+\def\eps{\varepsilon}
+\title{Invariant manifold of your dynamical system}
+\author{A. J. Roberts, University of Adelaide\\
+\texttt{http://www.maths.adelaide.edu.au/anthony.roberts}}
+\date{\now, \today}
+\begin{document}
+\maketitle
+Throughout and generally: the lowest order, most
+important, terms are near the end of each expression.
+\input{centreManSys}
 
-This empty document indicates error.
+\(
+\)
+\paragraph{The Centre
+manifold}
+
+
+These give the location of the invariant manifold in
+terms of parameters~\(s\sb j\).
+\(
+\)\par
+
+\(u_{1}=\eps^{2} \lPar \frac{11}{80} \sqrt {3} \exp ^{-\sqrt {3} i t} s_{4
+} i+\frac{5}{16} \exp ^{-\sqrt {3} i t} s_{4}^{2} s_{3}+\frac{5}{8} \exp
+ ^{-\sqrt {3} i t} s_{4} s_{2} s_{1}-\frac{9}{8} \exp ^{-i t} s_{4} s_{3
+} s_{2}-\frac{9}{16} \exp ^{-i t} s_{2}^{2} s_{1}-\frac{3}{80} \exp ^{-i
+ t} s_{2} i+\frac{25}{1248} \exp ^{-3 \sqrt {3} i t} s_{4}^{3}+\frac{7}{
+96} \exp ^{-3 i t} s_{2}^{3}+\frac{11}{32} \sqrt {3} \exp ^{-\sqrt {3} i
+ t-2 i t} s_{4} s_{2}^{2}-\frac{15}{32} \exp ^{-\sqrt {3} i t-2 i t} s_{
+4} s_{2}^{2}-\frac{11}{32} \sqrt {3} \exp ^{-\sqrt {3} i t+2 i t} s_{4} 
+s_{1}^{2}-\frac{15}{32} \exp ^{-\sqrt {3} i t+2 i t} s_{4} s_{1}^{2}-
+\frac{37}{416} \sqrt {3} \exp ^{-2 \sqrt {3} i t-i t} s_{4}^{2} s_{2}+
+\frac{99}{416} \exp ^{-2 \sqrt {3} i t-i t} s_{4}^{2} s_{2}+\frac{37}{
+416} \sqrt {3} \exp ^{-2 \sqrt {3} i t+i t} s_{4}^{2} s_{1}+\frac{99}{
+416} \exp ^{-2 \sqrt {3} i t+i t} s_{4}^{2} s_{1}-\frac{11}{32} \sqrt {3
+} \exp ^{\sqrt {3} i t-2 i t} s_{3} s_{2}^{2}-\frac{15}{32} \exp ^{
+\sqrt {3} i t-2 i t} s_{3} s_{2}^{2}+\frac{11}{32} \sqrt {3} \exp ^{
+\sqrt {3} i t+2 i t} s_{3} s_{1}^{2}-\frac{15}{32} \exp ^{\sqrt {3} i t+
+2 i t} s_{3} s_{1}^{2}+\frac{37}{416} \sqrt {3} \exp ^{2 \sqrt {3} i t-i
+ t} s_{3}^{2} s_{2}+\frac{99}{416} \exp ^{2 \sqrt {3} i t-i t} s_{3}^{2}
+ s_{2}-\frac{37}{416} \sqrt {3} \exp ^{2 \sqrt {3} i t+i t} s_{3}^{2} s_
+{1}+\frac{99}{416} \exp ^{2 \sqrt {3} i t+i t} s_{3}^{2} s_{1}-\frac{11
+}{80} \sqrt {3} \exp ^{\sqrt {3} i t} s_{3} i+\frac{5}{16} \exp ^{
+\sqrt {3} i t} s_{4} s_{3}^{2}+\frac{5}{8} \exp ^{\sqrt {3} i t} s_{3} s
+_{2} s_{1}-\frac{9}{8} \exp ^{i t} s_{4} s_{3} s_{1}-\frac{9}{16} \exp 
+^{i t} s_{2} s_{1}^{2}+\frac{3}{80} \exp ^{i t} s_{1} i+\frac{25}{1248} 
+\exp ^{3 \sqrt {3} i t} s_{3}^{3}+\frac{7}{96} \exp ^{3 i t} s_{1}^{3}
+\rPar+\exp ^{-\sqrt {3} i t} s_{4}+\exp ^{-i t} s_{2}+\exp ^{\sqrt {3} i
+ t} s_{3}+\exp ^{i t} s_{1}
+\)\par
+
+\(u_{2}=\eps^{2} \lPar \frac{1}{80} \sqrt {3} \exp ^{-\sqrt {3} i t} s_{4}
+ i+\frac{7}{16} \exp ^{-\sqrt {3} i t} s_{4}^{2} s_{3}+\frac{7}{8} \exp 
+^{-\sqrt {3} i t} s_{4} s_{2} s_{1}+\frac{3}{8} \exp ^{-i t} s_{4} s_{3}
+ s_{2}+\frac{3}{16} \exp ^{-i t} s_{2}^{2} s_{1}+\frac{9}{80} \exp ^{-i 
+t} s_{2} i-\frac{1}{1248} \exp ^{-3 \sqrt {3} i t} s_{4}^{3}-\frac{1}{96
+} \exp ^{-3 i t} s_{2}^{3}+\frac{5}{32} \sqrt {3} \exp ^{-\sqrt {3} i t-
+2 i t} s_{4} s_{2}^{2}-\frac{9}{32} \exp ^{-\sqrt {3} i t-2 i t} s_{4} s
+_{2}^{2}-\frac{5}{32} \sqrt {3} \exp ^{-\sqrt {3} i t+2 i t} s_{4} s_{1}
+^{2}-\frac{9}{32} \exp ^{-\sqrt {3} i t+2 i t} s_{4} s_{1}^{2}+\frac{11
+}{416} \sqrt {3} \exp ^{-2 \sqrt {3} i t-i t} s_{4}^{2} s_{2}-\frac{21}{
+416} \exp ^{-2 \sqrt {3} i t-i t} s_{4}^{2} s_{2}-\frac{11}{416} \sqrt {
+3} \exp ^{-2 \sqrt {3} i t+i t} s_{4}^{2} s_{1}-\frac{21}{416} \exp ^{-2
+ \sqrt {3} i t+i t} s_{4}^{2} s_{1}-\frac{5}{32} \sqrt {3} \exp ^{
+\sqrt {3} i t-2 i t} s_{3} s_{2}^{2}-\frac{9}{32} \exp ^{\sqrt {3} i t-2
+ i t} s_{3} s_{2}^{2}+\frac{5}{32} \sqrt {3} \exp ^{\sqrt {3} i t+2 i t}
+ s_{3} s_{1}^{2}-\frac{9}{32} \exp ^{\sqrt {3} i t+2 i t} s_{3} s_{1}^{2
+}-\frac{11}{416} \sqrt {3} \exp ^{2 \sqrt {3} i t-i t} s_{3}^{2} s_{2}-
+\frac{21}{416} \exp ^{2 \sqrt {3} i t-i t} s_{3}^{2} s_{2}+\frac{11}{416
+} \sqrt {3} \exp ^{2 \sqrt {3} i t+i t} s_{3}^{2} s_{1}-\frac{21}{416} 
+\exp ^{2 \sqrt {3} i t+i t} s_{3}^{2} s_{1}-\frac{1}{80} \sqrt {3} \exp 
+^{\sqrt {3} i t} s_{3} i+\frac{7}{16} \exp ^{\sqrt {3} i t} s_{4} s_{3}
+^{2}+\frac{7}{8} \exp ^{\sqrt {3} i t} s_{3} s_{2} s_{1}+\frac{3}{8} 
+\exp ^{i t} s_{4} s_{3} s_{1}+\frac{3}{16} \exp ^{i t} s_{2} s_{1}^{2}-
+\frac{9}{80} \exp ^{i t} s_{1} i-\frac{1}{1248} \exp ^{3 \sqrt {3} i t} 
+s_{3}^{3}-\frac{1}{96} \exp ^{3 i t} s_{1}^{3}\rPar-\exp ^{-\sqrt {3} i 
+t} s_{4}+\exp ^{-i t} s_{2}-\exp ^{\sqrt {3} i t} s_{3}+\exp ^{i t} s_{1
+}
+\)\par
+
+\(u_{3}=\eps^{2} \lPar -\frac{7}{16} \sqrt {3} \exp ^{-\sqrt {3} i t} s_{4
+}^{2} s_{3} i-\frac{7}{8} \sqrt {3} \exp ^{-\sqrt {3} i t} s_{4} s_{2} s
+_{1} i+\frac{3}{80} \exp ^{-\sqrt {3} i t} s_{4}+\frac{3}{8} \exp ^{-i t
+} s_{4} s_{3} s_{2} i+\frac{3}{16} \exp ^{-i t} s_{2}^{2} s_{1} i-\frac{
+9}{80} \exp ^{-i t} s_{2}-\frac{25}{416} \sqrt {3} \exp ^{-3 \sqrt {3} i
+ t} s_{4}^{3} i-\frac{7}{32} \exp ^{-3 i t} s_{2}^{3} i-\frac{7}{32} 
+\sqrt {3} \exp ^{-\sqrt {3} i t-2 i t} s_{4} s_{2}^{2} i-\frac{3}{32} 
+\exp ^{-\sqrt {3} i t-2 i t} s_{4} s_{2}^{2} i-\frac{7}{32} \sqrt {3} 
+\exp ^{-\sqrt {3} i t+2 i t} s_{4} s_{1}^{2} i+\frac{3}{32} \exp ^{-
+\sqrt {3} i t+2 i t} s_{4} s_{1}^{2} i-\frac{161}{416} \sqrt {3} \exp ^{
+-2 \sqrt {3} i t-i t} s_{4}^{2} s_{2} i+\frac{123}{416} \exp ^{-2 
+\sqrt {3} i t-i t} s_{4}^{2} s_{2} i-\frac{161}{416} \sqrt {3} \exp ^{-2
+ \sqrt {3} i t+i t} s_{4}^{2} s_{1} i-\frac{123}{416} \exp ^{-2 \sqrt {3
+} i t+i t} s_{4}^{2} s_{1} i+\frac{7}{32} \sqrt {3} \exp ^{\sqrt {3} i t
+-2 i t} s_{3} s_{2}^{2} i-\frac{3}{32} \exp ^{\sqrt {3} i t-2 i t} s_{3}
+ s_{2}^{2} i+\frac{7}{32} \sqrt {3} \exp ^{\sqrt {3} i t+2 i t} s_{3} s_
+{1}^{2} i+\frac{3}{32} \exp ^{\sqrt {3} i t+2 i t} s_{3} s_{1}^{2} i+
+\frac{161}{416} \sqrt {3} \exp ^{2 \sqrt {3} i t-i t} s_{3}^{2} s_{2} i+
+\frac{123}{416} \exp ^{2 \sqrt {3} i t-i t} s_{3}^{2} s_{2} i+\frac{161
+}{416} \sqrt {3} \exp ^{2 \sqrt {3} i t+i t} s_{3}^{2} s_{1} i-\frac{123
+}{416} \exp ^{2 \sqrt {3} i t+i t} s_{3}^{2} s_{1} i+\frac{7}{16} 
+\sqrt {3} \exp ^{\sqrt {3} i t} s_{4} s_{3}^{2} i+\frac{7}{8} \sqrt {3} 
+\exp ^{\sqrt {3} i t} s_{3} s_{2} s_{1} i+\frac{3}{80} \exp ^{\sqrt {3} 
+i t} s_{3}-\frac{3}{8} \exp ^{i t} s_{4} s_{3} s_{1} i-\frac{3}{16} \exp
+ ^{i t} s_{2} s_{1}^{2} i-\frac{9}{80} \exp ^{i t} s_{1}+\frac{25}{416} 
+\sqrt {3} \exp ^{3 \sqrt {3} i t} s_{3}^{3} i+\frac{7}{32} \exp ^{3 i t}
+ s_{1}^{3} i\rPar-\sqrt {3} \exp ^{-\sqrt {3} i t} s_{4} i-\exp ^{-i t} 
+s_{2} i+\sqrt {3} \exp ^{\sqrt {3} i t} s_{3} i+\exp ^{i t} s_{1} i
+\)\par
+
+\(u_{4}=\eps^{2} \lPar -\frac{5}{16} \sqrt {3} \exp ^{-\sqrt {3} i t} s_{4
+}^{2} s_{3} i-\frac{5}{8} \sqrt {3} \exp ^{-\sqrt {3} i t} s_{4} s_{2} s
+_{1} i+\frac{33}{80} \exp ^{-\sqrt {3} i t} s_{4}-\frac{9}{8} \exp ^{-i 
+t} s_{4} s_{3} s_{2} i-\frac{9}{16} \exp ^{-i t} s_{2}^{2} s_{1} i+
+\frac{3}{80} \exp ^{-i t} s_{2}+\frac{1}{416} \sqrt {3} \exp ^{-3 
+\sqrt {3} i t} s_{4}^{3} i+\frac{1}{32} \exp ^{-3 i t} s_{2}^{3} i-
+\frac{1}{32} \sqrt {3} \exp ^{-\sqrt {3} i t-2 i t} s_{4} s_{2}^{2} i+
+\frac{3}{32} \exp ^{-\sqrt {3} i t-2 i t} s_{4} s_{2}^{2} i-\frac{1}{32}
+ \sqrt {3} \exp ^{-\sqrt {3} i t+2 i t} s_{4} s_{1}^{2} i-\frac{3}{32} 
+\exp ^{-\sqrt {3} i t+2 i t} s_{4} s_{1}^{2} i+\frac{31}{416} \sqrt {3} 
+\exp ^{-2 \sqrt {3} i t-i t} s_{4}^{2} s_{2} i-\frac{45}{416} \exp ^{-2 
+\sqrt {3} i t-i t} s_{4}^{2} s_{2} i+\frac{31}{416} \sqrt {3} \exp ^{-2 
+\sqrt {3} i t+i t} s_{4}^{2} s_{1} i+\frac{45}{416} \exp ^{-2 \sqrt {3} 
+i t+i t} s_{4}^{2} s_{1} i+\frac{1}{32} \sqrt {3} \exp ^{\sqrt {3} i t-2
+ i t} s_{3} s_{2}^{2} i+\frac{3}{32} \exp ^{\sqrt {3} i t-2 i t} s_{3} s
+_{2}^{2} i+\frac{1}{32} \sqrt {3} \exp ^{\sqrt {3} i t+2 i t} s_{3} s_{1
+}^{2} i-\frac{3}{32} \exp ^{\sqrt {3} i t+2 i t} s_{3} s_{1}^{2} i-
+\frac{31}{416} \sqrt {3} \exp ^{2 \sqrt {3} i t-i t} s_{3}^{2} s_{2} i-
+\frac{45}{416} \exp ^{2 \sqrt {3} i t-i t} s_{3}^{2} s_{2} i-\frac{31}{
+416} \sqrt {3} \exp ^{2 \sqrt {3} i t+i t} s_{3}^{2} s_{1} i+\frac{45}{
+416} \exp ^{2 \sqrt {3} i t+i t} s_{3}^{2} s_{1} i+\frac{5}{16} \sqrt {3
+} \exp ^{\sqrt {3} i t} s_{4} s_{3}^{2} i+\frac{5}{8} \sqrt {3} \exp ^{
+\sqrt {3} i t} s_{3} s_{2} s_{1} i+\frac{33}{80} \exp ^{\sqrt {3} i t} s
+_{3}+\frac{9}{8} \exp ^{i t} s_{4} s_{3} s_{1} i+\frac{9}{16} \exp ^{i t
+} s_{2} s_{1}^{2} i+\frac{3}{80} \exp ^{i t} s_{1}-\frac{1}{416} \sqrt {
+3} \exp ^{3 \sqrt {3} i t} s_{3}^{3} i-\frac{1}{32} \exp ^{3 i t} s_{1}
+^{3} i\rPar+\sqrt {3} \exp ^{-\sqrt {3} i t} s_{4} i-\exp ^{-i t} s_{2} 
+i-\sqrt {3} \exp ^{\sqrt {3} i t} s_{3} i+\exp ^{i t} s_{1} i
+\)\par
+
+\(
+\)
+\paragraph{Centre
+manifold ODEs}
+
+
+The system evolves on the invariant manifold such
+that the parameters evolve according to these ODEs.
+\(
+\)\par
+
+\(\dot s_{1}=\eps^{2} \lPar \frac{3}{4} s_{4} s_{3} s_{1} i+\frac{3}{8} s_
+{2} s_{1}^{2} i-\frac{3}{40} s_{1}\rPar
+\)\par
+
+\(\dot s_{2}=\eps^{2} \lPar -\frac{3}{4} s_{4} s_{3} s_{2} i-\frac{3}{8} s
+_{2}^{2} s_{1} i-\frac{3}{40} s_{2}\rPar
+\)\par
+
+\(\dot s_{3}=\eps^{2} \lPar \frac{1}{8} \sqrt {3} s_{4} s_{3}^{2} i+\frac{
+1}{4} \sqrt {3} s_{3} s_{2} s_{1} i-\frac{3}{8} s_{3}\rPar
+\)\par
+
+\(\dot s_{4}=\eps^{2} \lPar -\frac{1}{8} \sqrt {3} s_{4}^{2} s_{3} i-
+\frac{1}{4} \sqrt {3} s_{4} s_{2} s_{1} i-\frac{3}{8} s_{4}\rPar
+\)\par
+\end{document}

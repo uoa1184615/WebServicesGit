@@ -1,0 +1,31 @@
+on div; off allfac; on revpri;
+factor ct,st,small;
+ap1:=4/10; ap2:=3/10; bp1:=2/10; bp2:=1/10;
+aq1:=1/10; aq2:=2/10; bq1:=5/10; bq2:=3/10;
+
+kp:=mat((-2-ct,2+st),(2+ct,-2-st));
+kq:=mat((-2-st,2+ct),(2+st,-2-ct));
+pv:=tp mat((p1,p2));
+qv:=tp mat((q1,q2));
+f:=+mat((ap1-bp1*q1,0),(0,ap2-bp2*q2))*pv;
+g:=-mat((aq1-bq1*p1,0),(0,aq2-bq2*q2))*qv;
+dpdt:=kp*pv+small*f;
+dqdt:=kq*qv+small*g;
+
+p1:=u1; p2:=u2; q1:=u3; q2:=u4; ct:=sigma*u5; st:=sigma*u6; 
+factor sigma,small;
+off nat;
+du1dt:=dpdt(1,1);
+du2dt:=dpdt(2,1);
+du3dt:=dqdt(1,1);
+du4dt:=dqdt(2,1);
+du5dt:=-u6;
+du6dt:=+u5;
+end;
+
+freqs: 0,0,1,-1
+(1,1,0,0,0,0),
+(0,0,1,1,0,0),
+(0,0,0,0,1/2,-i/2),
+(0,0,0,0,1/2,+i/2)
+

@@ -1,5 +1,5 @@
 \section{Output LaTeX version of results}
-% AJR, 24 aug 2012 -- aug 2014
+% AJR, 24 aug 2012 -- Jul 2015
 
 Change the printing of temporary arrays.
 \begin{reduce}
@@ -18,12 +18,15 @@ for k:=1:m do for j:=1:n do tmpzz(k,j):=(1*coeffn(zs_,e_(j,k),1));
 \end{reduce}
 
 Write to a file the commands needed to write the LaTeX expressions.
-Write the centre manifold to one order lower than computed.
+Write the invariant manifold to one order lower than computed.
+The output line length of each `write' statement must be short enough as otherwise Reduce puts in a line break---its counting is a bit mysterious!
+
 \begin{reduce}
 out "scratchfile.red";
 write "write ""\)
-\paragraph{The centre manifold}
-These give the location of the centre manifold in
+\paragraph{The ",natureMan_,"
+manifold}";
+write "These give the location of the invariant manifold in
 terms of parameters~\(s\sb j\).
 \("";";
 for j:=1:n do write "tmp(",j,
@@ -33,8 +36,9 @@ for j:=1:n do write "tmp(",j,
 Write the commands to write the ODEs on the centre manifold.
 \begin{reduce}
 write "write ""\)
-\paragraph{Centre manifold ODEs}
-The system evolves on the centre manifold such
+\paragraph{",natureMan_,"
+manifold ODEs}";
+write "The system evolves on the invariant manifold such
 that the parameters evolve according to these ODEs.
 \("";";
 for j:=1:m do write "tmps(",j,"):=1*coeffn(gg_,e_(",j,",1),1);";
@@ -67,11 +71,11 @@ shut "scratchfile.red";
 Execute the file with the required commands, with output to the main centre manifold LaTeX file.
 
 \begin{reduce}
-out "centreMan.tex";
-on latex;
+out "centreMan.tex"$
+on latex$
 in "scratchfile.red"$
-off latex;
-shut "centreMan.tex";
+off latex$
+shut "centreMan.tex"$
 \end{reduce}
 
 \begin{reduce}

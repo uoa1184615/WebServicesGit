@@ -10,6 +10,9 @@ differential equations (DDE), when the ODE/DDE has fast and
 centre modes.  This code underlies the web service at
 http://www.maths.adelaide.edu.au/anthony.roberts/gencm.php
 
+1 Jul 2015: This branch is to try creating invariant
+manifold code, so replace frequencies by eigenvalues, etc.
+
 StochasticNormalForm: derive a stochastic/non-autonomous
 coordinate transformation that separates slow, stable and
 unstable modes in a system of SDEs or non-autonomous ODEs

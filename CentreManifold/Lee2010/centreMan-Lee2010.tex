@@ -1,0 +1,172 @@
+\documentclass[11pt,a5paper]{article}
+\usepackage[a5paper,margin=13mm]{geometry}
+\usepackage{amsmath,parskip,time} \raggedright
+\def\cis\big(#1\big){\,e^{#1i}}
+\def\eps{\varepsilon}
+\title{Centre (slow) manifold of the example of \S7.1 by Lee \& Othmer (2010)}
+\author{A. J. Roberts, University of Adelaide\\
+\texttt{http://www.maths.adelaide.edu.au/anthony.roberts}}
+\date{\now, \today}
+\begin{document}
+\maketitle
+
+Rescale the system~(84) to the fast time so their \(\epsilon=\varepsilon^2\) here.
+For simplicity set \(k_i=1\) for all~\(i\).
+Then \(\epsilon=0\) and \(\vec c=(\sqrt{C_2},C_2,C_3)\) is a global manifold of equilibria.
+So with \(C_1=\sqrt{C_2}\) change to local variables~\(\vec u\) by \(c_i(t)=C_i+u_i(t)\).
+My website models the dynamics (creates the slow manifold) with the following input:
+\begin{verbatim}
+ff_:=tp mat((-2*((sqrt(c2)+u1)^2-(c2+u2))
+,((sqrt(c2)+u1)^2-(c2+u2))
++small*((c3+u3)-(c2+u2))
+,0-small*((c3+u3)-(c2+u2))));
+freqm_:=mat((0,0));
+ee_:=tp mat((1/2/sqrt(c2),1,0),(0,0,1));
+zz_:=tp mat((0,1,0),(0,0,1));
+toosmall:=3;
+\end{verbatim}
+
+Throughout and generally: the lowest order, most
+important, terms are near the end of each expression.
+
+\(\)
+\paragraph{The specified dynamical system}
+\(
+\)\par
+\(\dot u_{1}=-2 \eps u\sb1^{2}-4 \sqrt {C_2} u\sb1+2 u\sb2
+\)\par
+\(\dot u_{2}=\eps^{2} \big(-\cis\big(0\big) C_2+\cis\big(0\big) C_3-u\sb2+
+u\sb3\big)+\eps u\sb1^{2}+2 \sqrt {C_2} u\sb1-u\sb2
+\)\par
+\(\dot u_{3}=\eps^{2} \big(\cis\big(0\big) C_2-\cis\big(0\big) C_3+u\sb2-
+u\sb3\big)
+\)\par
+\(\)
+\paragraph{Centre subspace basis vectors}
+\(
+\)\par
+\(\vec e_{1}=\left\{
+\left\{
+1/2 \sqrt {C_2} C_2^{-1} , 1 , 0
+\right\} , \cis\big(0\big)
+\right\}
+\)\par
+\(\vec e_{2}=\left\{
+\left\{
+0 , 0 , 1
+\right\} , \cis\big(0\big)
+\right\}
+\)\par
+\(\vec z_{1}=\left\{
+\left\{
+0 , 1 , 0
+\right\} , \cis\big(0\big)
+\right\}
+\)\par
+\(\vec z_{2}=\left\{
+\left\{
+0 , 0 , 1
+\right\} , \cis\big(0\big)
+\right\}
+\)\par
+
+\(
+\)
+\paragraph{The centre manifold}
+These give the location of the centre manifold in
+terms of parameters~\(s\sb j\).
+\(
+\)\par
+\(u_{1}=-1/8 \sqrt {C_2} \eps s_{1}^{2} C_2^{-2}+1/2 \sqrt {C_2} s_{1} C_2^{-1
+}
+\)\par
+\(u_{2}=s_{1}
+\)\par
+\(u_{3}=s_{2}
+\)\par
+That is, 
+\begin{eqnarray*}
+c_2&=&C_2+u_2=C_2+s_1,\\
+c_3&=&C_3+u_3=C_3+s_2,\\
+c_1&=&C_1+u_1\approx\sqrt{C_2}+\tfrac12s_1/\sqrt{C_2}-\varepsilon\tfrac18s_1^2/C_2^{3/2}\approx \sqrt{C_2+s_1}\,.
+\end{eqnarray*}
+
+
+
+
+\paragraph{Centre manifold ODEs}
+The system evolves on the centre manifold such
+that the parameters evolve according to these ODEs.
+\(
+\)\par
+\(\dot s_{1}=\eps^{2} \big(-4 \sqrt {C_2} s_{2}+4 \sqrt {C_2} s_{1}+4 
+\sqrt {C_2} C_2-4 \sqrt {C_2} C_3+16 s_{2} C_2-16 s_{1} C_2-16 C_2^{2}+16 C_2 C_3
+\big)/\big(16 C_2-1\big)
+\)\par
+\(\dot s_{2}=\eps^{2} \big(-s_{2}+s_{1}+C_2-C_3\big)
+\)\par
+
+To match the result~(92), consider the 2nd evolution equation first:
+\begin{eqnarray*}
+\dot c_3&=&(C_3+s_2)\dot{}=\dot s_2
+=\varepsilon^2(-s_{2}+s_{1}+C_2-C_3)\\
+&=&\epsilon[(C_2+s_1)-(C_3+s_2)]
+=\epsilon(c_2-c_3).
+\end{eqnarray*}
+Similarly, but in brief, the first evolution equation goves
+\begin{eqnarray*}
+\dot c_2&=&(C_2+s_1)\dot{}=\dot s_1
+\\&=&\eps^{2} \big(-4 \sqrt {C_2} s_{2}+4 \sqrt {C_2} s_{1}+4 
+\sqrt {C_2} C_2-4 \sqrt {C_2} C_3
+\\&&{}+16 s_{2} C_2-16 s_{1} C_2-16 C_2^{2}+16 C_2 C_3
+\big)/\big(16 C_2-1\big)
+\\&\equiv&\epsilon \big(4 
+\sqrt {c_2} c_2-4 \sqrt {c_2} c_3+16 s_{2} c_2-16 c_2^{2}+16 c_2 c_3
+\big)/\big(16 c_2-1\big)
+\\&=&\epsilon4(c_3-c_2)\sqrt{c_2}/(4\sqrt{c_2}+1)
+\end{eqnarray*}
+which also matches~(92).
+
+
+The projection of initial conditions arise from the following, but I have not cancelled the common factors to see how the match.
+
+
+\paragraph{Normals to isochrons at the slow manifold}
+Use these vectors: to project initial conditions
+onto the slow manifold; to project non-autonomous
+forcing onto the slow evolution; to predict the
+consequences of modifying the original system; in
+uncertainty quantification to quantify effects on
+the model of uncertainties in the original system.
+The normal vector \(\vec z\sb j:=(z\sb{j1},\ldots,z\sb{jn}\
+)\)
+\(
+\)\par
+\(z_{11}=\eps^{2} \big(-3072 \sqrt {C_2} s_{1}^{2} C_2+28 \sqrt {C_2} s_{1}^{
+2} C_2^{-1}-1/4 \sqrt {C_2} s_{1}^{2} C_2^{-2}-192 \sqrt {C_2} s_{1}^{2}+
+8192 \sqrt {C_2} C_2^{3}+2560 \sqrt {C_2} C_2^{2}-160 \sqrt {C_2} C_2-2 
+\sqrt {C_2}+2048 s_{1}^{2} C_2-128 s_{1}^{2}-8192 C_2^{3}+32 C_2\big)/\big(
+65536 C_2^{4}-16384 C_2^{3}+1536 C_2^{2}-64 C_2+1\big)+\eps \big(\sqrt {C_2} 
+s_{1} C_2^{-1}+16 \sqrt {C_2} s_{1}-8 s_{1}\big)/\big(256 C_2^{2}-32 C_2+1
+\big)+\big(-2 \sqrt {C_2}+8 C_2\big)/\big(16 C_2-1\big)
+\)\par
+\(z_{12}=\eps^{2} \big(-6144 \sqrt {C_2} s_{1}^{2} C_2+56 \sqrt {C_2} s_{1}^{
+2} C_2^{-1}-1/2 \sqrt {C_2} s_{1}^{2} C_2^{-2}-384 \sqrt {C_2} s_{1}^{2}+
+6144 \sqrt {C_2} C_2^{2}-256 \sqrt {C_2} C_2-8 \sqrt {C_2}+4096 s_{1}^{2} C_2-
+256 s_{1}^{2}-8192 C_2^{3}-1024 C_2^{2}+96 C_2\big)/\big(65536 C_2^{4}-16384
+ C_2^{3}+1536 C_2^{2}-64 C_2+1\big)+\eps \big(2 \sqrt {C_2} s_{1} C_2^{-1}+32
+ \sqrt {C_2} s_{1}-16 s_{1}\big)/\big(256 C_2^{2}-32 C_2+1\big)+\big(-4 
+\sqrt {C_2}+16 C_2\big)/\big(16 C_2-1\big)
+\)\par
+\(z_{13}=\eps^{2} \big(-8 \sqrt {C_2}+16 C_2+1\big)/\big(256 C_2^{2}-32 C_2+1
+\big)
+\)\par
+\(z_{21}=\eps^{2} \big(-32 \sqrt {C_2} C_2-2 \sqrt {C_2}+16 C_2\big)/\big(256 
+C_2^{2}-32 C_2+1\big)
+\)\par
+\(z_{22}=\eps^{2} \big(-8 \sqrt {C_2}+16 C_2+1\big)/\big(256 C_2^{2}-32 C_2+1
+\big)
+\)\par
+\(z_{23}=1
+\)\par
+\end{document}

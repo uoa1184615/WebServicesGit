@@ -1,15 +1,25 @@
 \section{Initialise LaTeX output}
-% AJR, 21 aug 2012 -- Aug 2014
+% AJR, 21 aug 2012 -- Jul 2015
 
 This section writes to various files so the output to \verb|cmsyso.txt| must be redone afterwards.
 
 First define how various tokens get printed.
+%Using braces for every parenthesis has the virtue that we can typeset the exp functions quite nicely; however, it has the big disadvantage that the formulae are no longer line broken within a brace pair.
 
 \begin{reduce}
 load_package rlfi;
-deflist('((!( !\!b!i!g!() (!) !\!b!i!g!)) (!P!I !\!p!i! )
-         (!p!i !\!p!i! ) (!E !e) (!I !i) (e !e) (i !i)),'name)$
+%deflist('((!( !{!\!b!i!g!() (!) !\!b!i!g!)!}) (!P!I !\!p!i! )
+%         (!p!i !\!p!i! ) (!E !e) (!I !i) (e !e) (i !i)),'name)$
+deflist('((!( !\!l!P!a!r! ) (!) !\!r!P!a!r) 
+    (!P!I !\!p!i! ) (!p!i !\!p!i! ) (!E !e) (!I !i) 
+    (e !e) (i !i)),'name)$
 \end{reduce}
+
+Force all fractions (coded in Reduce as \verb|quotient|) to use \verb|\frac| command so we can change how it appears.
+\begin{reduce}
+put('quotient,'laprifn,'prinfrac);
+\end{reduce}
+
 
 Override the procedure that prints annoying messages about multicharacter symbols.  
 It ends the output of one expression.  
@@ -49,6 +59,11 @@ upon the command \verb|on latex|.
 Presumably modified from that in \verb|rlfi.red|.
 Use it to write a decent header that we use for one master file.
 
+In the following, not clear that we should simply omit parentheses with the exp function.
+Could do something cleverer with \verb|\lPar| and \verb|\rPar| such as have a counter and cycle through the alternatives depending upon the counter.
+
+%  prin2t "\def\exp\big(#1\big){\,e^{#1}}";
+
 \begin{reduce}
 symbolic procedure latexon;
 <<!*!*a2sfn:='texaeval;
@@ -56,9 +71,14 @@ symbolic procedure latexon;
   prin2t "\documentclass[11pt,a5paper]{article}";
   prin2t "\usepackage[a5paper,margin=13mm]{geometry}";
   prin2t "\usepackage{parskip,time} \raggedright";
-  prin2t "\def\cis\big(#1\big){\,e^{#1i}}";
+  prin2t "\def\lPar{\mathchoice{\big(}{\big(}{(}{(}}";
+  prin2t "\def\rPar{\mathchoice{\big)}{\big)}{)}{)}}";
+  prin2t "\let\FRaC\frac";
+  prin2t "\renewcommand{\frac}[2]{\mathchoice%";
+  prin2t "    {\FRaC{#1}{#2}}{\FRaC{#1}{#2}}{#1/#2}{#1/#2}}";
+  prin2t "\def\exp{\,e}";
   prin2t "\def\eps{\varepsilon}";
-  prin2t "\title{Centre manifold of your dynamical system}";
+  prin2t "\title{Invariant manifold of your dynamical system}";
   prin2t "\author{A. J. Roberts, University of Adelaide\\";
   prin2t "\texttt{http://www.maths.adelaide.edu.au/anthony.roberts}}";
   prin2t "\date{\now, \today}";
@@ -72,8 +92,6 @@ symbolic procedure latexon;
         prin2t "REDUCE Input:">>;
   put('tex,'rtypefn,'(lambda(x) 'tex)) >>$
 \end{reduce}
-
-The above definition for \verb|\cis| is not quite right for \verb|rlfi|, but I do not know how to fix it.
 
 Set the default output to be inline mathematics.
 
@@ -134,18 +152,18 @@ defid e_,name="e";
 defindex d_(arg,down,down);
 defid d_,name="D";
 defindex u(down);
-defid u1,name="u\sb1"; 
-defid u2,name="u\sb2"; 
-defid u3,name="u\sb3"; 
-defid u4,name="u\sb4"; 
-defid u5,name="u\sb5"; 
-defid u6,name="u\sb6"; 
-defid u7,name="u\sb7"; 
-defid u8,name="u\sb8"; 
-defid u9,name="u\sb9"; 
+%defid u1,name="u\sb1"; 
+%defid u2,name="u\sb2"; 
+%defid u3,name="u\sb3"; 
+%defid u4,name="u\sb4"; 
+%defid u5,name="u\sb5"; 
+%defid u6,name="u\sb6"; 
+%defid u7,name="u\sb7"; 
+%defid u8,name="u\sb8"; 
+%defid u9,name="u\sb9"; 
 defindex s(down);
-defid cis,name="\cis";
-defindex cis(arg);
+defindex exp(up);
+defid exp,name="e"; %does not work??
 \end{reduce}
 
 
@@ -162,11 +180,12 @@ defid tmp,name="\dot u";
 defid tmps,name="\vec e";
 defid tmpz,name="\vec z";
 rhs_:=rhsfn_$
-for k:=1:m do tmps(k):={for j:=1:n collect ee_(j,k),cis(freq(k)*t)};
-for k:=1:m do tmpz(k):={for j:=1:n collect zz_(j,k),cis(freq(k)*t)};
+for k:=1:m do tmps(k):={for j:=1:n collect ee_(j,k),exp(evl_(k)*t)};
+for k:=1:m do tmpz(k):={for j:=1:n collect zz_(j,k),exp(evl_(k)*t)};
 \end{reduce}
 
 We have to be shifty here because \verb|rlfi| does not work inside a loop: so write the commands to a file, and then input the file.
+The output line length of each `write' statement must be short enough as otherwise Reduce puts in a line break.
 
 \begin{reduce}
 out "scratchfile.red";
@@ -175,7 +194,8 @@ write "write ""\)
 \("";";
 for j:=1:n do write "tmp(",j,"):=coeffn(rhs_,e_(",j,",1),1);";
 write "write ""\)
-\paragraph{Centre subspace basis vectors}
+\paragraph{",natureMan_,"
+subspace basis vectors}","
 \("";";
 for j:=1:m do write "tmps(",j,"):=tmps(",j,");";
 for j:=1:m do write "tmpz(",j,"):=tmpz(",j,");";

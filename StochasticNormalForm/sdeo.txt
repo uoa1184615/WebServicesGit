@@ -1,82 +1,379 @@
 
-no. of slow modes m := 1
+no. of slow modes m := 2
 
-                   1
-dx(1)/dt = small*(---*y(1) - x(1) + x(1)*y(1)) + sigma*w(1)
-                   2
+dx(1)/dt = small*( - 2*x(1)*y(1) - x(1)*y(2)) + sigma*w(1)
 
-no. of stable fast modes ny := 1
+                           1          1
+            + s*sigma*( - ---*w(1) - ---*w(2))
+                           2          2
 
-dy(1)/dt =  - 100*y(1) + small*(100*x(1) - 100*x(1)*y(1))
+dx(2)/dt = 0
+
+no. of stable fast modes ny := 2
+
+dy(1)/dt =  - 2*y(1)
+
+                              2                     2
+            + small*( - 2*y(1)  - 3*y(2)*y(1) - y(2)  - x(2)*x(1))
+
+                      1          1
+            + sigma*(---*w(1) + ---*w(2) - w(3))
+                      2          2
+
+            + s*small*( - x(2) - x(2)*y(1) - x(2)*y(2))
+
+dy(2)/dt =  - y(2) + small*x(2)*x(1) + sigma*w(3)
+
+            + s*small*(x(2) + x(2)*y(1) + x(2)*y(2))
 
 no. of unstable fast modes nz := 0
 
-lengthresy := 2
+lengthresy := 11
 
-lengthresx := 7
+lengthresy := 14
 
-Time: 0 ms
+lengthresx := 20
 
-lengthresy := 8
-
-lengthresx := 9
-
-Time: 0 ms
-
-lengthresy := 7
-
-lengthresx := 8
-
-Time: 0 ms
-
-lengthresy := 2
-
-lengthresx := 3
+lengthresx := 1
 
 Time: 10 ms
+
+lengthresy := 95
+
+lengthresy := 54
+
+lengthresx := 109
+
+lengthresx := 1
+
+Time: 20 ms
+
+lengthresy := 204
+
+lengthresy := 38
+
+lengthresx := 141
+
+lengthresx := 1
+
+Time: 59 ms
+
+lengthresy := 1
 
 lengthresy := 1
 
 lengthresx := 1
 
-Time: 0 ms
+lengthresx := 1
 
-Number of iterations it := 1000005
+Time: 40 ms  plus GC time: 10 ms
+
+Number of iterations it := 1000004
 
 ***** Success *****
 
 The stochastic/non-autonomous coordinate transform
 
-y(1) := yy(1) + small*xx(1) - sigma*small*ou(w(1),tt,-100)
+                            2
+y(1) := yy(1) + small*(yy(1)  + 3*yy(2)*yy(1)) + sigma
 
-                            1             1
-x(1) := xx(1) + small*( - -----*yy(1) - -----*xx(1)*yy(1))
-                           200           100
+           1                    1
+        *(---*ou(w(1),tt,-2) + ---*ou(w(2),tt,-2) - ou(w(3),tt,-2)) + 
+           2                    2
 
-             1
-         - -----*sigma*small*ou(w(1),tt,100)*yy(1)
-            100
+                                             3
+        sigma*small*(ou(w(1),tt,-2)*yy(1) + ---*ou(w(1),tt,-2)*yy(2)
+                                             2
+
+               3
+            - ---*ou(w(1),tt,-1)*yy(2) + ou(w(2),tt,-2)*yy(1)
+               2
+
+               3                          3
+            + ---*ou(w(2),tt,-2)*yy(2) - ---*ou(w(2),tt,-1)*yy(2)
+               2                          2
+
+            - 2*ou(w(3),tt,-2)*yy(1) - 3*ou(w(3),tt,-2)*yy(2)
+
+            + 3*ou(w(3),tt,-1)*yy(1) + 3*ou(w(3),tt,-1)*yy(2)
+
+            - 2*ou(ou(w(3),tt,-1),tt,-1)*yy(2))
+
+            1
+         + ---*xx(2)*sigma*small*ou(w(1),tt,-2)
+            2
+
+                              1
+         + xx(2)*s*small*( - --- - yy(2)) + xx(2)*s*sigma*small*(
+                              2
+
+               1                    1
+            - ---*ou(w(1),tt,-2) - ---*ou(w(2),tt,-2) + ou(w(3),tt,-2)
+               4                    4
+
+                                1
+            - ou(w(3),tt,-1) - ---*ou(ou(w(1),tt,-2),tt,-2)
+                                2
+
+               1
+            - ---*ou(ou(w(2),tt,-2),tt,-2) + ou(ou(w(3),tt,-2),tt,-2))
+               2
+
+            1
+         - ---*xx(2)*xx(1)*small
+            2
+
+y(2) := yy(2) + sigma*ou(w(3),tt,-1)
+
+         - xx(2)*sigma*small*ou(w(1),tt,-1)
+
+         + xx(2)*s*small*(1 - yy(1)) + xx(2)*s*sigma*small*(
+
+               1                                     1
+            - ---*ou(w(1),tt,-2) + ou(w(1),tt,-1) - ---*ou(w(2),tt,-2)
+               2                                     2
+
+            + ou(w(2),tt,-1) + ou(w(3),tt,-2) - ou(w(3),tt,-1)
+
+            + ou(ou(w(3),tt,-1),tt,-1)) + xx(2)*xx(1)*small
+
+x(1) := sigma*small*(ou(w(1),tt,1)*yy(2) + ou(w(1),tt,2)*yy(1)) + s
+
+                          1
+        *sigma*small*( - ---*ou(w(1),tt,1)*yy(2)
+                          2
+
+               1                         1
+            - ---*ou(w(1),tt,2)*yy(1) - ---*ou(w(2),tt,1)*yy(2)
+               2                         2
+
+               1
+            - ---*ou(w(2),tt,2)*yy(1)) + xx(1)
+               2
+
+         + xx(1)*small*(yy(1) + yy(2)) + xx(1)*sigma*small*(
+
+            1                    1
+           ---*ou(w(1),tt,-2) + ---*ou(w(2),tt,-2) - ou(w(3),tt,-2)
+            2                    2
+
+            + ou(w(3),tt,-1))
+
+x(2) := xx(2)
 
 The normal form S/ODEs
 
-dyy(1)/dt =  - 100*yy(1) - 100*small*xx(1)*yy(1)
+                                    2
+dyy(1)/dt =  - 2*yy(1) - small*yy(2)
 
-                    2      1
-             + small *( - ---*yy(1) - xx(1)*yy(1))
-                           2
+             + sigma*small*( - w(1)*yy(1) - w(2)*yy(1) - w(3)*yy(1)) +
 
-                 1              2
-             - -----*sigma*small *w(1)*yy(1)
-                100
+                        2
+             sigma*small
 
-                                  2   1               2
-dxx(1)/dt =  - small*xx(1) + small *(---*xx(1) + xx(1) ) + sigma*w(1)
-                                      2
+               11            2    11            2    7            2
+            *(----*w(1)*yy(2)  + ----*w(2)*yy(2)  + ---*w(3)*yy(2) ) +
+               4                  4                  2
 
-                          2       1            1
-             + sigma*small *( - -----*w(1) - -----*w(1)*xx(1))
-                                 200          100
+                  2      2   1
+             sigma *small *(---*ou(w(1),tt,-2)*w(1)*yy(1)
+                             2
 
-                 1        2      2
-             - -----*sigma *small *ou(w(1),tt,-100)*w(1)
-                100
+                   1
+                + ---*ou(w(1),tt,-2)*w(2)*yy(1)
+                   2
+
+                   1
+                + ---*ou(w(2),tt,-2)*w(1)*yy(1)
+                   2
+
+                   1
+                + ---*ou(w(2),tt,-2)*w(2)*yy(1)
+                   2
+
+                - ou(w(3),tt,-2)*w(1)*yy(1)
+
+                - ou(w(3),tt,-2)*w(2)*yy(1)
+
+                + ou(w(3),tt,-1)*w(1)*yy(1)
+
+                + ou(w(3),tt,-1)*w(2)*yy(1))
+
+                3                   2
+             + ---*xx(2)*sigma*small *w(1)*yy(1) - xx(2)*s*small*yy(1)
+                2
+
+                            2                    2
+             + xx(2)*s*small *( - yy(1) + 3*yy(2) ) + xx(2)*s*sigma
+
+                  2      1                1
+            *small *( - ---*w(1)*yy(1) - ---*w(2)*yy(1))
+                         4                4
+
+                                  2              2  2      2
+             - 2*xx(2)*xx(1)*small *yy(1) + xx(2) *s *small *yy(1)
+
+                                        2
+dyy(2)/dt =  - yy(2) + xx(2)*sigma*small *w(1)*yy(2)
+
+                                                        2
+             + xx(2)*s*small*yy(2) + xx(2)*s*sigma*small
+
+                  5                5                1
+            *( - ---*w(1)*yy(2) - ---*w(2)*yy(2) - ---*w(3)*yy(2))
+                  4                4                2
+
+                                2              2  2      2
+             + xx(2)*xx(1)*small *yy(2) - xx(2) *s *small *yy(2)
+
+                              2            1
+dxx(1)/dt = sigma*w(1) + sigma *small*( - ---*ou(w(1),tt,-2)*w(1)
+                                           2
+
+                   1
+                - ---*ou(w(2),tt,-2)*w(1) + ou(w(3),tt,-2)*w(1)
+                   2
+
+                - ou(w(3),tt,-1)*w(1))
+
+                            1          1                 2
+             + s*sigma*( - ---*w(1) - ---*w(2)) + s*sigma *small*(
+                            2          2
+
+                1                         1
+               ---*ou(w(1),tt,-2)*w(1) + ---*ou(w(1),tt,-2)*w(2)
+                4                         4
+
+                   1                         1
+                + ---*ou(w(2),tt,-2)*w(1) + ---*ou(w(2),tt,-2)*w(2)
+                   4                         4
+
+                   1                         1
+                - ---*ou(w(3),tt,-2)*w(1) - ---*ou(w(3),tt,-2)*w(2)
+                   2                         2
+
+                   1                         1
+                + ---*ou(w(3),tt,-1)*w(1) + ---*ou(w(3),tt,-1)*w(2))
+                   2                         2
+
+                                      1          1
+             + xx(1)*sigma*small*( - ---*w(1) - ---*w(2)) + xx(1)
+                                      2          2
+
+                  2      2   1
+            *sigma *small *(---*ou(w(1),tt,-2)*w(1)
+                             4
+
+                   1                         1
+                + ---*ou(w(1),tt,-2)*w(2) + ---*ou(w(2),tt,-2)*w(1)
+                   4                         4
+
+                   1                         1
+                + ---*ou(w(2),tt,-2)*w(2) - ---*ou(w(3),tt,-2)*w(1)
+                   4                         2
+
+                   1                         1
+                - ---*ou(w(3),tt,-2)*w(2) + ---*ou(w(3),tt,-1)*w(1)
+                   2                         2
+
+                   1                                    2      2
+                + ---*ou(w(3),tt,-1)*w(2)) + xx(2)*sigma *small
+                   2
+
+                  1
+            *( - ---*ou(w(1),tt,-2)*w(1) + ou(w(1),tt,-1)*w(1)) + 
+                  2
+
+                         2      2
+            xx(2)*s*sigma *small *(ou(w(1),tt,-2)*w(1)
+
+                   1                         3
+                + ---*ou(w(1),tt,-2)*w(2) - ---*ou(w(1),tt,-1)*w(1)
+                   4                         2
+
+                   1                         3
+                - ---*ou(w(1),tt,-1)*w(2) + ---*ou(w(2),tt,-2)*w(1)
+                   2                         4
+
+                - ou(w(2),tt,-1)*w(1) - 2*ou(w(3),tt,-2)*w(1)
+
+                + 2*ou(w(3),tt,-1)*w(1)
+
+                   1
+                + ---*ou(ou(w(1),tt,-2),tt,-2)*w(1)
+                   2
+
+                   1
+                + ---*ou(ou(w(2),tt,-2),tt,-2)*w(1)
+                   2
+
+                - ou(ou(w(3),tt,-2),tt,-2)*w(1)
+
+                                                          2      2
+                - ou(ou(w(3),tt,-1),tt,-1)*w(1)) + xx(2)*s *sigma
+
+                  2      3
+            *small *( - ---*ou(w(1),tt,-2)*w(1)
+                         8
+
+                   3                         1
+                - ---*ou(w(1),tt,-2)*w(2) + ---*ou(w(1),tt,-1)*w(1)
+                   8                         2
+
+                   1                         3
+                + ---*ou(w(1),tt,-1)*w(2) - ---*ou(w(2),tt,-2)*w(1)
+                   2                         8
+
+                   3                         1
+                - ---*ou(w(2),tt,-2)*w(2) + ---*ou(w(2),tt,-1)*w(1)
+                   8                         2
+
+                   1
+                + ---*ou(w(2),tt,-1)*w(2) + ou(w(3),tt,-2)*w(1)
+                   2
+
+                + ou(w(3),tt,-2)*w(2) - ou(w(3),tt,-1)*w(1)
+
+                - ou(w(3),tt,-1)*w(2)
+
+                   1
+                - ---*ou(ou(w(1),tt,-2),tt,-2)*w(1)
+                   4
+
+                   1
+                - ---*ou(ou(w(1),tt,-2),tt,-2)*w(2)
+                   4
+
+                   1
+                - ---*ou(ou(w(2),tt,-2),tt,-2)*w(1)
+                   4
+
+                   1
+                - ---*ou(ou(w(2),tt,-2),tt,-2)*w(2)
+                   4
+
+                   1
+                + ---*ou(ou(w(3),tt,-2),tt,-2)*w(1)
+                   2
+
+                   1
+                + ---*ou(ou(w(3),tt,-2),tt,-2)*w(2)
+                   2
+
+                   1
+                + ---*ou(ou(w(3),tt,-1),tt,-1)*w(1)
+                   2
+
+                   1
+                + ---*ou(ou(w(3),tt,-1),tt,-1)*w(2))
+                   2
+
+                1                         2
+             + ---*xx(2)*xx(1)*sigma*small *w(1)
+                2
+
+                                        2      1          1
+             + xx(2)*xx(1)*s*sigma*small *( - ---*w(1) - ---*w(2))
+                                               4          4
+
+dxx(2)/dt = 0
