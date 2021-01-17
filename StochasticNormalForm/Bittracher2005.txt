@@ -1,0 +1,9 @@
+% example from \cite{Bittracher2005}, section 4,
+% from banana potential V(x,y):=(x^2-1)^2+10(x^2+y)^2
+% AJR, Sep 2020
+xrhs:={-4*x(1)*(x(1)^2-1) - 40*x(1)*(x(1)^2+y(1)) + w(1)};
+yrhs:={-20*(x(1)^2+y(1)) + w(2)};
+zrhs:={ };
+toosmall:=3;
+factor small,sig;
+end;

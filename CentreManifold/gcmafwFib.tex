@@ -39,8 +39,8 @@ Further, this code now derives vectors defining the projection onto the centre m
 In the following, assign \verb|thecase:=myweb;| for the web service (or to read a system from file \verb|cmsysb.red|), otherwise assign \verb|thecase| to be any of the example dynamical systems in set~\verb|thecases|.
 \begin{reduce}
 % see gcmafwFib.pdf for detailed explanation
-% AJ Roberts, Nov 2013 -- Jul 2015
-thecase:=normalmodes; 
+% AJ Roberts, Nov 2013 -- Nov 2018
+thecase:=gspt; 
 thecases:={onedde, anotherdde, twodde, dde2d, dde2d2ha,
 dde2d2hb, simple2d, simple2ds, simple2dss, norm2dsimp, fourstatemarkov,
 another2d, another2ds, simple3d, simple3ds, geneigenvec,
@@ -49,7 +49,7 @@ quasidelayosc, quasidelayoscmod, rosslerlike, doubleosc,
 oscmeanflow, modulateduffing, modulateoscillator,
 StoleriuOne, StoleriuTwo, delayprolif, delayedprolif,
 normalmodes, koopmanmodes, forcedvdp, lorenz86slow, lorenz86norm,
-substablem }$
+substablem, gspt }$
 \end{reduce}
 
 Define default parameters for the iteration:
@@ -67,7 +67,7 @@ For optional trace printing of test cases:
 comment out second line when not needed.
 \begin{reduce}
 trace_:=0$ 
-%trace_:=1; maxiter_:=9; 
+trace_:=1; maxiter_:=9; 
 \end{reduce}
 
 
@@ -2620,7 +2620,7 @@ The normal vector \(\vec z\sb j:=(z\sb{j1},\ldots,z\sb{jn}\
 
 \subsubsection{Normal form shows drift from the fast waves}
 
-Finds that any fast waves will generate a mean drift effect on the slow dynamics (in the \(s_3\approx u_3\) equation), an effect quadratic in amplitude of the fast waves.
+Finds that any fast waves generate a mean drift effect on the slow dynamics (in the \(s_3\approx u_3\) equation), an effect quadratic in amplitude of the fast waves.
 
 \begin{reduce}
 if thecase=lorenz86norm then begin
@@ -2642,6 +2642,28 @@ end;
 
 
 
+
+\subsection{A GSPT: generalised singular perturbation problem}
+From Martin W and Ian.
+
+\begin{reduce}
+if thecase=gspt then begin
+x_:=z+u1;
+y_:=1-z^2+u2;
+ff_:=tp mat((-2*x_*(x_^2+y_-1)+small*epsilon*2
+, -y_*(x_^2+y_-1)+small*epsilon*(epsilon-x_)));
+evalm_:=mat((0));
+ee_:=tp mat((1,-2*z));
+zz_:=tp mat((1-z^2,-2*z));
+toosmall:=3;
+factor small,epsilon;
+end;
+\end{reduce}
+
+
+
+
+
  
 
 
@@ -2650,7 +2672,7 @@ Extract dimension information from the specification of the dynamical system: se
 
 \begin{reduce}
 if thecase=myweb then begin
-%  out "cmsyso.txt"$
+  out "cmsyso.txt"$
   ODE_function:=ff_; 
   subspace_eigenvalues:=evalm_;
   subspace_eigenvectors:=ee_; 
@@ -2663,11 +2685,13 @@ write "total no. of modes  ",
 n:=part(length(ee_),1);
 write "no. of manifold modes ",
 m:=part(length(ee_),2);
+if trace_ then
+write dims:={length(evalm_),length(zz_),length(ee_),length(ff_)};
 if {length(evalm_),length(zz_),length(ee_),length(ff_)}
   ={{1,m},{n,m},{n,m},{n,1}} 
   then write "Input dimensions are OK" 
   else <<write "INCONSISTENT INPUT DIMENSIONS, I QUIT"; 
-      quit>>;
+      if trace_ then rederr("WELL ALMOST") else quit>>;
 \end{reduce}
 
 
@@ -2744,6 +2768,7 @@ For un/stable manifolds we have to cope with complex frequencies.
 Seems to need \verb|zz_| to have minus?? complex conjugated frequency so store in~\verb|cexp_|---which is the same as \verb|dexp_| for real frequencies??  Need to decide on the inner product, especially to cater for the case of DDEs??
 
 \begin{reduce}
+operator cis;
 matrix aa_(m,m),dexp_(m,m),cexp_(m,m);
 for j:=1:m do dexp_(j,j):=exp(evl_(j)*t);
 for j:=1:m do cexp_(j,j):=exp(-conj_(evl_(j))*t);
@@ -2880,17 +2905,19 @@ The feature of the second alternative is that when a user invokes~\verb|small| t
 
 This might need reconsidering ??  but the if always chooses the first simple alternative.
 \begin{reduce}
+if trace_ then write "Ameliorate the nonlinearity";
 somerules:=for j:=1:n collect 
   (d_(1,t,~dt)*u(j)=d_(u(j),t,dt))$
+tmp_:=(ll_*uvec where somerules)$
 ff_:=(if 1 then small*ff_
-    else ff_-(1-small)*sub(small=0,ff_)) +(1-small)
-    *(ll_*uvec where somerules)$
+    else ff_-(1-small)*sub(small=0,ff_)) +(1-small)*tmp_$
 \end{reduce}
 
 Any constant term in the equations~\verb|ff_| has to be multiplied by~\verb|exp(0)|.
 
 \begin{reduce}
-ff_:=ff_+(exp(0)-1)*(ff_ where {small=>0,u(~l)=>0})$
+tmp_:=(ff_ where {small=>0,u(~l)=>0});
+ff_:=ff_+(exp(0)-1)*tmp_;
 \end{reduce}
 
 From the matrix versions of the equations, create algebraic form using the matrix basis.
@@ -2916,6 +2943,7 @@ Remember the frequency set is not in the `correct' order.
 Array \verb|modes| stores the set of indices of all the modes of a given frequency.
 
 \begin{reduce}
+if trace_ then write "Store invariant manifold frequencies";
 array evals(m),modes(m); 
 neval:=0$ evalset:={}$ 
 for j:=1:m do if not(evl_(j) member evalset) then begin
@@ -3122,7 +3150,7 @@ But first, and if for the web, open the output file and write out the possibly a
 According to the manual, this will append to the earlier output to the file.
 
 \begin{reduce}
-%if thecase=myweb then out "cmsyso.txt"$
+if thecase=myweb then out "cmsyso.txt"$
 \end{reduce}
 
 \begin{reduce}
@@ -3157,9 +3185,9 @@ gg_:=0$
 For some temporary trace printing??
 \begin{reduce}
 procedure matify(a,m,n)$
-  begin matrix z(m,n);
-    for i:=1:m do for j:=1:n do z(i,j):=coeffn(a,e_(i,j),1);
-    return (z where {exp(0)=>1,small=>s}); 
+  begin matrix z_(m,n);
+    for i:=1:m do for j:=1:n do z_(i,j):=coeffn(a,e_(i,j),1);
+    return (z_ where {exp(0)=>1,small=>s}); 
     end$
 \end{reduce}
 

@@ -1,6 +1,6 @@
 \documentclass[11pt,a5paper]{article}
 
-\title{Computer algebra derives normal forms of general stochastic and non-autonomous differential equations}
+\title{Computer algebra derives normal forms of general stochastic and non-autonomous differential equations---so far abortive attempt to have non-zero rates for slow modes??}
 
 \author{A.~J. Roberts\thanks{School of Mathematical Sciences, University of Adelaide, South Australia~5005, \textsc{Australia}.
 \url{http://www.maths.adelaide.edu.au/anthony.roberts/}}}
@@ -67,10 +67,11 @@ Define default parameters for the iteration:
 Specific problems may override these defaults.
 The code cannot handle any higher order in noise amplitude~\verb|sigma|.
 \begin{reduce}
-maxiter_:=29$
+maxiter_:=5$%??
 factor small; 
 toosmall:=3$
 let sigma^3=>0;
+trace_:=0;
 \end{reduce}
 
 
@@ -138,12 +139,13 @@ Alternatively, \(w(t)\)~could denote some non-autonomous deterministic forcing, 
 Specify the slow $x$~\sde\ by allocating the one element list of its right-hand side to the variable~\verb|xrhs|.
 \begin{reduce}
 if thecase=sdesimple then begin
-xrhs:={-x(1)*y(1)};
+trace_:=1;
+xrhs:={x(1)/9-x(1)*y(1)};
 \end{reduce}
 
 Specify the nonlinear and noise terms of the $y$~\sde\ as the one element list assigned to \verb|yrhs|.
 \begin{reduce}
-yrhs:={-y(1)+x(1)^2-2*y(1)^2+w(1)};
+yrhs:={-y(1)+x(1)^2-2*y(1)^2+0*w(1)};
 \end{reduce}
 
 There are no unstable modes. 
@@ -1952,10 +1954,46 @@ The number of slow equations is the number of terms in the list in~\verb|xrhs|.
 write "no. of slow modes ",m:=length(xrhs);
 \end{reduce}
 
-Multiply all the right-hand sides by~\verb|small| so we can control the truncation of the asymptotic construction through discarding high powers of~\verb|small|.
+\paragraph{Extract linear rates}
+Extract the linear rates of the slow equations into an array.
+For each expression in the provided set of right-hand sides:
+\begin{reduce}
+array rats(m);
+for i:=1:m do begin
+\end{reduce}
+
+For the $i$th right-hand side get the linear dependence upon~\verb|x(i)|, then set other dynamic variables to zero to get just the coefficient.
+\begin{reduce}
+  rats(i):=coeffn(part(xrhs,i),x(i),1);
+  rats(i):=(rats(i) where {x(~j)=>0,y(~j)=>0,z(~j)=>0,w(~j)=>0});
+\end{reduce}
+
+However, the coefficient may depend upon parameters, so if it is not simply a number, but is a sum, then trawl through the sum looking for a simple number to use as the linear rate.
+\begin{reduce}
+  if not numberp(rats(i)) then 
+  if part(rats(i),0)=plus then begin
+    rr:=0;
+    for j:=1:arglength(rats(i)) do 
+      if numberp(part(rats(i),j)) 
+      then rr:=part(rats(i),j);
+    rate(i):=rr;
+  end;
+\end{reduce}
+If the above has not ended up with a simple number, then force all in the \(i\)th \ode\ to be small. 
+\begin{reduce}
+  if not numberp(rats(i)) then rats(i):=0;
+\end{reduce}
+
+End the loop over all right-hand sides.
+\begin{reduce}
+end;
+\end{reduce}
+
+Multiply all the right-hand sides by~\verb|small| so we control the truncation of the asymptotic construction through discarding high powers of~\verb|small|, except for the identified linear terms.
 Users could use~\verb|small| in their equations for appropriate effects. 
 \begin{reduce}
-xrhs:=for i:=1:m collect small*part(xrhs,i)$
+xrhs:=for i:=1:m collect 
+    small*part(xrhs,i)+(1-small)*(rats(i)*x(i))$
 \end{reduce}
 
 Adjust the noise terms.
@@ -2447,7 +2485,8 @@ let zres(~a,ttyz,~r)=>ou(sign(df(a,yz)*yz/a-r)
 
 \section{Solve homological equation with noise}
 
-When solving homological equations of the form $F+\xi_t=\res$ (the resonant case $\mu=0$), we separate the terms in the right-hand side~$\res$ into those that are integrable in fast time, and hence modify the coordinate transform by changing~$\xi$, and those that are not, and hence must remain in the evolution by changing~$F$.  the operator \verb|zint| extracts those parts of a term that we know are integrable; the operator \verb|znon| extracts those parts which are not.
+When solving homological equations of the form $F+\xi_t=\res$ (the resonant case $\mu=0$), we separate the terms in the right-hand side~$\res$ into those that are integrable in fast time, and hence modify the coordinate transform by changing~$\xi$, and those that are not, and hence must remain in the evolution by changing~$F$.  
+The operator \verb|zint| extracts those parts of a term that we know are integrable; the operator \verb|znon| extracts those parts which are not.
 Note: with more research, more types of terms may be found to be integrable; hence what is extracted by \verb|zint| and what is left by \verb|zint| may change with more research.
 These transforms are not critical: changing the transforms may change intermediate computations, but as long as the iteration converges, the computer algebra results will be algebraically correct.
 \begin{reduce}
@@ -2464,8 +2503,10 @@ let { zint(w(~i),tt)=>0, znon(w(~i),tt)=>w(i)
 
 Second, by~\eqref{eq:ddtconv} a convolution may be split into an integrable part, and a part in its argument which in turn may be integrable or not.
 \begin{reduce}
-, zint(ou(~r,tt,~mu),tt)=>ou(r,tt,mu)/mu+zint(r,tt)/abs(mu)
-, znon(ou(~r,tt,~mu),tt)=>znon(r,tt)/abs(mu)
+%, zint(ou(~r,tt,~mu),tt)=>ou(r,tt,mu)/mu+zint(r,tt)/abs(mu)
+, zint(ou(~r,tt,~mu),tt)=>ou(r,tt,mu)/(mu-mui)
+    +zint(r,tt)*sign(mui)/(mu-mui)
+, znon(ou(~r,tt,~mu),tt)=>znon(r,tt)*sign(mui)/(mu-mui)
 \end{reduce}
 
 Third, squares of convolutions may be integrated by parts to an integrable term and a part that may have integrable or non-integrable parts.
@@ -2560,6 +2601,10 @@ for it:=1:maxiter_ do begin
   ok:=1;
 \end{reduce}
 
+Introduce the following for de-resonant slow manifold??
+\begin{reduce}
+mui:=0;
+\end{reduce}
 
 \subsection{Fast stable modes}
 
@@ -2572,6 +2617,7 @@ Compute the residual of each of the $y_i$~\sde{}s, updating \verb|ok| to track w
 
 Trace print the length of the residuals to check how the iteration is progressing.
 \begin{reduce}
+    if trace_ then write res:=res;
     write lengthresy:=length(res);
 \end{reduce}
 
@@ -2597,6 +2643,7 @@ Compute the residual of each of the $z_i$~\sde{}s, updating \verb|ok| to track w
 
 Trace print the length of the residuals to check how the iteration is progressing.
 \begin{reduce}
+    if trace_ then write res:=res;
     write lengthresz:=length(res);
 \end{reduce}
 
@@ -2627,17 +2674,19 @@ Compute the residual of each of the $x$~\sde{}s, updating \verb|ok| to track whe
 
 Trace print the length of this residual.
 \begin{reduce}
+    if trace_ then write res:=res;
     write lengthresx:=length(res);
 \end{reduce}
 
 Update the $X_i$~evolution \verb|ff(i)| and the $x_i$~transform.
 Use the same process as for the fast variables; the difference is that here the mode rate is zero.
 \begin{reduce}
+write mui:=rats(i);%??
     res:=sub(y4y,res);
     res0:=reso(res,yz,0);
     res1:=res-res0;
     ff(i):=ff(i)+znon(res0,tt);
-    x(i):=x(i) +zint(res0,tt) -zres(res1,ttyz,0);
+    x(i):=x(i) +zint(res0,tt) -zres(res1,ttyz,-mui);
   end;
 \end{reduce}
 
@@ -2659,14 +2708,10 @@ if ok=0 then begin
     Failed to converge in maximum allowed iterations";
     if thecase=webpage then <<
       shut "sdeo.txt"; quit >>;
-end;
+end else write "***** Success *****";
 \end{reduce}
 
 If converged, then print results.
- 
-\begin{reduce}
-write "***** Success *****";
-\end{reduce}
 
 \subsection{Plain text output}
 

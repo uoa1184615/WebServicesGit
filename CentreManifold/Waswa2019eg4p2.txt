@@ -1,0 +1,19 @@
+Example from section 4.2 of paper "A plain approach for
+center manifold reduction of nonlinear systems with external
+periodic excitations" by Peter MB Waswa, Sangram Redkar and
+Susheelkumar C Subramanian, DOI: 10.1177/1077546319890213
+
+(u3,u4,
+-2*u1+u2-u3+u4+small*u5-u1^3,
+ u1-2*u2+u3-u4+small*2*u6-u2^3,
+-u7,-u8,16*u5,64*u6)
+
+-1,1,-4,4,-8,8
+
+(1,1,-i,-i,0,0,0,0),(1,1,i,i,0,0,0,0),
+(0,0,0,0,-i/4,0,1,0),(0,0,0,0,i/4,0,1,0),
+(0,0,0,0,0,-i/8,0,1),(0,0,0,0,0,i/8,0,1)
+
+(1,1,-i,-i,0,0,0,0),(1,1,i,i,0,0,0,0),
+(0,0,0,0,1,0,i/4,0),(0,0,0,0,1,0,-i/4,0),
+(0,0,0,0,0,1,0,i/8),(0,0,0,0,0,1,0,-i/8)
