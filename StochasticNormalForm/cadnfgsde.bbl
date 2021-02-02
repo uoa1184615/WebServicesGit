@@ -4,7 +4,6 @@
 Chao, X. \harvardand\ Roberts, A.~J.  \harvardyearleft 1996\harvardyearright ,
   `On the low-dimensional modelling of {Stratonovich} stochastic differential
   equations', {\em Physica~A} {\bf 225},~62--80.
-\newblock \doi{10.1016/0378-4371(95)00387-8}.
 
 \harvarditem{Cox \harvardand\ Roberts}{1991}{Cox91}
 Cox, S.~M. \harvardand\ Roberts, A.~J.  \harvardyearleft 1991\harvardyearright
@@ -31,24 +30,21 @@ Pavliotis, G.~A. \harvardand\ Stuart, A.~M.  \harvardyearleft
 Potzsche, C. \harvardand\ Rasmussen, M.  \harvardyearleft 2006\harvardyearright
   , `Taylor approximation of integral manifolds', {\em Journal of Dynamics and
   Differential Equations} {\bf 18},~427--460.
-\newline\harvardurl{http://dx.doi.org/10.1007/s10884-006-9011-8}
 
 \harvarditem{Roberts}{2008}{Roberts06k}
 Roberts, A.~J.  \harvardyearleft 2008\harvardyearright , `Normal form
   transforms separate slow and fast modes in stochastic dynamical systems',
   {\em Physica~A} {\bf 387},~12--38.
-\newblock \doi{10.1016/j.physa.2007.08.023}.
 
-\harvarditem{Roberts}{2009}{Roberts07d}
-Roberts, A.~J.  \harvardyearleft 2009\harvardyearright , Normal form of
-  stochastic or deterministic multiscale differential equations, Technical
+\harvarditem{Roberts}{2009--\the\year}{Roberts07d}
+Roberts, A.~J.  \harvardyearleft 2009--\the\year\harvardyearright , Normal form
+  of stochastic or deterministic multiscale differential equations, Technical
   report, \url{http://www.maths.adelaide.edu.au/anthony.roberts/sdenf.php}.
-\newblock Last revised Jun 2013.
 
-\harvarditem{Roberts}{2013}{Roberts2013a}
-Roberts, A.~J.  \harvardyearleft 2013\harvardyearright , Macroscale, slowly
-  varying, models emerge from the microscale dynamics in long thin domains,
-  Technical report, [\url{http://arxiv.org/abs/1310.1541}].
+\harvarditem{Roberts}{2015}{Roberts2013a}
+Roberts, A.~J.  \harvardyearleft 2015\harvardyearright , `Macroscale, slowly
+  varying, models emerge from the microscale dynamics in long thin domains',
+  {\em IMA Journal of Applied Mathematics} {\bf 80}(5),~1492--1518.
 
 \harvarditem[Sun et~al.]{Sun, Kan \harvardand\ Duan}{2011}{Sun2011}
 Sun, X., Kan, X. \harvardand\ Duan, J.  \harvardyearleft 2011\harvardyearright
