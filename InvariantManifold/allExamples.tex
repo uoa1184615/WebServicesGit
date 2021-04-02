@@ -1,0 +1,52 @@
+\documentclass[11pt,a4paper]{refart}
+
+\title{Examples of invariant manifold construction}
+
+\author{A.~J. Roberts\thanks{School of Mathematical Sciences, University of Adelaide, South Australia~5005, \textsc{Australia}.
+\url{https://profajroberts.github.io/}}}
+
+\date{Nov 2013 -- \today}
+
+
+
+\usepackage{natbib,amsmath,defns,reducecode}
+\let\harvardurl\url
+\IfFileExists{ajr.sty}{\usepackage{ajr}}{}
+\Cal L \Cal E \Cal Z
+\Vec e\Vec z\Vec u
+\def\dde{\textsc{dde}}
+\newcommand{\adj}[1]{#1^\dagger} % denotes cc transpose
+% for output of coordinate transform
+\def\cis\big(#1\big){\,e^{#1i}}
+\def\eps{\varepsilon}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+
+
+\section{Slow invariant manifolds}
+
+\input{Examples/simple2d}
+
+
+
+
+\section{Oscillations on the invariant manifolds}
+
+\input{Examples/simpleosc}
+\input{Examples/quasidde}
+
+
+
+
+\section{Invariant manifolds in delay DEs}
+
+\input{Examples/simple1dde}
+\input{Examples/logistic1dde}
+
+
+\end{document}

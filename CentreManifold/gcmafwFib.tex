@@ -3,9 +3,9 @@
 \title{A general centre manifold construction algorithm for the web, including isochrons of slow manifolds}
 
 \author{A.~J. Roberts\thanks{School of Mathematical Sciences, University of Adelaide, South Australia~5005, \textsc{Australia}.
-\url{http://www.maths.adelaide.edu.au/anthony.roberts/}}}
+\url{https://profajroberts.github.io/}}}
 
-\date{\today}
+\date{Nov 2013 -- \today}
 
 
 
@@ -38,8 +38,8 @@ Further, this code now derives vectors defining the projection onto the centre m
 In the following, assign \verb|thecase:=myweb;| for the web service (or to read a system from file \verb|cmsysb.red|), otherwise assign \verb|thecase| to be any of the example dynamical systems in set~\verb|thecases|.
 \begin{reduce}
 % see gcmafwFib.pdf for detailed explanation
-% AJ Roberts, Nov 2013 -- Aug 2014
-thecase:=myweb; 
+% AJ Roberts, Nov 2013 -- Mar 2021
+thecase:=simple2d; 
 thecases:={onedde, anotherdde, twodde, dde2d, dde2d2ha,
 dde2d2hb, simple2d, simple2ds, fourstatemarkov, another2d,
 another2ds, simple3d, simple3ds, geneigenvec, bifurcate2d,
@@ -635,7 +635,7 @@ the model of uncertainties in the original system.
 
 \subsubsection{The stable manifold}
 Appears to get sensible answers even for the stable manifold!
-Just invoke this case to characterise the linear stable subspace.
+Invoke this case to characterise the linear stable subspace (separated from the centre manifold).
 \begin{reduce}
 if thecase=simple2ds then begin
 ff_:=tp mat((-u1+u2-u1^2,u1-u2+u2^2));
@@ -1174,7 +1174,7 @@ if thecase=simpleosc then begin
 ff_:=tp mat((u2,-u1-u1*u3,-u3+5*u1^2));
 freqm_:=mat((1,-1));
 ee_:=tp mat((1,+i,0),(1,-i,0));
-ee_:=tp mat((1+1/10,+i,0),(1+1/10,-i,0)); % causes fail, Jan 2015
+%ee_:=tp mat((1+1/10,+i,0),(1+1/10,-i,0)); % causes fail, Jan 2015 -- 2021
 zz_:=tp mat((1,+i,0),(1,-i,0));
 end;
 \end{reduce}
@@ -1210,7 +1210,7 @@ u_{3}=\varepsilon  \big(2 \cis\big(-2 t\big) s_{2}^{2} i+\cis\big(-2 t
 
 
 \subsection{Perturbed frequency oscillatory centre manifold---separated form}
-  Putting real parameters into the linear operator works here also.
+Putting real parameters into the linear operator works here also.
 
 \begin{math}
 \dot u_{1}=\varepsilon  \big(u_{2} b+u_{1} a\big)+u_{2}
@@ -2504,8 +2504,9 @@ Need function~\verb|conj_| to do parsimonious complex conjugation.
 \begin{reduce}
 operator cis__;
 procedure conj_(a)$    
-    ((a where {i=>i__, cis(~b)=>cis__(b) })
-        where {i__=>-i,cis__(~b)=>cis(-b)})$
+    begin a_:=(a where {i=>i__, cis(~b)=>cis__(b) when b neq 0})$
+        return (a_ where {i__=>-i,cis__(~b)=>cis(-b)})$
+    end$
 \end{reduce}
 
 Make another array of frequencies for simplicity.
@@ -2615,7 +2616,7 @@ Check that the frequencies and eigenvectors are specified correctly.
 write "Check centre subspace linearisation ";
 for j:=1:m do for k:=1:m do aa_(j,k):=0;
 for j:=1:m do aa_(j,j):=i*freq(j);
-write %temporary write
+%%write %temporary write??
 reslin:=(ll_*(ee_*dcis_)-(ee_*dcis_)*aa_
     where cis(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(a)+i*sin(a))*cis(a) )$ 
 ok_:=1$
@@ -2662,19 +2663,20 @@ if not ok_ then << write
 Anything not in the linear operator gets multiplied by \verb|small| to be treated as small in the analysis.
 The feature of the second alternative is that when a user invokes~\verb|small| then the power of smallness is not then changed; however, causes issues in the relative scaling of some terms, so restore to the original version.
 
-This might need reconsidering ??  but the if always chooses the first simple alternative.
+This might need reconsidering ??  but the current if always chooses the first simple alternative.
 \begin{reduce}
 somerules:=for j:=1:n collect 
   (d_(1,t,~dt)*mkid(u,j)=d_(mkid(u,j),t,dt))$
+ll0_:=(ll_*uvec where somerules)$
 ff_:=(if 1 then small*ff_
-    else ff_-(1-small)*sub(small=0,ff_)) +(1-small)
-    *(ll_*uvec where somerules)$
+           else ff_-(1-small)*sub(small=0,ff_)) 
+    +(1-small)*ll0_$
 \end{reduce}
 
 Any constant term in the equations~\verb|ff_| has to be multiplied by~\verb|cis(0)|.
-
 \begin{reduce}
-ff_:=ff_+(cis(0)-1)*(ff_ where uzero)$
+ff0_:=(ff_ where uzero)$
+ff_:=ff_+(cis(0)-1)*ff0_$
 \end{reduce}
 
 From the matrix versions of the equations, create algebraic form using the matrix basis.
@@ -2742,6 +2744,7 @@ array linvs(nfreq),ginvs(nfreq);
 array l1invs(nfreq),g1invs(nfreq),l2invs(nfreq),g2invs(nfreq);
 operator sp_; linear sp_;
 for k:=0:nfreq do begin
+%%write k:=k; %????
 \end{reduce}
 
 Code the operator \(\cL\hat v\) where the delay is to only act on the oscillation part.
@@ -2772,31 +2775,29 @@ Use operator \verb|sp_| to extract the delay parts that subtly affect the update
              });
 \end{reduce}
 
-Force the updates to be orthogonal to the left-eigenvectors in the complex conjugate transpose adjoint.,
-
+Force the updates to be orthogonal to the left-eigenvectors in the complex conjugate transpose adjoint.
 \begin{reduce}
-  for i:=1:length(modes(k)) do 
-    for j:=1:n do llzz(n+i,j):=conj_(zz_(j,part(modes(k),i)));
+  for ii:=1:length(modes(k)) do 
+    for j:=1:n do llzz(n+ii,j):=conj_(zz_(j,part(modes(k),ii)));
+%%    write "Force the updates to be orthogonal";
 \end{reduce}
 
 Set the bottom-right corner of the matrix to zero.
-
 \begin{reduce}
   for i:=1:length(modes(k)) do 
     for j:=1:m do llzz(n+i,n+j):=0;
 \end{reduce}
 
 Add some trivial rows and columns to make the matrix up to the same size for all frequencies.
-
 \begin{reduce}
   for i:=length(modes(k))+1:m do begin 
     for j:=1:n+i-1 do llzz(n+i,j):=llzz(j,n+i):=0;
     llzz(n+i,n+i):=1;
   end;
+%%  write "Add some trivial rows and columns";
 \end{reduce}
 
 Invert the matrix and unpack into arrays ready for use by the inversion operators.
-
 \begin{reduce}
 if trace_ then write llzz:=llzz; 
   llzz:=llzz^(-1);
@@ -2804,23 +2805,28 @@ if trace_ then write llzz:=llzz;
   linvs(k):=for i:=1:n sum for j:=1:n sum e_(i,j)*llzz(i,j);
   ginvs(k):=for i:=1:length(modes(k)) sum 
     for j:=1:n sum e_(part(modes(k),i),j)*llzz(i+n,j);
+%%write "Invert the matrix and unpack";
 \end{reduce}
 
 Unpack the conjugate transpose for inverse operators used for the isochrons.  
 A difference here is that the orthogonality condition is non-trivial (in the slow manifold we assumed amplitudes were exactly orthogonal to the left-eigenvectors), so we need to remember more parts of the inverse of the matrix.
 Will it need to be more subtle for the un/stable manifolds case??
-
 \begin{reduce}
 %  realgenfreq:={repart(genfreq)=>genfreq, impart(genfreq)=>0}$
-  l1invs(k):=for i:=1:n sum for j:=1:n sum 
-      e_(i,j)*conj_(llzz(j,i));
-  l2invs(k):=for i:=1:n sum for j:=1:length(modes(k)) sum 
-      e_(i,part(modes(k),j))*conj_(llzz(j+n,i));
-  g1invs(k):=for i:=1:length(modes(k)) sum for j:=1:n sum 
-      e_(part(modes(k),i),j)*conj_(llzz(j,i+n));
+%%write "0 Unpack the conjugate transpose for inverse";
+  l1invs(k):=for ii:=1:n sum for j:=1:n sum 
+      e_(ii,j)*conj_(llzz(j,ii));
+%%write "1 Unpack the conjugate transpose for inverse";
+  l2invs(k):=for ii:=1:n sum for j:=1:length(modes(k)) sum 
+      e_(ii,part(modes(k),j))*conj_(llzz(j+n,ii));
+%%write "2 Unpack the conjugate transpose for inverse";
+  g1invs(k):=for ii:=1:length(modes(k)) sum for j:=1:n sum 
+      e_(part(modes(k),ii),j)*conj_(llzz(j,ii+n));
+%%write "3 Unpack the conjugate transpose for inverse";
   g2invs(k):=
-    for i:=1:length(modes(k)) sum for j:=1:length(modes(k)) sum 
-      e_(part(modes(k),i),part(modes(k),j))*conj_(llzz(j+n,i+n));
+    for ii:=1:length(modes(k)) sum for j:=1:length(modes(k)) sum 
+      e_(part(modes(k),ii),part(modes(k),j))*conj_(llzz(j+n,ii+n));
+%%write "Unpack the conjugate transpose for inverse";
 end;
 \end{reduce}
 
@@ -2974,6 +2980,9 @@ ITERATION = ",iter,"
 
 Compute residual vector (matrix) of the dynamical system \cite{Roberts96a}.
 \begin{reduce}
+%write rhsfn:=rhsfn_;
+%write manifolduu:=manifold_();
+%write duudt:=df(uu_,t);
 resde_:=-df(uu_,t)+sub(manifold_(),rhsfn_);
 if trace_ then write "resde_=",matify(resde_,n,1);
 \end{reduce}
