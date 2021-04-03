@@ -29,7 +29,7 @@ Sciences, University of Adelaide, South Australia~5005,
 
 \begin{abstract}
 This procedure constructs a specified invariant manifold for a specified system of ordinary differential equations or delay differential equations. 
-The invariant manifold may be any of a centre manifold, a slow manifold, an un/stable manifold, a sub-centre manifold, a nonlinear normal form, or any spectral submanifold.
+The invariant manifold may be any of a centre manifold, a slow manifold, an un/stable manifold, a sub-centre manifold, a nonlinear normal form, any spectral submanifold, or indeed a normal form coordinate transform of the entire state space.
 Thus the procedure may be used to analyse pitchfork bifurcations, or oscillatory Hopf bifurcations, or any more complicated superposition. 
 In the cases when the neglected spectral modes all decay, the constructed invariant manifold supplies a faithful large time model of the dynamics of the differential equations. 
 Further, in the case of a slow manifold, this procedure now derives vectors defining the projection onto the invariant manifold along the isochrons: this projection is needed for initial conditions, forcing, system modifications, and uncertainty quantification.
@@ -154,15 +154,22 @@ Evaluate these at \(\eps=1\) to apply to the original specified system, or here 
 
 
 \subsection{Header of the procedure}
-Define the procedure as an operator so we can be flexible
+
+Need a couple of things established before defining the procedure: the \verb|rlfi| package; and operator names for the variables of the dynamical system (in case they have delays), currently code a max of nine variables.
+\begin{reduce}
+load_package rlfi; 
+operator u1,u2,u3,u4,u5,u6,u7,u8,u9;
+\end{reduce}
+
+Now define the procedure as an operator so we can be flexible
 with its arguments.
 \begin{reduce}
-load_package rlfi; % also need rlfi loaded first
 operator invariantmanifold;
 for all odefns, evals, evecs, adjvecs, toosmall 
   let invariantmanifold(odefns, evals, evecs, adjvecs, toosmall) 
   = begin 
 \end{reduce}
+
 
 \subsection{Preamble to the procedure}
 Operators and arrays are always global, but we can make
@@ -230,12 +237,12 @@ let tpe_(e_(~i,~j),e_)=>e_(j,i);
 
 
 
-Need to enter delayed factors in the \ode{}s, so use
-operators for the dependent variables in the dynamical
-system (for the moment up to nine).
-\begin{reduce}
-operator u,u1,u2,u3,u4,u5,u6,u7,u8,u9;
-\end{reduce}
+%Need to enter delayed factors in the \ode{}s, so use
+%operators for the dependent variables in the dynamical
+%system (for the moment up to nine). % do not seem to need u??
+%\begin{reduce}
+%operator u,u1,u2,u3,u4,u5,u6,u7,u8,u9;
+%\end{reduce}
 
 Empty the output LaTeX file in case of error.
 \begin{reduce}
