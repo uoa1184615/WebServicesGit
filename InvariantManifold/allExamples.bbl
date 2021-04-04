@@ -1,0 +1,26 @@
+\begin{thebibliography}{xx}
+
+\harvarditem{Erneux}{2009}{Erneux2009}
+Erneux, T.  \harvardyearleft 2009\harvardyearright , {\em Applied Delay
+  Differential equations}, Vol.~3 of {\em Surveys and Tutorials in the Applied
+  Mathematical Sciences}, Springer.
+
+\harvarditem[Renson et~al.]{Renson, Deliege \harvardand\
+  Kerschen}{2012}{Renson2012}
+Renson, L., Deliege, G. \harvardand\ Kerschen, G.  \harvardyearleft
+  2012\harvardyearright , Finite element computation of nonlinear normal modes
+  of nonconservative systems, {\em in} `Proceedings of the ISMA 2012
+  conference'.
+\newline\harvardurl{http://hdl.handle.net/2268/129189}
+
+\harvarditem{Roberts}{1989}{Roberts89b}
+Roberts, A.~J.  \harvardyearleft 1989\harvardyearright , `Appropriate initial
+  conditions for asymptotic descriptions of the long term evolution of
+  dynamical systems', {\em J.~Austral. Math. Soc.~B} {\bf 31},~48--75.
+
+\harvarditem{Roberts}{2000}{Roberts97b}
+Roberts, A.~J.  \harvardyearleft 2000\harvardyearright , `Computer algebra
+  derives correct initial conditions for low-dimensional dynamical models',
+  {\em Computer Phys. Comm.} {\bf 126}(3),~187--206.
+
+\end{thebibliography}

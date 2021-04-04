@@ -1,14 +1,17 @@
 WebServicesGit
 ==============
 
-Source code for using Reduce to construct emergent models of
-complex dynamical systems.
+Source code for using computer algebra package Reduce to
+construct emergent models of complex dynamical systems.
 
-CentreManifold: obtain a centre manifold of your specified
-system of ordinary differential equations (ODE) or delay
-differential equations (DDE), when the ODE/DDE has fast and
-centre modes.  This code underlies the web service at
-http://www.maths.adelaide.edu.au/anthony.roberts/gencm.php
+InvariantManifold: provides a Reduce procedure to construct
+a specified invariant manifold for a specified system of
+ordinary differential equations or delay differential
+equations. The invariant manifold may be any of a centre
+manifold, a slow manifold, an un/stable manifold, a
+sub-centre manifold, a nonlinear normal form, any spectral
+submanifold, or indeed a normal form coordinate transform of
+the entire state space.
 
 StochasticNormalForm: derive a stochastic/non-autonomous
 coordinate transformation that separates slow, stable and
@@ -19,3 +22,8 @@ slow manifold (and also other invariant manifolds), and the
 corresponding stochastic/non-autonomous isochrons which are
 so useful for projecting initial conditions and uncertainty
 quantification.
+
+CentreManifold: replaced by InvariantManifold.  This code
+used to provide the web service that does no longer exist
+but was at
+http://www.maths.adelaide.edu.au/anthony.roberts/gencm.php

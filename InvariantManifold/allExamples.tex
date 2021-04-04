@@ -9,11 +9,13 @@
 
 
 
-\usepackage{natbib,amsmath,defns,reducecode}
+\usepackage{url,natbib,amsmath,defns,reducecode}
+\RaisedNamesfalse
 \let\harvardurl\url
 \IfFileExists{ajr.sty}{\usepackage{ajr}}{}
+\usepackage{mycleveref}
 \Cal L \Cal E \Cal Z
-\Vec e\Vec z\Vec u
+\Vec e\Vec z\Vec u\Vec s\Vec x
 \def\dde{\textsc{dde}}
 \newcommand{\adj}[1]{#1^\dagger} % denotes cc transpose
 % for output of coordinate transform
@@ -24,7 +26,35 @@
 
 \maketitle
 
+
+\paragraph{Instructions}
+\begin{itemize}
+\item Download and install the computer algebra package
+\emph{Reduce} via \url{http://www.reduce-algebra.com}
+
+\item Navigate to folder \verb|Examples| within folder \verb|InvariantManifold|.
+
+\item For each example of interest, start-up \emph{Reduce} and enter the command \verb|in_tex "filename.tex"$|  where filename is the root name of the example (as listed in the following table of contents).
+
+\end{itemize}
+
+
 \tableofcontents
+
+
+\atBegin{section}{\newpage}%??
+
+
+\section{Five representative examples}
+
+\input{Examples/simple3d}
+\input{Examples/doubleHopfDDE}
+\input{Examples/metastable4}
+\input{Examples/nonlinNormModes}
+\input{Examples/stable3d}
+
+
+
 
 
 
@@ -49,4 +79,6 @@
 \input{Examples/logistic1dde}
 
 
+\bibliographystyle{agsm}
+\bibliography{bib,ajr}
 \end{document}
