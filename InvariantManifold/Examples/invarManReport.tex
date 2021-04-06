@@ -1,7 +1,7 @@
 \documentclass[11pt,a5paper]{article}
 \usepackage[a5paper,margin=13mm]{geometry}
 \usepackage{parskip,time} \raggedright
-\def\cis\big(#1\big){\,e^{#1i}}
+\def\exp\big(#1\big){\,{\rm e}^{#1}}
 \def\eps{\varepsilon}
 \title{Invariant manifold of your dynamical system}
 \author{A. J. Roberts, University of Adelaide\\
@@ -24,19 +24,16 @@ terms of parameters~\(s\sb j\).
 \(
 \)\par
 
-\(u_{1}=\eps \big(-51/25 \cis\big(2 i t\big) s_{2}^{2}-6/5 \cis\big(2 i t
-\big) s_{2} s_{1}+3 \cis\big(2 i t\big) s_{1}^{2}\big)+2/5 \cis\big(i t
-\big) s_{2}+\cis\big(i t\big) s_{1}
+\(u_{1}=\eps^{4} \big(-s_{2}+2 s_{1}\big)-\eps^{2} s_{1}+s_{1}
 \)\par
 
-\(u_{2}=\eps \big(-2/5 \cis\big(2 i t\big) s_{2}^{2}-7/5 \cis\big(2 i t
-\big) s_{2} s_{1}-\cis\big(2 i t\big) s_{1}^{2}\big)+7/5 \cis\big(i t
-\big) s_{2}-\cis\big(i t\big) s_{1}
+\(u_{2}=\eps^{4} \big(s_{2}-2 s_{1}\big)+\eps^{2} s_{1}
 \)\par
 
-\(u_{3}=\eps \big(4 \cis\big(2 i t\big) s_{2}^{2}+13/5 \cis\big(2 i t\big)
- s_{2} s_{1}-5 \cis\big(2 i t\big) s_{1}^{2}\big)-\cis\big(i t\big) s_{2
-}-\cis\big(i t\big) s_{1}
+\(u_{3}=\eps^{4} \big(-2 s_{2}+s_{1}\big)+\eps^{2} s_{2}
+\)\par
+
+\(u_{4}=\eps^{4} \big(2 s_{2}-s_{1}\big)-\eps^{2} s_{2}+s_{2}
 \)\par
 
 \(
@@ -47,9 +44,46 @@ that the parameters evolve according to these ODEs.
 \(
 \)\par
 
-\(\dot s_{1}=3/5 \eps s_{2}
+\(\dot s_{1}=\eps^{4} \big(s_{2}-s_{1}\big)
 \)\par
 
-\(\dot s_{2}=0
+\(\dot s_{2}=\eps^{4} \big(-s_{2}+s_{1}\big)
+\)\par
+
+\(
+\)
+\paragraph{Normals to isochrons at the slow manifold}
+Use these vectors: to project initial conditions
+onto the slow manifold; to project non-autonomous
+forcing onto the slow evolution; to predict the
+consequences of modifying the original system; in
+uncertainty quantification to quantify effects on
+the model of uncertainties in the original system.
+The normal vector \(\vec z\sb j:=(z\sb{j1},\ldots,z\sb{jn})\)
+\(
+\)\par
+
+\(z_{11}=\eps^{4}+1
+\)\par
+
+\(z_{12}=4 \eps^{4}-\eps^{2}+1
+\)\par
+
+\(z_{13}=-4 \eps^{4}+\eps^{2}
+\)\par
+
+\(z_{14}=-\eps^{4}
+\)\par
+
+\(z_{21}=-\eps^{4}
+\)\par
+
+\(z_{22}=-4 \eps^{4}+\eps^{2}
+\)\par
+
+\(z_{23}=4 \eps^{4}-\eps^{2}+1
+\)\par
+
+\(z_{24}=\eps^{4}+1
 \)\par
 \end{document}

@@ -19,7 +19,7 @@ in_tex "../invariantManifold.tex"$
 \end{reduce}
 In the printed output, group terms with like powers of amplitudes~\(s_j\), the complex exponential, and the parameter~\(\alpha\).
 \begin{reduce}
-factor s,cis,alpha;
+factor s,exp,alpha;
 \end{reduce}
 Execute the construction of the slow manifold for this system (ignore the warning messages about \verb|u1| declared, and then already defined, as an operator).
 \begin{reduce}
@@ -38,24 +38,21 @@ end;
 These give the location of the invariant manifold in
 terms of parameters~\(s_1,s_2\) (complex conjugate for real solutions).
 \begin{align*}&
-u_{1}=\cis\big(-4 t\big) s_{2}^{2} \eps \big(-7/12 i+1/12\big)+\cis\big(
--2 t\big) s_{2}
-\\&\qquad{}
-+\cis\big(4 t\big) s_{1}^{2} \eps \big(7/12 i+1/12\big)+
-\cis\big(2 t\big) s_{1}-s_{2} s_{1} \eps
+u_{1}=\ParMath{\exp \big(-4 i t\big) s_{2}^{2} \eps \big(-7/12 i+1/12\big)+\exp 
+\big(-2 i t\big) s_{2}+\exp \big(4 i t\big) s_{1}^{2} \eps \big(7/12 i+1
+/12\big)+\exp \big(2 i t\big) s_{1}-s_{2} s_{1} \eps
+}
 \\&
-u_{2}=\cis\big(-4 t\big) s_{2}^{2} \eps \big(-1/12 i+1/4\big)+\cis\big(-
-2 t\big) s_{2} \big(1/2 i+1/2\big)
-\\&\qquad{}
-+\cis\big(4 t\big) s_{1}^{2} \eps 
-\big(1/12 i+1/4\big)+\cis\big(2 t\big) s_{1} \big(-1/2 i+1/2\big)-s_{2} 
-s_{1} \eps
+u_{2}=\ParMath{\exp \big(-4 i t\big) s_{2}^{2} \eps \big(-1/12 i+1/4\big)+\exp 
+\big(-2 i t\big) s_{2} \big(1/2 i+1/2\big)+\exp \big(4 i t\big) s_{1}^{2
+} \eps \big(1/12 i+1/4\big)+\exp \big(2 i t\big) s_{1} \big(-1/2 i+1/2
+\big)-s_{2} s_{1} \eps
+}
 \\&
-u_{3}=\cis\big(-4 t\big) s_{2}^{2} \eps \big(1/12 i+1/12\big)+1/2 \cis
-\big(-2 t\big) s_{2} i
-\\&\qquad{}
-+\cis\big(4 t\big) s_{1}^{2} \eps \big(-1/12 i+1/
-12\big)-1/2 \cis\big(2 t\big) s_{1} i-s_{2} s_{1} \eps
+u_{3}=\ParMath{\exp \big(-4 i t\big) s_{2}^{2} \eps \big(1/12 i+1/12\big)+1/2 
+\exp \big(-2 i t\big) s_{2} i+\exp \big(4 i t\big) s_{1}^{2} \eps \big(-
+1/12 i+1/12\big)-1/2 \exp \big(2 i t\big) s_{1} i-s_{2} s_{1} \eps
+}
 \end{align*}
  
 \paragraph{Centre manifold ODEs} 

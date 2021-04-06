@@ -26,7 +26,7 @@ in_tex "../invariantManifold.tex"$
 \end{reduce}
 In the printed output, group terms with like powers of amplitudes~\(s_j\), and the complex exponential.
 \begin{reduce}
-factor s,cis;
+factor s,exp;
 \end{reduce}
 The following code makes the linear damping to be effectively small (which then makes it \verb|small| squared); consequently, also scale the smallness of the cubic nonlinearity to match.
 \begin{reduce}
@@ -69,17 +69,19 @@ Here these give the reparametrisation of the state space~\uv\ in
 terms of parameters~\(s\sb j\), via rotating basis vectors.
 Here, the coordinate transform is very complicated so I do not give the complexity.  The leading approximation is, of course, the linear, errors~\Ord{\eps^2},
 \begin{align*}&
-u_{1}=\cis\big(-\sqrt {3} t\big) s_{4}+\cis\big(-t\big) s_{2}+\cis\big(
-\sqrt {3} t\big) s_{3}+\cis\big(t\big) s_{1}
+u_{1}=\exp \big(-\sqrt {3} i t\big) s_{4}+\exp \big(-i t\big) s_{2}+\exp
+ \big(\sqrt {3} i t\big) s_{3}+\exp \big(i t\big) s_{1}
 \\&
-u_{2}=-\cis\big(-\sqrt {3} t\big) s_{4}+\cis\big(-t\big) s_{2}-\cis\big(
-\sqrt {3} t\big) s_{3}+\cis\big(t\big) s_{1}
+u_{2}=-\exp \big(-\sqrt {3} i t\big) s_{4}+\exp \big(-i t\big) s_{2}-
+\exp \big(\sqrt {3} i t\big) s_{3}+\exp \big(i t\big) s_{1}
 \\&
-u_{3}=-\sqrt {3} \cis\big(-\sqrt {3} t\big) s_{4} i-\cis\big(-t\big) s_{
-2} i+\sqrt {3} \cis\big(\sqrt {3} t\big) s_{3} i+\cis\big(t\big) s_{1} i
+u_{3}=-\sqrt {3} \exp \big(-\sqrt {3} i t\big) s_{4} i-\exp \big(-i t
+\big) s_{2} i+\sqrt {3} \exp \big(\sqrt {3} i t\big) s_{3} i+\exp \big(i
+ t\big) s_{1} i
 \\&
-u_{4}=\sqrt {3} \cis\big(-\sqrt {3} t\big) s_{4} i-\cis\big(-t\big) s_{2
-} i-\sqrt {3} \cis\big(\sqrt {3} t\big) s_{3} i+\cis\big(t\big) s_{1} i
+u_{4}=\sqrt {3} \exp \big(-\sqrt {3} i t\big) s_{4} i-\exp \big(-i t
+\big) s_{2} i-\sqrt {3} \exp \big(\sqrt {3} i t\big) s_{3} i+\exp \big(i
+ t\big) s_{1} i
 \end{align*}
 
  

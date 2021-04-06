@@ -16,7 +16,7 @@ Sciences, University of Adelaide, South Australia~5005,
 \let\harvardurl\url
 \IfFileExists{ajr.sty}{\usepackage{ajr}}{}
 \usepackage{mycleveref}
-\Vec u\Vec e\Vec z\Vec s
+\Vec u\Vec e\Vec z
 \Cal L \Cal E \Cal Z
 \def\dde{\textsc{dde}}% delay diff equation
 \newcommand{\adj}[1]{#1^\dagger} % denotes cc transpose
@@ -25,7 +25,6 @@ Sciences, University of Adelaide, South Australia~5005,
 \def\eps{\varepsilon}
 
 \begin{document}
-\sloppy
 
 \maketitle
 
@@ -57,22 +56,20 @@ uncertainty quantification.
 
 Download and install the computer algebra package
 \emph{Reduce} via \url{http://www.reduce-algebra.com}\quad
-Download and unzip the folder \url{https://profajroberts.github.io/InvariantManifold.zip}\quad
-Within the folder \verb|InvariantManifold|, start-up \emph{Reduce} and load the procedure by executing
+Start-up \emph{Reduce} and load the procedure by executing
 the command \verb|in_tex "invariantManifold.tex"$|
 \footnote{This script changes a lot of internal settings of
 \emph{Reduce}, so best only to do when needed.}
-Test your installation by then executing \verb|exampleslowman();|
 
 Thereafter, construct a specified invariant manifold of a
 specific dynamical system by executing the following command
-with specific values for the input parameters.  See \verb|allExamples.pdf| for many examples.
+with specific values for the input parameters.
 \begin{verbatim}
 invariantmanifold(odefns, evals, evecs, adjvecs, toosmall);
 \end{verbatim}
 
 \paragraph{Inputs}
-As in the example of the next \cref{ss:eg}, the input parameters
+As in the example of the next \cref{ss:eg}, input parameters
 to the procedure are the following: \begin{itemize}
 
 \item \verb|odefns|, a comma separated list within
@@ -98,9 +95,9 @@ modes corresponding to the given eigenvalues of the
 invariant manifold basis;
 
 \item \verb|adjvecs|, a comma separated list of vectors
-within \verb|mat(...)|, usually the adjoint eigenvectors of the
+within \verb|mat(...)|, the adjoint eigenvectors of the
 modes corresponding to the given eigenvalues of the
-invariant manifold basis;  
+invariant manifold basis??;
 
 \item \verb|toosmall|, an integer giving the desired order
 of error in the asymptotic approximation that is
@@ -162,19 +159,19 @@ procedure exampleslowman;
 We seek the slow manifold so specify the eigenvalue zero.
 From the linearisation matrix~\(\begin{bmat} -1&1 \\ 1&-1
 \end{bmat}\) a corresponding eigenvector is \(\ev=(1,1)\),
-and a corresponding left-eigenvector is \(\zv=\ev=(1,1)\), as
+and corresponding left-eigenvector is \(\zv=\ev=(1,1)\), as
 specified. The last parameter specifies to construct the
 slow manifold to errors~\Ord{\eps^5}.
 
-The procedure actually analyses the embedding system, the family of problems,
+The procedure actually analyses the embedding system
 \begin{equation*}
 \dot u_1=-u_1+u_2-\eps u_1^2\,, \quad \dot u_2=u_1-u_2+\eps u_2^2\,.
 \end{equation*}
-Here the artificial parameter~\(\eps\) has a physical
+So here the artificial parameter~\(\eps\) has a physical
 interpretation in that it counts the nonlinearity: a term
 in~\(\eps^p\) will be a \((p+1)\)th~order term
 in~\(\uv=(u_1,u_2)\). Hence the specified error~\Ord{\eps^5}
-is here the same as error~\Ord{|\sv|^6}.
+is here the same as error~\Ord{|\uv|^6}.
 
 The constructed slow manifold is, in terms of the
 parameter~\(s_1\) (and reverse ordering!), 
@@ -214,7 +211,7 @@ to count the order of each term.
 Need a couple of things established before defining the
 procedure: the \verb|rlfi| package; and operator names for
 the variables of the dynamical system (in case they have
-delays)---currently code a max of nine variables.
+delays), currently code a max of nine variables.
 \begin{reduce}
 load_package rlfi; 
 operator u1,u2,u3,u4,u5,u6,u7,u8,u9;
@@ -235,9 +232,9 @@ Operators and arrays are always global, but we can make
 variables and matrices local, except for matrices that need
 to be declared \verb|matrix|.  So, move to implement all
 arrays and operators to have underscores, and almost all
-scalars and most matrices to be declared local here.
+scalars and most matrices to be declared here.
 \begin{reduce}
-scalar ff, evalm, ee, zz, maxiter, ff0, trace, ll, uvec,
+scalar ff, freqm, ee, zz, maxiter, ff0, trace, ll, uvec,
 reslin, ok, rhsjact, jacadj, resd, resde, resz, rhsfn, zs,
 pp, est, eyem;
 \end{reduce}
@@ -245,13 +242,14 @@ pp, est, eyem;
 Transpose the defining matrices so that vectors are columns.
 \begin{reduce}
 ff := tp odefns;
+freqm := -i*evals;
 ee := tp evecs;
 zz := tp adjvecs; 
 \end{reduce}
 
 
 Define default parameters for the iteration:
-\verb|maxiter|~is the maximum number of allowed iterations.
+\verb|maxiter|~is the maximum number of allowed iterations;
 Specific problems may override these defaults.
 \begin{reduce}
 maxiter:=29$
@@ -262,7 +260,7 @@ For optional trace printing of test cases: comment out
 second line when not needed.
 \begin{reduce}
 trace:=0$
-%trace:=1; maxiter:=5; 
+trace:=1; maxiter:=5; 
 \end{reduce}
 
 
@@ -274,7 +272,7 @@ on div; off allfac; on revpri;
 on rationalize;
 \end{reduce}
 
-Use \verb|e_| as basis vector for matrices and
+Propose to use \verb|e_| as basis vector for matrices and
 vectors. Declare it non-commutative so that multiplication
 does not commute.
 \begin{reduce}
@@ -286,7 +284,7 @@ let { e_(~j,~k)*e_(~l,~m)=>0 when k neq l
     , e_(~j,~k)^2=>0 when j neq k
     , e_(~j,j)^2=>e_(j,j) };
 \end{reduce}
-Also need (once) a transpose operator: do complex conjugation
+Also need a transpose operator: do complex conjugation
 explicitly when needed.
 \begin{reduce}
 operator tpe_; linear tpe_;
@@ -295,6 +293,12 @@ let tpe_(e_(~i,~j),e_)=>e_(j,i);
 
 
 
+%Need to enter delayed factors in the \ode{}s, so use
+%operators for the dependent variables in the dynamical
+%system (for the moment up to nine). % do not seem to need u??
+%\begin{reduce}
+%operator u,u1,u2,u3,u4,u5,u6,u7,u8,u9;
+%\end{reduce}
 
 Empty the output LaTeX file in case of error.
 \begin{reduce}
@@ -308,14 +312,15 @@ shut "invarManReport.tex";
 
 
 \subsection{Check the dimensionality of specified system}
-Extract dimension information from the parameters of the procedure: seek $m$D~invariant manifold of an
+Extract dimension information from the specification of the
+dynamical system: seek $m$D~invariant manifold of an
 $n$D~system.
 \begin{reduce}
 write "total no. of variables ",
 n:=part(length(ee),1);
 write "no. of invariant modes ",
 m:=part(length(ee),2);
-if {length(evals),length(zz),length(ee),length(ff)}
+if {length(freqm),length(zz),length(ee),length(ff)}
   ={{1,m},{n,m},{n,m},{n,1}} 
   then write "Input dimensions are OK" 
   else <<write "INCONSISTENT INPUT DIMENSIONS, I EXIT"; 
@@ -337,28 +342,32 @@ eyem:=for j:=1:m sum e_(j,j)$
 
 \section{Dissect the linear part}
 
-Use the exponential $\verb|exp|(u)=e^{u}$, but not with the myriad of inbuilt properties so clear it! Do not
-(yet) invoke the simplification of $\verb|exp|(0)$ as I want
-it to label modes of no oscillation, zero eigenvalue.
+Define complex exponential $\verb|cis|(u)=e^{iu}$. Do not
+(yet) invoke the simplification of $\verb|cis|(0)$ as I want
+it to label modes of no oscillation, zero frequency.
 \begin{reduce}
-clear exp; operator exp;
-let { df(exp(~u),t) => df(u,t)*exp(u)
-    , exp(~u)*exp(~v) => exp(u+v)
-    , exp(~u)^~p => exp(p*u)
+operator cis;
+let { df(cis(~u),t) => i*df(u,t)*cis(u)
+    , cis(~u)*cis(~v) => cis(u+v)
+    , cis(~u)^~p => cis(p*u)
     };
 \end{reduce}
 
 Need function~\verb|conj_| to do parsimonious complex
-conjugation.   
+conjugation.
 \begin{reduce}
-operator exp__;
-procedure conj_(a)$ sub(i=-i,a)$
+operator cis__;
+procedure conj_(a)$ begin scalar aa;
+    aa:=(a where {i=>i__, cis(~b)=>cis__(b) when b neq 0})$
+    return (aa where {i__=>-i,cis__(~b)=>cis(-b)})$
+    end$
 \end{reduce}
 
-Make an array of eigenvalues for simplicity (\verb|evals| not used hereafter).
+Make another array of frequencies for simplicity.
+% freqm not used hereafter, only freq.
 \begin{reduce}
-array eval_(m);
-for j:=1:m do eval_(j):=evals(1,j);
+array freq_(m);
+for j:=1:m do freq_(j):=freqm(1,j);
 \end{reduce}
 
 
@@ -367,33 +376,33 @@ for j:=1:m do eval_(j):=evals(1,j);
 When we include delay differential equations, then we need
 to account for the history of the eigenvector as well. Hence
 multiply each eigenvector by its oscillating
-factor,~\(e^{i\omega t},e^{\lambda t}\), and then take the mean. This
+factor,~\(e^{i\omega t}\), and then take the mean. This
 multiplication by its oscillating factor should not make any
 difference for non-delay equations by the natural
 orthogonality of left and right eigenvectors of different
-eigenvalues. 
-%Reduce implements \verb|conj| via \verb|repart|
-%and \verb|impart|, so let \verb|repart| do the conjugation
-%of the exp factors.
+eigenvalues. Reduce implements \verb|conj| via \verb|repart|
+and \verb|impart|, so let \verb|repart| do the conjugation
+of the cis factors.
 
 Note: the `left eigenvectors' have to be the eigenvectors of
 the complex conjugate transpose, and for the complex
-conjugate eigenvalue. This seems best: for example, when the
+conjugate frequency. This seems best: for example, when the
 linear operator is \(\begin{bmat} 0&1\\-1&0 \end{bmat}\)
 then the adjoint and the right eigenvectors are the same.
 
-For oscillations and un/stable manifolds we have to cope with imaginary and with real
-eigenvalues. Seems to need \verb|zz| to have negative complex
-conjugated frequency so store in~\verb|cexp_|---cannot remember why this appears to work!?  It may only work for pure real and for pure imaginary eigenvalues??
+For un/stable manifolds we have to cope with complex
+frequencies. Seems to need \verb|zz| to have complex
+conjugated frequency so store in~\verb|ccis_|---which is the
+same as \verb|dcis_| for real frequencies.
 
 \begin{reduce}
-matrix aa_(m,m),dexp_(m,m),cexp_(m,m);
-for j:=1:m do dexp_(j,j):=exp(eval_(j)*t);
-for j:=1:m do cexp_(j,j):=exp(-conj_(eval_(j))*t); 
-aa_:=(tp map(conj_(~b),ee*dexp_)*zz*cexp_ )$
+matrix aa_(m,m),dcis_(m,m),ccis_(m,m);
+for j:=1:m do dcis_(j,j):=cis(freq_(j)*t);
+for j:=1:m do ccis_(j,j):=cis(conj_(freq_(j))*t);
+aa_:=(tp map(conj_(~b),ee*dcis_)*zz*ccis_ )$
 if trace then write aa_:=aa_;
 write "Normalising the left-eigenvectors:";
-aa_:=(aa_ where {exp(0)=>1, exp(~a)=>0 when a neq 0})$
+aa_:=(aa_ where {cis(0)=>1, cis(~a)=>0 when a neq 0})$
 if trace then write aa_:=aa_;
 if det(aa_)=0 then << write
     "ORTHOGONALITY ERROR IN EIGENVECTORS; I EXIT"; 
@@ -405,13 +414,13 @@ zz:=zz*aa_^(-1);
 \subsection{Operator to represent delays}
 
 Introduce an operator to represent delay factors more
-conveniently for analysis.  The \verb|exp| rule probably only works for pure imaginary modes!?
+conveniently for analysis.
 \begin{reduce}
 operator d_; linear d_;
 let { d_(~a^~p,t,~dt)=>d_(a,t,dt)^p
     , d_(~a*~b,t,~dt)=>d_(a,t,dt)*d_(b,t,dt)
-    , d_(exp(~a),t,~dt)=>exp(a)
-        *sub(t=-dt,cos(-i*a)+i*sin(-i*a))
+    , d_(cis(~a),t,~dt)=>cis(a)
+        *sub(t=-dt,cos(a)+i*sin(a))
     , df(d_(~a,t,~dt),~b)=>d_(df(a,b),t,dt)
     , d_(~a,t,0)=>a
     , d_(d_(~a,t,~dta),t,~dtb)=>d_(a,t,dta+dtb)
@@ -419,7 +428,9 @@ let { d_(~a^~p,t,~dt)=>d_(a,t,dt)^p
 \end{reduce}
 
 Now rewrite the (delay) factors in terms of this operator.
-For the moment limit to a maximum of
+Need to say that the symbol~\verb|u| depends upon time;
+later we write things into~\verb|u| and this dependence
+would be forgotten. For the moment limit to a maximum of
 nine \ode{}s.
 
 \begin{reduce}
@@ -440,13 +451,13 @@ ff:=(ff where somerules)$
 \subsection{Linearise at the origin}
 
 Assume the equilibrium is at the origin. Find the linear
-operator at the equilibrium.  Include \verb|small=0| as we
-notionally adjoin it in the list of variables.  Do not need
-to here make any non-zero forcing small at the equilibrium
-as it gets multiplied by \verb|small| later.  (For some
+operator at the equilibrium. Include \verb|small=0| as we
+notionally adjoin it in the list of variables. Do not need
+to here make small any non-zero forcing at the equilibrium
+as it gets multiplied by \verb|small| later?? For some
 reason using \verb|mkid(u,k)=>0| does not resolve the mkid,
 but \verb|mkid(u,k)=0| does; however, not clear if it is a
-problem??)
+problem??
 \begin{reduce}
 ll:=ee*(tp ee)*0; %zero nxn matrix
 uzero:=(for k:=1:n collect (mkid(u,k)=0))$
@@ -468,16 +479,17 @@ for j:=1:n do uvec(j,1):=mkid(u,j);
 
 \subsection{Eigen-check}
 
+%Force slow variable dynamics to be small.  
+%Should not be necessary for Jordan form linear operator, but I do not think we can risk it in general.
 Variable \verb|aa_| appears here as the diagonal matrix of
-eigenvalues. Check that the eigenvalues and eigenvectors are
+frequencies. Check that the frequencies and eigenvectors are
 specified correctly.
 \begin{reduce}
 write "Check invariant subspace linearisation ";
 for j:=1:m do for k:=1:m do aa_(j,k):=0;
-for j:=1:m do aa_(j,j):=eval_(j);
-% following maybe only for pure centre modes????
-reslin:=(ll*(ee*dexp_)-(ee*dexp_)*aa_
-    where exp(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(-i*a)+i*sin(-i*a))*exp(a) )$ 
+for j:=1:m do aa_(j,j):=i*freq_(j);
+reslin:=(ll*(ee*dcis_)-(ee*dcis_)*aa_
+    where cis(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(a)+i*sin(a))*cis(a) )$ 
 if trace then write reslin:=reslin;
 ok:=1$
 for j:=1:n do for k:=1:m do 
@@ -496,15 +508,18 @@ delay operator transforms in the product.
 if not ok then for iter:=1:2 do begin
 write "WARNING: I NEED TO ADJUST LINEAR OPERATOR";
 write
-lladj:=reslin*tp map(conj_(~b),zz*cexp_);
+lladj:=reslin*tp map(conj_(~b),zz*ccis_);
 write
-lladj:=(lladj where {exp(0)=>1, exp(~a)=>0 when a neq 0});
+lladj:=(lladj where {cis(0)=>1, cis(~a)=>0 when a neq 0});
 write
 ll:=ll-lladj;
-% following maybe only for pure centre modes????
 write
-reslin:=(ll*(ee*dexp_)-(ee*dexp_)*aa_
-    where exp(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(-i*a)+i*sin(-i*a))*exp(a) ); 
+reslin:=(ll*(ee*dcis_)-(ee*dcis_)*aa_
+    where cis(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(a)+i*sin(a))*cis(a) ); 
+%for j:=1:n do for k:=1:m do 
+%    if reslin(j,k) neq 0 then << write
+%    "OOPS, INCONSISTENT EIGENVALUES, EIGENVECTORS AND OPERATOR.
+%    EMAIL ME; I QUIT"; write reslin:=reslin; rederr "aaaaah";quit >>; 
 ok:=1$
 for j:=1:n do for k:=1:m do 
     ok:=if reslin(j,k)=0 then ok else 0$
@@ -527,7 +542,8 @@ feature of the second alternative is that when a user
 invokes~\verb|small| then the power of smallness is not then
 changed; however, causes issues in the relative scaling of
 some terms, so restore to the original version.
-This might need reconsidering??  The current \verb|if| always
+
+This might need reconsidering ??  but the current if always
 chooses the first simple alternative.
 \begin{reduce}
 somerules:=for j:=1:n collect 
@@ -539,10 +555,10 @@ ff:=(if 1 then small*ff
 \end{reduce}
 
 Any constant term in the equations~\verb|ff| has to be
-multiplied by~\verb|exp(0)|.
+multiplied by~\verb|cis(0)|.
 \begin{reduce}
 ff0:=(ff where uzero)$
-ff:=ff+(exp(0)-1)*ff0$
+ff:=ff+(cis(0)-1)*ff0$
 \end{reduce}
 
 From the matrix versions of the equations, create algebraic
@@ -561,39 +577,39 @@ rhsjact:=for i:=1:n sum for j:=1:n sum
 
 
 
-\subsection{Store invariant manifold eigenvalues}
+\subsection{Store invariant manifold frequencies}
 
-Extract all the eigenvalues in the invariant manifold, and
+Extract all the frequencies in the invariant manifold, and
 the set of all the corresponding modes in the invariant
 manifold variables. The slow modes are accounted for as
-having zero eigenvalue. Remember the eigenvalue set is not in
+having zero frequency. Remember the frequency set is not in
 the `correct' order. Array \verb|modes_| stores the set of
-indices of all the modes of a given eigenvalue.
+indices of all the modes of a given frequency.
 \begin{reduce}
-array eval_s(m),modes_(m); 
-neval:=0$ eval_set:={}$ 
-for j:=1:m do if not(eval_(j) member eval_set) then begin
-  neval:=neval+1; 
-  eval_s(neval):=eval_(j);
-  eval_set:=eval_(j).eval_set;
-  modes_(neval):=for k:=j:m join 
-    if eval_(j)=eval_(k) then {k} else {};
+array freq_s(m),modes_(m); 
+nfreq:=0$ freq_set:={}$ 
+for j:=1:m do if not(freq_(j) member freq_set) then begin
+  nfreq:=nfreq+1; 
+  freq_s(nfreq):=freq_(j);
+  freq_set:=freq_(j).freq_set;
+  modes_(nfreq):=for k:=j:m join 
+    if freq_(j)=freq_(k) then {k} else {};
 end;
 \end{reduce}
 
 Set a flag for the case of a slow manifold when all
-eigenvalues are zero, as then we compute the isochron
+frequencies are zero, as then we compute the isochron
 projection. The next challenge is to get this isochron code
 working for the case of non-slow invariant manifolds.
 \begin{reduce}
-itisSlowMan_:=if eval_set={0} then 1 else 0$
+itisSlowMan_:=if freq_set={0} then 1 else 0$
 if trace then write itisSlowMan_:=itisSlowMan_;
 \end{reduce}
 
 Put in the non-singular general case as the zero entry of
 the arrays.
 \begin{reduce}
-eval_s(0):=geneval$
+freq_s(0):=genfreq$
 modes_(0):={}$
 \end{reduce}
 
@@ -604,7 +620,7 @@ modes_(0):={}$
 \subsection{Precompute matrices for updates}
 
 Precompute matrices to solve for updates for each of the
-critical eigenvalues, and the general case $\verb|k|=0$. The
+critical frequencies, and the general case $\verb|k|=0$. The
 matrix 
 \begin{equation*}
 \verb|llzz_| = \begin{bmatrix} -\cL+\partial_t & \cE_0 
@@ -615,10 +631,10 @@ blocks for the generalised inverses and solvability
 condition into \verb|l_invs| and~\verb|g_invs|.
 \begin{reduce}
 matrix llzz_(n+m,n+m);
-array l_invs(neval),g_invs(neval);
-array l1_invs(neval),g1_invs(neval),l2_invs(neval),g2_invs(neval);
+array l_invs(nfreq),g_invs(nfreq);
+array l1_invs(nfreq),g1_invs(nfreq),l2_invs(nfreq),g2_invs(nfreq);
 operator sp_; linear sp_;
-for k:=0:neval do begin
+for k:=0:nfreq do begin
   if trace then write "ITERATION ",k:=k; 
 \end{reduce}
 
@@ -627,13 +643,13 @@ act on the oscillation part.
 \begin{reduce}
   for ii:=1:n do for jj:=1:n do llzz_(ii,jj):=(
       -sub(small=0,ll(ii,jj))
-      where d_(1,t,~dt)=>cos(i*eval_s(k)*dt)+i*sin(i*eval_s(k)*dt));
+      where d_(1,t,~dt)=>cos(freq_s(k)*dt)-i*sin(freq_s(k)*dt));
 \end{reduce}
 
 Code the operator \(\D t{\hat v}\) where it only acts on the
 oscillation part.
 \begin{reduce}
-  for j:=1:n do llzz_(j,j):=eval_s(k)+llzz_(j,j);
+  for j:=1:n do llzz_(j,j):=i*freq_s(k)+llzz_(j,j);
 \end{reduce}
 
 Now code the part leading to the solvability condition which
@@ -647,7 +663,7 @@ subtly affect the updates of the evolution.
        sp_(ll(ii,jj)*ee(jj,part(modes_(k),j)),d_)
        where { sp_(1,d_)=>0
              , sp_(d_(1,t,~dt),d_)=>dt*(
-               cos(i*eval_s(k)*dt)+i*sin(i*eval_s(k)*dt))
+               cos(freq_s(k)*dt)-i*sin(freq_s(k)*dt))
              });
 \end{reduce}
 
@@ -666,7 +682,7 @@ Set the bottom-right corner of the matrix to zero.
 \end{reduce}
 
 Add some trivial rows and columns to make the matrix up to
-the same size for all eigenvalues.
+the same size for all frequencies.
 \begin{reduce}
   for i:=length(modes_(k))+1:m do begin 
     for j:=1:n+i-1 do llzz_(n+i,j):=llzz_(j,n+i):=0;
@@ -692,9 +708,10 @@ for the isochrons. A difference here is that the
 orthogonality condition is non-trivial (in the slow manifold
 we assumed amplitudes were exactly orthogonal to the
 left-eigenvectors), so we need to remember more parts of the
-inverse of the matrix.  
+inverse of the matrix. Will it need to be more subtle for
+the un/stable manifolds case??
 \begin{reduce}
-%  realgeneval:={repart(geneval)=>geneval, impart(geneval)=>0}$
+%  realgenfreq:={repart(genfreq)=>genfreq, impart(genfreq)=>0}$
   l1_invs(k):=for ii:=1:n sum for j:=1:n sum 
       e_(ii,j)*conj_(llzz_(j,ii));
   l2_invs(k):=for ii:=1:n sum for j:=1:length(modes_(k)) sum 
@@ -719,36 +736,39 @@ these linear operators: must post-multiply by~\verb|e_|
 because the linear inverse is a premultiply.
 \begin{reduce}
 operator l_inv; linear l_inv;
-let l_inv(e_(~j,~k)*exp(~a),exp)=>l_invproc(a/t)*e_(j,k);
+let l_inv(e_(~j,~k)*cis(~a),cis)=>l_invproc(a/t)*e_(j,k);
 procedure l_invproc(a);
-  if a member eval_set
+  if a member freq_set
   then << k:=0; 
-    repeat k:=k+1 until a=eval_s(k);
-    l_invs(k)*exp(a*t) >>
-  else sub(geneval=a,l_invs(0))*exp(a*t)$
+    repeat k:=k+1 until a=freq_s(k);
+    l_invs(k)*cis(a*t) >>
+  else sub(genfreq=a,l_invs(0))*cis(a*t)$
 \end{reduce}
 
 Second for the evolution on the invariant manifold.
 \begin{reduce}
 operator g_inv; linear g_inv;
-let g_inv(e_(~j,~k)*exp(~a),exp)=>ginv_proc(a/t)*e_(j,k);
+let g_inv(e_(~j,~k)*cis(~a),cis)=>ginv_proc(a/t)*e_(j,k);
 procedure ginv_proc(a); 
-  if a member eval_set
+  if a member freq_set
   then << k:=0; 
-    repeat k:=k+1 until a=eval_s(k);
+    repeat k:=k+1 until a=freq_s(k);
     g_invs(k) >>
-  else sub(geneval=a,g_invs(0))$
+  else sub(genfreq=a,g_invs(0))$
 \end{reduce}
 
-Copy and adjust the above for the projection.  But first
-define the generic procedure.  
+Copy and adjust the above for the projection. But first
+define the generic procedure. Perhaps use conjugate\slash
+negative of the frequency when applying to the general case
+of oscillations---but it might already have been accounted
+for??
 \begin{reduce}
 procedure inv_proc(a,invs);
-  if a member eval_set
+  if a member freq_set
   then << k:=0; 
-    repeat k:=k+1 until a=eval_s(k);
-    invs(k)*exp(a*t) >>
-  else sub(geneval=a,invs(0))*exp(a*t)$
+    repeat k:=k+1 until a=freq_s(k);
+    invs(k)*cis(a*t) >>
+  else sub(genfreq=a,invs(0))*cis(a*t)$
 \end{reduce}
 
 Then define operators that we use to update the projection.
@@ -757,10 +777,10 @@ operator l1_inv; linear l1_inv;
 operator l2_inv; linear l2_inv;
 operator g1_inv; linear g1_inv;
 operator g2_inv; linear g2_inv;
-let { l1_inv(e_(~j,~k)*exp(~a),exp)=>inv_proc(a/t,l1_invs)*e_(j,k)
-    , l2_inv(e_(~j,~k)*exp(~a),exp)=>inv_proc(a/t,l2_invs)*e_(j,k)
-    , g1_inv(e_(~j,~k)*exp(~a),exp)=>inv_proc(a/t,g1_invs)*e_(j,k)
-    , g2_inv(e_(~j,~k)*exp(~a),exp)=>inv_proc(a/t,g2_invs)*e_(j,k)
+let { l1_inv(e_(~j,~k)*cis(~a),cis)=>inv_proc(a/t,l1_invs)*e_(j,k)
+    , l2_inv(e_(~j,~k)*cis(~a),cis)=>inv_proc(a/t,l2_invs)*e_(j,k)
+    , g1_inv(e_(~j,~k)*cis(~a),cis)=>inv_proc(a/t,g1_invs)*e_(j,k)
+    , g2_inv(e_(~j,~k)*cis(~a),cis)=>inv_proc(a/t,g2_invs)*e_(j,k)
     };
 \end{reduce}
 
@@ -843,8 +863,8 @@ defid u7,name="u\sb7";
 defid u8,name="u\sb8"; 
 defid u9,name="u\sb9"; 
 defindex s(down);
-defid exp,name="\exp";
-defindex exp(arg);
+defid cis,name="\cis";
+defindex cis(arg);
 \end{reduce}
 
 
@@ -860,8 +880,8 @@ defid tmp_,name="\dot u";
 defid tmp_s,name="\vec e";
 defid tmp_z,name="\vec z";
 rhs_:=rhsfn$
-for k:=1:m do tmp_s(k):={for j:=1:n collect ee(j,k),exp(eval_(k)*t)};
-for k:=1:m do tmp_z(k):={for j:=1:n collect zz(j,k),exp(eval_(k)*t)};
+for k:=1:m do tmp_s(k):={for j:=1:n collect ee(j,k),cis(freq_(k)*t)};
+for k:=1:m do tmp_z(k):={for j:=1:n collect zz(j,k),cis(freq_(k)*t)};
 \end{reduce}
 
 We have to be shifty here because \verb|rlfi| does not work
@@ -911,7 +931,7 @@ write "Analyse ODE/DDE system du/dt = ",ff;
 Parametrise the invariant manifold in terms of these
 amplitudes. For this substitution to work, \verb|gg_|
 \emph{cannot} be declared scalar as then it gets replaced by
-zero here and throughout.  
+zero here and throughout.  What if we clear it??
 \begin{reduce}
 clear gg_;
 operator s; depend s,t;
@@ -928,33 +948,33 @@ procedure manifold_(uu);
 
 
 The linear approximation to the invariant manifold must be
-the following corresponding to the eigenvalues down the
+the following corresponding to the frequencies down the
 diagonal (even if zero). The amplitudes~$s_j$ are slowly
 evolving as they are either slow modes, or the complex
 amplitudes of oscillating modes.
 \begin{reduce}
-uu_:=for j:=1:m sum s(j)*exp(eval_(j)*t)
+uu_:=for j:=1:m sum s(j)*cis(freq_(j)*t)
   *(for k:=1:n sum e_(k,1)*ee(k,j))$
 gg_:=0$
 if trace then write uu_:=uu_;
 \end{reduce}
 
-For some temporary trace printing, where for simplicity \verb|small| is replaced by~\verb|s|.
+For some temporary trace printing??
 \begin{reduce}
 procedure matify(a,m,n)$
   begin matrix z(m,n);
     for i:=1:m do for j:=1:n do z(i,j):=coeffn(a,e_(i,j),1);
-    return (z where {exp(0)=>1,small=>s}); 
+    return (z where {cis(0)=>1,small=>s}); 
     end$
 \end{reduce}
 
 For the isochron may need to do something different with
-eigenvalues, but this should work as the inner product is
+frequencies, but this should work as the inner product is
 complex conjugate transpose. The \verb|pp| matrix is
 proposed to place the projection residuals in the range of
 the isochron. 
 \begin{reduce}
-zs:=for j:=1:m sum exp(eval_(j)*t)
+zs:=for j:=1:m sum cis(freq_(j)*t)
   *(for k:=1:n sum e_(k,j)*zz(k,j))$
 pp:=0$
 \end{reduce}
@@ -989,6 +1009,9 @@ ITERATION = ",iter,"
 Compute residual vector (matrix) of the dynamical system
 \cite{Roberts96a}.
 \begin{reduce}
+%write rhsfn:=rhsfn;
+%write manifolduu:=manifold_(uu_);
+%write duudt:=df(uu_,t);
 resde:=-df(uu_,t)+sub(manifold_(uu_),rhsfn);
 if trace then write "resde=",matify(resde,n,1);
 \end{reduce}
@@ -1003,7 +1026,7 @@ if trace then write "est=",matify(est,m,n);
 
 Compute residual matrix for the isochron projection
 \cite{Roberts89b, Roberts97b}. But for the moment, only do
-it if the \verb|eval_set| is for slow manifolds.
+it if the \verb|freq_set| is for slow manifolds.
 \begin{reduce}
 if itisSlowMan_ then begin
     jacadj:=conj_(sub(manifold_(uu_),rhsjact));
@@ -1014,7 +1037,7 @@ if itisSlowMan_ then begin
 
 Compute residual of the normalisation of the projection.
 \begin{reduce}
-    resz:=est*zs-eyem*exp(0);
+    resz:=est*zs-eyem*cis(0);
     if trace then write "resz=",matify(resz,m,m);
 end else resd:=resz:=0; % for when not slow manifold
 \end{reduce}
@@ -1028,8 +1051,8 @@ write lengthRes:=map(length(~a),{resde,resd,resz});
 Solve for updates---all the hard work is already encoded in
 the operators.
 \begin{reduce}
-uu_:=uu_+l_inv(resde,exp);
-gg_:=gg_+g_inv(resde,exp);
+uu_:=uu_+l_inv(resde,cis);
+gg_:=gg_+g_inv(resde,cis);
 if trace then write "gg=",matify(gg_,m,1);
 if trace then write "uu=",matify(uu_,n,1);
 \end{reduce}
@@ -1037,8 +1060,8 @@ if trace then write "uu=",matify(uu_,n,1);
 Now update the isochron projection, with normalisation.
 \begin{reduce}
 if itisSlowMan_ then begin
-zs:=zs+l1_inv(resd,exp)-l2_inv(resz,exp);
-pp:=pp-g1_inv(resd,exp)+youshouldnotseethis*g2_inv(resz,exp);
+zs:=zs+l1_inv(resd,cis)-l2_inv(resz,cis);
+pp:=pp-g1_inv(resd,cis)+youshouldnotseethis*g2_inv(resz,cis);
 if trace then write "zs=",matify(zs,n,m);
 if trace then write "pp=",matify(pp,m,m);
 end;
@@ -1066,9 +1089,9 @@ if {resde,resd,resz}={0,0,0}
 
 \section{Output text version of results}
 
-Once construction is finished, simplify \verb|exp(0)|.
+Once construction is finished, simplify \verb|cis(0)|.
 \begin{reduce}
-let exp(0)=>1;
+let cis(0)=>1;
 \end{reduce}
 
 Invoking switch \verb|complex| improves some of the output
@@ -1125,11 +1148,11 @@ end;
 \end{reduce}
 
 
-%There is an as yet unresolved problem in the typesetting
-%when the argument of \verb|exp| (eigenvalue) is a rational
-%number instead of integer: the numerator has an extra pair
-%of parentheses which then makes the typesetting wrong; maybe
-%we need a pre-\LaTeX\ filter??
+There is an as yet unresolved problem in the typesetting
+when the argument of \verb|cis| (frequency) is a rational
+number instead of integer: the numerator has an extra pair
+of parentheses which then makes the typesetting wrong; maybe
+we need a pre-\LaTeX\ filter??
 
 
 
@@ -1296,7 +1319,7 @@ symbolic procedure latexon;
   prin2t "\documentclass[11pt,a5paper]{article}";
   prin2t "\usepackage[a5paper,margin=13mm]{geometry}";
   prin2t "\usepackage{parskip,time} \raggedright";
-  prin2t "\def\exp\big(#1\big){\,{\rm e}^{#1}}";
+  prin2t "\def\cis\big(#1\big){\,e^{#1i}}";
   prin2t "\def\eps{\varepsilon}";
   prin2t "\title{Invariant manifold of your dynamical system}";
   prin2t "\author{A. J. Roberts, University of Adelaide\\";

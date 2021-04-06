@@ -19,8 +19,10 @@
 \def\dde{\textsc{dde}}
 \newcommand{\adj}[1]{#1^\dagger} % denotes cc transpose
 % for output of coordinate transform
-\def\cis\big(#1\big){\,e^{#1i}}
+\def\exp\big(#1\big){\,{\rm e}^{#1}}
 \def\eps{\varepsilon}
+\newcommand{\ParMath}[1]%
+    {\parbox[t]{0.9\linewidth}{\raggedright\(#1\)}}
 
 \begin{document}
 

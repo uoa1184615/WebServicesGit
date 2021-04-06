@@ -43,17 +43,20 @@ So, the procedure actually analyses the embedding system
 \paragraph{The stable manifold} 
 The constructed stable manifold is, in terms of the parameters~\(s_1,s_2\) (to error~\Ord{\eps^2}, and reverse ordering!, and in terms of the ugly \(e^{iti}=e^{-t}\) which I aim to improve soon!), 
 \begin{align*}&
-u_{1}=\eps \big(-51/25 \cis\big(2 i t\big) s_{2}^{2}-6/5 \cis\big(2 i t
-\big) s_{2} s_{1}+3 \cis\big(2 i t\big) s_{1}^{2}\big)+2/5 \cis\big(i t
-\big) s_{2}+\cis\big(i t\big) s_{1}\,, 
+u_{1}=\ParMath{\eps \big(-51/25 \exp \big(-2 t\big) s_{2}^{2}-6/5 \exp \big(-2 t
+\big) s_{2} s_{1}+3 \exp \big(-2 t\big) s_{1}^{2}\big)+2/5 \exp \big(-t
+\big) s_{2}+\exp \big(-t\big) s_{1}
+\,,}
 \\&
-u_{2}=\eps \big(-2/5 \cis\big(2 i t\big) s_{2}^{2}-7/5 \cis\big(2 i t
-\big) s_{2} s_{1}-\cis\big(2 i t\big) s_{1}^{2}\big)+7/5 \cis\big(i t
-\big) s_{2}-\cis\big(i t\big) s_{1}
-\,, \\&
-u_{3}=\eps \big(4 \cis\big(2 i t\big) s_{2}^{2}+13/5 \cis\big(2 i t\big)
- s_{2} s_{1}-5 \cis\big(2 i t\big) s_{1}^{2}\big)-\cis\big(i t\big) s_{2
-}-\cis\big(i t\big) s_{1}\,.
+u_{2}=\ParMath{\eps \big(-2/5 \exp \big(-2 t\big) s_{2}^{2}-7/5 \exp \big(-2 t
+\big) s_{2} s_{1}-\exp \big(-2 t\big) s_{1}^{2}\big)+7/5 \exp \big(-t
+\big) s_{2}-\exp \big(-t\big) s_{1}
+\,,}
+ \\&
+u_{3}=\ParMath{\eps \big(4 \exp \big(-2 t\big) s_{2}^{2}+13/5 \exp \big(-2 t\big)
+ s_{2} s_{1}-5 \exp \big(-2 t\big) s_{1}^{2}\big)-\exp \big(-t\big) s_{2
+}-\exp \big(-t\big) s_{1}
+\,.}
 \end{align*}
 Observe the linear terms in~\sv\ all have~\(e^{-t}\), and the quadratic terms in~\sv\ all have~\(e^{-2t}\).
 Consequently, we could in principle write the stable manifold in terms of, say, the variables \(x_j=s_je^{-t}\) giving  
@@ -77,5 +80,5 @@ On the stable manifold the evolution is
 So, \(s_2\)~is constant, and hence \(s_1\)~increases linearly.  
 But such increase only modifies slightly the robust exponential decay,~\(e^{-t}\), on the stable manifold. 
 
-In terms of~\xv\ this evolution is \(\dot x_1=-2x_1+\tfrac35\eps x_2\)\,, \(\dot x_2=-2x_2\)\,.
+In terms of~\xv\ this evolution is \(\dot x_1=-x_1+\tfrac35\eps x_2\)\,, \(\dot x_2=-x_2\)\,.
 

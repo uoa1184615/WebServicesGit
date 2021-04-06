@@ -18,7 +18,7 @@ in_tex "../invariantManifold.tex"$
 \end{reduce}
 In the printed output, group terms with like powers of amplitudes~\(s_j\) and the complex exponential
 \begin{reduce}
-factor s,cis;
+factor s,exp;
 \end{reduce}
 Execute the construction of the centre manifold for this system.
 \begin{reduce}
@@ -35,12 +35,12 @@ end;
 These give the location of the invariant manifold in
 terms of parameters~\(s\sb j\).
 \begin{align*}&
-u_{1}=\cis\big(-t\big) s_{2}+\cis\big(t\big) s_{1}
+u_{1}=\exp \big(-i t\big) s_{2}+\exp \big(i t\big) s_{1}
 \\&
-u_{2}=-\cis\big(-t\big) s_{2} i+\cis\big(t\big) s_{1} i
+u_{2}=-\exp \big(-i t\big) s_{2} i+\exp \big(i t\big) s_{1} i
 \\&
-u_{3}=\cis\big(-2 t\big) s_{2}^{2} \eps \big(2 i+1\big)+\cis\big(2 t
-\big) s_{1}^{2} \eps \big(-2 i+1\big)+10 s_{2} s_{1} \eps
+u_{3}=\exp \big(-2 i t\big) s_{2}^{2} \eps \big(2 i+1\big)+\exp \big(2 i
+ t\big) s_{1}^{2} \eps \big(-2 i+1\big)+10 s_{2} s_{1} \eps
 \end{align*}
  
 \paragraph{Centre manifold ODEs} 
