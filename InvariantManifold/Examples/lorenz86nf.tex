@@ -1,0 +1,130 @@
+%!TEX root = ../allExamples.tex
+\subsection{\texttt{lorenz86nf}: Paradoxically justify a slow manifold despite being proven to not exist} 
+\label{lorenz86nf}
+
+\cite{Lorenz86} proposed the following simple system in order to understand aspects of the quasi-geostrophic approximation in atmospheric dynamics.
+\begin{align*}&
+\dot u_{1}=b u_2 u_5- u_2 u_3
+\,, \\& 
+\dot u_{2}=-b u_1 u_5+ u_1 u_3
+\,, \\&
+\dot u_{3}=- u_1 u_2
+\,, \\&
+\dot u_{4}=-u_5
+\,, \\&
+\dot u_{5}=b u_1 u_2+u_4
+\,.
+\end{align*}
+The parameter~\(b\) controls the interaction between slow and fast dynamics.
+As in \cref{lorenz86sm}, it appears that a slow manifold of quasi-geostrophy exists and is constructible.  
+Nonetheless, \cite{Lorenz87} proved that a slow manifold cannot exist for this system!
+
+A resolution of this apparent paradox comes via backwards theory \cite[\S2.5]{Roberts2018a}.
+There are systems exponentially close to the above Lorenz86 system (that is, asymptotically the same to all orders in~\(|\uv|\)) which do possess a slow manifold.
+Hence the properties that cause the non-existence are exponentially small, they are beyond all orders, and so are likely to be physically irrelevant---they are likely to be smaller than the mathematical modelling errors of the original system.
+ 
+Let's see this resolution by constructing, to any specified order, a system that has a slow manifold and is close to the Lorenz86 system.
+We do this by constructing a coordinate transform of the 5D state space.
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+\end{reduce}
+Group output expressions on~\(b\).
+\begin{reduce}
+factor b;
+\end{reduce}
+Execute the construction of the coordinate transform for this system.
+\begin{reduce}
+invariantmanifold(
+    mat(( -u2*u3+b*u2*u5,
+        u1*u3-b*u1*u5,
+        -u1*u2,
+        -u5,
+        +u4+b*u1*u2 )),
+    mat(( 0,0,0,i,-i )),
+    mat( (1,0,0,0,0),(0,1,0,0,0),(0,0,1,0,0),
+        (0,0,0,1,-i), (0,0,0,1,+i) ),
+    mat( (1,0,0,0,0),(0,1,0,0,0),(0,0,1,0,0),
+        (0,0,0,1,-i), (0,0,0,1,+i) ),
+    4 )$
+end;
+\end{reduce}
+The matrix of the linearisation about the origin has eigenvalues zero (multiplicity three) and~\(\pm i\), as specified for the eigenvalues in the second parameter to the procedure.
+Corresponding eigenvectors are simply the three unit vectors and the two complex eigenvectors of the fast waves.
+The last parameter,~\(4\), specifies to construct the slow manifold to errors~\Ord{\eps^4}, that is, to errors~\Ord{|\sv|^5}.
+
+The procedure actually analyses the embedding system
+\begin{align*}&
+\dot u_{1}=b \eps u_2 u_5-\eps u_2 u_3
+\,, \\& 
+\dot u_{2}=-b \eps u_1 u_5+\eps u_1 u_3
+\,, \\&
+\dot u_{3}=-\eps u_1 u_2
+\,, \\&
+\dot u_{4}=-u_5
+\,, \\&
+\dot u_{5}=b \eps u_1 u_2+u_4
+\,.
+\end{align*}
+
+\paragraph{The coordinate transform} 
+The constructed coordinate transform is, in terms of the slow variables~\(\sv\) and a time-dependent basis (to errors~\Ord{\eps^3}, and reverse ordering!), 
+\begin{align*}&
+u_{1}=\ParMath{
+b^{2} \eps^{2} \big(-1/2 \exp \big(-2 i t\big) s_{5}^{2} s_{1}-1/2
+ \exp \big(2 i t\big) s_{4}^{2} s_{1}\big)+b \eps \big(-\exp \big(-i t
+\big) s_{5} s_{2}-\exp \big(i t\big) s_{4} s_{2}\big)+s_{1}
+\,,} \\&
+u_{2}=\ParMath{
+b^{2} \eps^{2} \big(-1/2 \exp \big(-2 i t\big) s_{5}^{2} s_{2}-1/2
+ \exp \big(2 i t\big) s_{4}^{2} s_{2}\big)+b \eps \big(\exp \big(-i t
+\big) s_{5} s_{1}+\exp \big(i t\big) s_{4} s_{1}\big)+s_{2}
+\,,} \\&
+u_{3}=b \eps^{2} \big(\exp \big(-i t\big) s_{5} s_{2}^{2} i-\exp \big(-i
+ t\big) s_{5} s_{1}^{2} i-\exp \big(i t\big) s_{4} s_{2}^{2} i+\exp 
+\big(i t\big) s_{4} s_{1}^{2} i\big)+s_{3}
+\,, \\&
+u_{4}=\ParMath{
+b^{2} \eps^{2} \big(1/4 \exp \big(-i t\big) s_{5} s_{2}^{2}-1/4 
+\exp \big(-i t\big) s_{5} s_{1}^{2}+1/4 \exp \big(i t\big) s_{4} s_{2}^{
+2}-1/4 \exp \big(i t\big) s_{4} s_{1}^{2}\big)-b \eps s_{2} s_{1}+\exp 
+\big(-i t\big) s_{5}+\exp \big(i t\big) s_{4}
+\,,} \\&
+u_{5}=\ParMath{
+b^{2} \eps^{2} \big(-1/4 \exp \big(-i t\big) s_{5} s_{2}^{2} i+1/4
+ \exp \big(-i t\big) s_{5} s_{1}^{2} i+1/4 \exp \big(i t\big) s_{4} s_{2
+}^{2} i-1/4 \exp \big(i t\big) s_{4} s_{1}^{2} i\big)+b \eps^{2} \big(-s
+_{3} s_{2}^{2}+s_{3} s_{1}^{2}\big)+\exp \big(-i t\big) s_{5} i-\exp 
+\big(i t\big) s_{4} i
+\,.}
+\end{align*}
+
+\paragraph{Transformed ODEs} 
+In the variables~\sv\ the evolution is
+\begin{align*}&
+\dot s_{1}=b^{2} \eps^{3} \big(-s_{3} s_{2}^{3}+s_{3} s_{2} s_{1}^{2}
+\big)-\eps s_{3} s_{2}
+\,, \\&
+\dot s_{2}=b^{2} \eps^{3} \big(s_{3} s_{2}^{2} s_{1}-s_{3} s_{1}^{3}
+\big)+\eps s_{3} s_{1}
+\,, \\&
+\dot s_{3}={\color{red!70!black}2 b^{2} \eps^{3} s_{5} s_{4} s_{2} s_{1}}-\eps s_{2} s_{1}
+\,, \\&
+\dot s_{4}=b^{2} \eps^{2} \big(-1/2 s_{4} s_{2}^{2} i+1/2 s_{4} s_{1}^{2
+} i\big)
+\,, \\&
+\dot s_{5}=b^{2} \eps^{2} \big(1/2 s_{5} s_{2}^{2} i-1/2 s_{5} s_{1}^{2}
+ i\big)
+\,.
+\end{align*}
+When \(s_4=s_5=0\) we recover precisely the same slow manifold as constructed by \cref{lorenz86sm}.
+Hence the above system of \(\uv=\cdots\) and \(\dot{\sv}=\cdots\) together both has a slow manifold, and is \Ord{|\sv|^5} close to the original Lorenz86 system.
+Such construction can proceed to any order, and so the above closeness of a system with a slow manifold holds to all orders in~\(|\sv|\).
+
+Also of interest is the red term in the \(\dot s_3\) \ode: it shows that the evolution of the slow variables,~\(s_1,s_2,s_3\), is affected by the presence of fast waves, \(s_4,s_5\)~non-zero.
+That is, the evolution on and off the slow manifold differ by this term (and similar higher-order terms).
+Users of slow models among fast waves need to be aware of this physical feature.
+
+
+
+

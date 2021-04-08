@@ -5,6 +5,15 @@ Erneux, T.  \harvardyearleft 2009\harvardyearright , {\em Applied Delay
   Differential equations}, Vol.~3 of {\em Surveys and Tutorials in the Applied
   Mathematical Sciences}, Springer.
 
+\harvarditem{Lorenz}{1986}{Lorenz86}
+Lorenz, E.~N.  \harvardyearleft 1986\harvardyearright , `On the existence of a
+  slow manifold', {\em J.~Atmos. Sci.} {\bf 43},~1547--1557.
+
+\harvarditem{Lorenz \harvardand\ Krishnamurthy}{1987}{Lorenz87}
+Lorenz, E.~N. \harvardand\ Krishnamurthy, V.  \harvardyearleft
+  1987\harvardyearright , `On the non-existence of a slow manifold', {\em
+  J.~Atmos. Sci.} {\bf 44},~2940--2950.
+
 \harvarditem[Renson et~al.]{Renson, Deliege \harvardand\
   Kerschen}{2012}{Renson2012}
 Renson, L., Deliege, G. \harvardand\ Kerschen, G.  \harvardyearleft
@@ -22,5 +31,21 @@ Roberts, A.~J.  \harvardyearleft 1989\harvardyearright , `Appropriate initial
 Roberts, A.~J.  \harvardyearleft 2000\harvardyearright , `Computer algebra
   derives correct initial conditions for low-dimensional dynamical models',
   {\em Computer Phys. Comm.} {\bf 126}(3),~187--206.
+
+\harvarditem{Roberts}{2015}{Roberts2014a}
+Roberts, A.~J.  \harvardyearleft 2015\harvardyearright , {\em Model emergent
+  dynamics in complex systems}, SIAM, Philadelphia.
+\newline\harvardurl{http://bookstore.siam.org/mm20/}
+
+\harvarditem{Roberts}{2019}{Roberts2018a}
+Roberts, A.~J.  \harvardyearleft 2019\harvardyearright , Backwards theory
+  supports modelling via invariant manifolds for non-autonomous dynamical
+  systems, Technical report, [\url{http://arxiv.org/abs/1804.06998}].
+
+\harvarditem{Stoleriu}{2012}{Stoleriu2012}
+Stoleriu, I.  \harvardyearleft 2012\harvardyearright , Periodic orbits of a
+  pair of coupled oscillators near resonance, Technical report, University of
+  Iasi.
+\newline\harvardurl{http://www.math.uaic.ro/~ITN2012/files/talk/Stoleriu.pdf}
 
 \end{thebibliography}

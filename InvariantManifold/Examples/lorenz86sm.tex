@@ -1,0 +1,125 @@
+%!TEX root = ../allExamples.tex
+\subsection{\texttt{lorenz86sm}: Slow manifold of the Lorenz 1986 atmosphere model} 
+\label{lorenz86sm}
+
+In this case we construct the slow sub-centre manifold, analogous to quasi-geostrophy, in order to disentangle the slow dynamics from fast oscillations, analogous to gravity waves, in the \cite{Lorenz86} model.
+The normals to the isochrons determine `balancing' onto the slow manifold.
+\begin{align*}&
+\dot u_{1}=b u_2 u_5- u_2 u_3
+\,, \\& 
+\dot u_{2}=-b u_1 u_5+ u_1 u_3
+\,, \\&
+\dot u_{3}=- u_1 u_2
+\,, \\&
+\dot u_{4}=-u_5
+\,, \\&
+\dot u_{5}=b u_1 u_2+u_4
+\,.
+\end{align*}
+The parameter~\(b\) controls the interaction between slow and fast waves.
+\cref{lorenz86nf} constructs its full state space normal form in order to determine the forcing of the slow modes by the mean fast waves.
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+\end{reduce}
+Group output expressions on~\(b\).
+\begin{reduce}
+factor b;
+\end{reduce}
+Execute the construction of the slow manifold for this system.
+\begin{reduce}
+invariantmanifold(
+    mat(( -u2*u3+b*u2*u5,
+        u1*u3-b*u1*u5,
+        -u1*u2,
+        -u5,
+        +u4+b*u1*u2 )),
+    mat(( 0,0,0 )),
+    mat( (1,0,0,0,0),(0,1,0,0,0),(0,0,1,0,0) ),
+    mat( (1,0,0,0,0),(0,1,0,0,0),(0,0,1,0,0) ),
+    4 )$
+end;
+\end{reduce}
+The matrix of the linearisation about the origin has eigenvalues zero (multiplicity three) and~\(\pm i\). 
+We seek the slow manifold so specify the eigenvalue zero (thrice) in the second parameter to the procedure.
+Since the system is already in linearly separated form, the slow eigenvectors are simply the three given unit vectors.
+The last parameter,~\(4\), specifies to construct the slow manifold to errors~\Ord{\eps^4}, that is, to errors~\Ord{|\sv|^5}.
+
+The procedure actually analyses the embedding system
+\begin{align*}&
+\dot u_{1}=b \eps u_2 u_5-\eps u_2 u_3
+\,, \\& 
+\dot u_{2}=-b \eps u_1 u_5+\eps u_1 u_3
+\,, \\&
+\dot u_{3}=-\eps u_1 u_2
+\,, \\&
+\dot u_{4}=-u_5
+\,, \\&
+\dot u_{5}=b \eps u_1 u_2+u_4
+\,.
+\end{align*}
+Consequently, here the artificial parameter~\(\eps\) has a physical interpretation in that it counts the nonlinearity: a term in~\(\eps^p\) will be a \((p+1)\)th~order term in~\(\sv\).
+%Hence the specified error~\Ord{\eps^3} is here the same as error~\Ord{|\uv|^4} and~\Ord{|\sv|^4}.
+
+\paragraph{The slow manifold} 
+The constructed slow manifold is, in terms of the parameters~\sv\ (to errors~\Ord{\eps^3}, and reverse ordering!), 
+\begin{align*}&
+u_{1}=s_{1}
+\,, \\&
+u_{2}=s_{2}
+\,, \\&
+u_{3}=s_{3}
+\,, \\&
+u_{4}=-b \eps s_{2} s_{1}
+\,, \\&
+u_{5}=b \eps^{2} \big(-s_{3} s_{2}^{2}+s_{3} s_{1}^{2}\big) .
+\end{align*}
+
+\paragraph{Slow manifold ODEs} 
+On this slow manifold the evolution is
+\begin{align*}&
+\dot s_{1}=b^{2} \eps^{3} \big(-s_{3} s_{2}^{3}+s_{3} s_{2} s_{1}^{2}
+\big)-\eps s_{3} s_{2}
+\,, \\&
+\dot s_{2}=b^{2} \eps^{3} \big(s_{3} s_{2}^{2} s_{1}-s_{3} s_{1}^{3}
+\big)+\eps s_{3} s_{1}
+\,, \\&
+\dot s_{3}=-\eps s_{2} s_{1}
+\,.
+\end{align*}
+Here the quadratic terms in~\(s_1,s_2,s_3\) is that of nonlinear slow wave oscillations.  The \(b\)-terms modify these slow waves, reflecting the influence of the fast dynamics (as distinct from the effects of fast waves---these effects are quantified by \cref{lorenz86nf}).
+
+
+\paragraph{Normals to isochrons at the slow manifold}
+To project initial conditions
+onto the slow manifold, or non-autonomous
+forcing, or modifications of the original system, or to quantify uncertainty \cite[]{Roberts89b, Roberts97b}, use the projection defined by the derived vectors
+\begin{align*}&
+\zv_1 =\begin{bmatrix}
+b^{2} \eps^{2} s_{2}^{2}+1\\
+b^{2} \eps^{2} s_{2} s_{1}\\
+0\\
+b^{3} \eps^{3} \big(s_{2}^{3}-s_{2} s_{1}^{2}\big)+b \eps^{3} 
+\big(-s_{2}^{3}+s_{2} s_{1}^{2}\big)+b \eps s_{2}\\
+0
+\end{bmatrix},\\&
+\zv_2 =\begin{bmatrix}
+-b^{2} \eps^{2} s_{2} s_{1}\\
+-b^{2} \eps^{2} s_{1}^{2}+1\\
+0\\
+b^{3} \eps^{3} \big(-s_{2}^{2} s_{1}+s_{1}^{3}\big)+b \eps^{3} 
+\big(s_{2}^{2} s_{1}-s_{1}^{3}\big)-b \eps s_{1}\\
+0
+\end{bmatrix},\\&
+\zv_3 =\begin{bmatrix}
+0\\
+0\\
+1\\
+-4 b \eps^{3} s_{3} s_{2} s_{1}\\
+b \eps^{2} \big(-s_{2}^{2}+s_{1}^{2}\big)
+\end{bmatrix}.
+\end{align*}
+Evaluate these at \(\eps=1\) to apply to the original specified system, or here just interpret~\(\eps\) as a way to count the order of each term.
+
+

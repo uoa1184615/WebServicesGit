@@ -1,0 +1,88 @@
+%!TEX root = ../allExamples.tex
+\subsection{\texttt{stoleriu2}: Oscillatory centre manifold among stable and unstable modes}
+\label{stoleriu2}
+
+Consider the case \cite{Stoleriu2012} calls \((3\pi/4,k^2/2)\).
+\begin{align*}&
+\dot u_{1}=u_{2} \,,\\&
+\dot u_{2}=-\sigma u_3+1-\cos u_1 \,,\\&
+\dot u_{3}=u_4 \,,\\&
+\dot u_4=(u_3+\tfrac1\sigma)\sin u_1
+\end{align*}
+Eigenvalues are $\pm 1$~and~$\pm i$, so we find the centre manifold among stable and unstable modes.
+
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+\end{reduce}
+In the printed output, group terms with like powers of amplitudes~\(s_j\) and the complex exponential
+\begin{reduce}
+factor s,exp;
+\end{reduce}
+%Sometimes we have a parameter (here~\(\sigma\)) in 
+%the linear operator of the system, so we may need to 
+%specify its real and imaginary parts. ??
+%\begin{reduce}
+%let { repart(sigma)=>sigma, impart(sigma)=>0 };
+%\end{reduce}
+Execute the construction of the centre manifold for Stoleriu's system.
+But use Taylor expansions for trigonometric functions in the \ode{}s, and multiply higher-orders of nonlinearity by~\verb|small| to better (not best) count and manage nonlinearities.
+\begin{reduce}
+invariantmanifold(
+    mat(( u2,
+        sigma*u3+u1^2/2-small*u1^4/24,
+        u4,
+        (u3+1/sigma)*(u1-small*u1^3/6)
+       )),
+    mat(( i,-i )),
+    mat( (sigma,i*sigma,-1,-i),(sigma,-i*sigma,-1,+i) ),
+    mat( (+i,-1,-i*sigma,sigma),(-i,-1,+i*sigma,sigma) ),
+    3)$
+end;
+\end{reduce}
+Code adjoint eigenvectors~\verb|zz_| that are eigenvectors of the complex conjugate transpose matrix of the linear matrix~\(\begin{bmat} 0&1&0&0\\ 0&0&\sigma&0\\ 0&0&0&1\\ 1/\sigma&0&0&0 \end{bmat}\).
+Here analyse to errors~\Ord{\eps^3}.
+
+The procedure analyses the embedding system
+\begin{align*}&
+\dot u_{1}=u_2 \,,\\&
+\dot u_{2}=-1/24 \eps^{2} u_1^{4}+1/2 \eps u_1^{2}+\sigma  u_3 \,,\\&
+\dot u_{3}=u_4 \,,\\&
+\dot u_{4}=\eps^{2} \big(-1/6 \sigma ^{-1} u_1^{3}-1/6 u_1^{3} u_3
+\big)+\eps u_1 u_3+\sigma ^{-1} u_1
+\end{align*}
+
+
+
+\paragraph{The centre manifold} 
+These give the location of the invariant manifold in
+terms of (complex conjugate) parameters~\(s_1,s_2\).
+\begin{align*}&
+u_{1}=\exp \big(-i t\big) s_{2} \sigma -1/5 \exp \big(-2 i t\big) s_{2}
+^{2} \eps \sigma ^{2}+\exp \big(i t\big) s_{1} \sigma -1/5 \exp \big(2 i
+ t\big) s_{1}^{2} \eps \sigma ^{2}+2 s_{2} s_{1} \eps \sigma ^{2}
+\\&
+u_{2}=-\exp \big(-i t\big) s_{2} i \sigma +2/5 \exp \big(-2 i t\big) s_{
+2}^{2} \eps i \sigma ^{2}+\exp \big(i t\big) s_{1} i \sigma -2/5 \exp 
+\big(2 i t\big) s_{1}^{2} \eps i \sigma ^{2}
+\\&
+u_{3}=-\exp \big(-i t\big) s_{2}+3/10 \exp \big(-2 i t\big) s_{2}^{2} 
+\eps \sigma -\exp \big(i t\big) s_{1}+3/10 \exp \big(2 i t\big) s_{1}^{2
+} \eps \sigma -s_{2} s_{1} \eps \sigma 
+\\&
+u_{4}=\exp \big(-i t\big) s_{2} i-3/5 \exp \big(-2 i t\big) s_{2}^{2} 
+\eps i \sigma -\exp \big(i t\big) s_{1} i+3/5 \exp \big(2 i t\big) s_{1}
+^{2} \eps i \sigma 
+\end{align*}
+ 
+\paragraph{Centre manifold ODEs} 
+The system evolves on the centre manifold such
+that the parameters evolve according to these ODEs.
+\begin{align*}&
+\dot s_{1}=-6/5 s_{2} s_{1}^{2} \eps^{2} i \sigma ^{2}
+\\&
+\dot s_{2}=6/5 s_{2}^{2} s_{1} \eps^{2} i \sigma ^{2}
+\end{align*}
+These establish that the leading effect of the nonlinearities is to cause a frequency down-shift in the oscillations on the centre manifold.
+Higher-order analysis indicates the only effect is a frequency shift of the nonlinear oscillations.  

@@ -1,9 +1,35 @@
 \begin{thebibliography}{xx}
 
-\harvarditem{Roberts}{1989}{Roberts89b}
-Roberts, A.~J.  \harvardyearleft 1989\harvardyearright , `Appropriate initial
-  conditions for asymptotic descriptions of the long term evolution of
+\harvarditem{Carr}{1981}{Carr81}
+Carr, J.  \harvardyearleft 1981\harvardyearright , {\em Applications of centre
+  manifold theory}, Vol.~35 of {\em Applied Math. Sci.}, Springer--Verlag.
+\newline\harvardurl{http://books.google.com.au/books?id=93BdN7btysoC}
+
+\harvarditem{Coullet \harvardand\ Spiegel}{1983}{Coullet83}
+Coullet, P.~H. \harvardand\ Spiegel, E.~A.  \harvardyearleft
+  1983\harvardyearright , `Amplitude equations for systems with competing
+  instabilities', {\em SIAM J.~Appl. Math.} {\bf 43},~776--821.
+
+\harvarditem[Foias et~al.]{Foias, Jolly, Kevrekidis, Sell \harvardand\
+  Titi}{1988}{Foias88b}
+Foias, C., Jolly, M.~S., Kevrekidis, I.~G., Sell, G.~R. \harvardand\ Titi,
+  E.~S.  \harvardyearleft 1988\harvardyearright , `On the computation of
+  inertial manifolds', {\em Phys. Lett.~A} {\bf 131},~433--436.
+
+\harvarditem{Haragus \harvardand\ Iooss}{2011}{Haragus2011}
+Haragus, M. \harvardand\ Iooss, G.  \harvardyearleft 2011\harvardyearright ,
+  {\em Local Bifurcations, Center Manifolds, and Normal Forms in
+  Infinite-Dimensional Dynamical Systems}, Springer.
+
+\harvarditem{Roberts}{1989{\em a}}{Roberts89b}
+Roberts, A.~J.  \harvardyearleft 1989{\em a}\harvardyearright , `Appropriate
+  initial conditions for asymptotic descriptions of the long term evolution of
   dynamical systems', {\em J.~Austral. Math. Soc.~B} {\bf 31},~48--75.
+
+\harvarditem{Roberts}{1989{\em b}}{Roberts89}
+Roberts, A.~J.  \harvardyearleft 1989{\em b}\harvardyearright , `The utility of
+  an invariant manifold description of the evolution of a dynamical system',
+  {\em SIAM J.~Math. Anal.} {\bf 20},~1447--1458.
 
 \harvarditem{Roberts}{1997}{Roberts96a}
 Roberts, A.~J.  \harvardyearleft 1997\harvardyearright , `Low-dimensional
@@ -14,5 +40,15 @@ Roberts, A.~J.  \harvardyearleft 1997\harvardyearright , `Low-dimensional
 Roberts, A.~J.  \harvardyearleft 2000\harvardyearright , `Computer algebra
   derives correct initial conditions for low-dimensional dynamical models',
   {\em Computer Phys. Comm.} {\bf 126}(3),~187--206.
+
+\harvarditem{Roberts}{2015}{Roberts2014a}
+Roberts, A.~J.  \harvardyearleft 2015\harvardyearright , {\em Model emergent
+  dynamics in complex systems}, SIAM, Philadelphia.
+\newline\harvardurl{http://bookstore.siam.org/mm20/}
+
+\harvarditem{Roberts}{2019}{Roberts2018a}
+Roberts, A.~J.  \harvardyearleft 2019\harvardyearright , Backwards theory
+  supports modelling via invariant manifolds for non-autonomous dynamical
+  systems, Technical report, [\url{http://arxiv.org/abs/1804.06998}].
 
 \end{thebibliography}

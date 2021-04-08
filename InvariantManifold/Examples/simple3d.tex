@@ -1,13 +1,15 @@
 %!TEX root = ../allExamples.tex
 \subsection{\texttt{simple3d}: Slow manifold of a basic 3D system} 
-\label{ss:simple3d}
+\label{simple3d}
 
-The basic example system to analyse is 
+The basic example system to analyse for a slow manifold is 
 \begin{align*}&
 \dot u_1=2u_1+u_2+2u_3+u_2u_3\,, \\& 
 \dot u_2=u_1-u_2+u_3-u_1u_3\,, \\&
-\dot u_3=-3u_1-u_2-3u_3-u_1u_2\,.
+\dot u_3=-3u_1-u_2-3u_3-u_1u_2\,,
 \end{align*}
+(\cref{stable3d} constructs its stable manifold).
+
 Start by loading the procedure.
 \begin{reduce}
 in_tex "../invariantManifold.tex"$
@@ -36,7 +38,7 @@ The procedure actually analyses the embedding system
 \dot u_3=-3u_1-u_2-3u_3-\eps u_1u_2\,.
 \end{align*}
 Consequently, here the artificial parameter~\(\eps\) has a physical interpretation in that it counts the nonlinearity: a term in~\(\eps^p\) will be a \((p+1)\)th~order term in~\(\uv=(u_1,u_2,u_3)\).
-Hence the specified error~\Ord{\eps^3} is here the same as error~\Ord{|\uv|^4}.
+Hence the specified error~\Ord{\eps^3} is here the same as error~\Ord{|\uv|^4} and~\Ord{|\sv|^4}.
 
 \paragraph{The slow manifold} 
 The constructed slow manifold is, in terms of the parameter~\(s_1\) (to error~\Ord{\eps^2}, and reverse ordering!), 

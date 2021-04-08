@@ -1,6 +1,6 @@
 \documentclass[11pt,a5paper]{article}
 
-\title{A general invariant manifold construction algorithm,
+\title{A general invariant manifold construction procedure,
 including isochrons of slow manifolds}
 
 \author{A.~J. Roberts\thanks{School of Mathematical
@@ -11,7 +11,7 @@ Sciences, University of Adelaide, South Australia~5005,
 
 
 
-\usepackage{natbib,amsmath,defns,reducecode}
+\usepackage{url,natbib,amsmath,defns,reducecode}
 \RaisedNamesfalse
 \let\harvardurl\url
 \IfFileExists{ajr.sty}{\usepackage{ajr}}{}
@@ -57,23 +57,27 @@ uncertainty quantification.
 
 Download and install the computer algebra package
 \emph{Reduce} via \url{http://www.reduce-algebra.com}\quad
-Download and unzip the folder \url{https://profajroberts.github.io/InvariantManifold.zip}\quad
-Within the folder \verb|InvariantManifold|, start-up \emph{Reduce} and load the procedure by executing
-the command \verb|in_tex "invariantManifold.tex"$|
+Download and unzip the folder
+\url{https://profajroberts.github.io/InvariantManifold.zip}
+\quad Within the folder \verb|InvariantManifold|, start-up
+\emph{Reduce} and load the procedure by executing the
+command \verb|in_tex "invariantManifold.tex"$|
 \footnote{This script changes a lot of internal settings of
-\emph{Reduce}, so best only to do when needed.}
-Test your installation by then executing \verb|exampleslowman();|
+\emph{Reduce}, so best only to do when needed.} Test your
+installation by then executing \verb|exampleslowman();|
 
 Thereafter, construct a specified invariant manifold of a
 specific dynamical system by executing the following command
-with specific values for the input parameters.  See \verb|allExamples.pdf| for many examples.
+with specific values for the input parameters.  See
+\verb|allExamples.pdf| for many examples.
 \begin{verbatim}
 invariantmanifold(odefns, evals, evecs, adjvecs, toosmall);
 \end{verbatim}
 
 \paragraph{Inputs}
-As in the example of the next \cref{ss:eg}, the input parameters
-to the procedure are the following: \begin{itemize}
+As in the example of the next \cref{ss:eg}, the input
+parameters to the procedure are the following:
+\begin{itemize}
 
 \item \verb|odefns|, a comma separated list within
 \verb|mat((...))|, the \textsc{rhs} expressions of the
@@ -98,8 +102,8 @@ modes corresponding to the given eigenvalues of the
 invariant manifold basis;
 
 \item \verb|adjvecs|, a comma separated list of vectors
-within \verb|mat(...)|, usually the adjoint eigenvectors of the
-modes corresponding to the given eigenvalues of the
+within \verb|mat(...)|, usually the adjoint eigenvectors of
+the modes corresponding to the given eigenvalues of the
 invariant manifold basis;  
 
 \item \verb|toosmall|, an integer giving the desired order
@@ -132,7 +136,8 @@ and the dynamics by their evolution in time.
 \verb|invarManReport.tex| (and
 \verb|invarManReportSys.tex|)---the invariant manifold is
 parametrised by variables \(s_1\), \(s_2\), \ldots, and the
-dynamics by their evolution in time.
+dynamics by their evolution in time.  Generate a pdf version
+by executing \verb|pdflatex invarManReport|\,.
 \end{itemize}
 One may change the appearance of the output somewhat. For
 example, it is often useful to execute  \verb|factor s;|
@@ -141,12 +146,28 @@ group terms with the same powers of amplitudes\slash
 order-parameters\slash coarse-variables.
 
 
+\paragraph{Background}
+The theoretical support for the results of the analysis of
+this procedure is centre\slash stable\slash unstable
+manifold theory \cite[e.g.,][]{Carr81, Haragus2011,
+Roberts2014a}, and an embryonic backwards theory
+\cite[]{Roberts2018a}. This particular procedure is
+developed from a coordinate-independent algorithm for
+constructing centre manifolds originally by
+\cite{Coullet83}, adapted for human-efficient computer
+algebra by \cite{Roberts96a}, extended to invariant\slash
+inertial manifolds \cite[]{Roberts89, Foias88b}, and further
+extended to the projection of initial conditions, forcing,
+uncertainty via the innovations of \cite{Roberts89b,
+Roberts97b}.
+
+
 
 \subsection{A simple example: \texttt{exampleslowman()}} 
 \label{ss:eg}
 Execute this example by invoking the command
-\verb|exampleslowman(); | The example system to analyse is
-specified to be
+\verb|exampleslowman();|\quad The example system to analyse
+is specified to be \cite[Example~2.1]{Roberts2014a}
 \begin{equation*}
 \dot u_1=-u_1+u_2-u_1^2\,, \quad \dot u_2=u_1-u_2+u_2^2\,.
 \end{equation*}
@@ -162,11 +183,12 @@ procedure exampleslowman;
 We seek the slow manifold so specify the eigenvalue zero.
 From the linearisation matrix~\(\begin{bmat} -1&1 \\ 1&-1
 \end{bmat}\) a corresponding eigenvector is \(\ev=(1,1)\),
-and a corresponding left-eigenvector is \(\zv=\ev=(1,1)\), as
-specified. The last parameter specifies to construct the
+and a corresponding left-eigenvector is \(\zv=\ev=(1,1)\),
+as specified. The last parameter specifies to construct the
 slow manifold to errors~\Ord{\eps^5}.
 
-The procedure actually analyses the embedding system, the family of problems,
+The procedure actually analyses the embedding system, the
+family of problems,
 \begin{equation*}
 \dot u_1=-u_1+u_2-\eps u_1^2\,, \quad \dot u_2=u_1-u_2+\eps u_2^2\,.
 \end{equation*}
@@ -220,8 +242,9 @@ load_package rlfi;
 operator u1,u2,u3,u4,u5,u6,u7,u8,u9;
 \end{reduce}
 
-Now define the procedure as an operator so we can be
-flexible with its arguments.
+Now define the procedure as an operator so we can define
+procedures internally, and may be flexible with its
+arguments.
 \begin{reduce}
 operator invariantmanifold;
 for all odefns, evals, evecs, adjvecs, toosmall let
@@ -241,6 +264,12 @@ scalar ff, evalm, ee, zz, maxiter, ff0, trace, ll, uvec,
 reslin, ok, rhsjact, jacadj, resd, resde, resz, rhsfn, zs,
 pp, est, eyem;
 \end{reduce}
+
+Write an intro message.
+\begin{reduce}
+write "Construct an invariant manifold (version 8 Apr 2021)"$
+\end{reduce}
+
 
 Transpose the defining matrices so that vectors are columns.
 \begin{reduce}
@@ -274,9 +303,9 @@ on div; off allfac; on revpri;
 on rationalize;
 \end{reduce}
 
-Use \verb|e_| as basis vector for matrices and
-vectors. Declare it non-commutative so that multiplication
-does not commute.
+Use \verb|e_| as basis vector for matrices and vectors.
+Declare it non-commutative so that multiplication does not
+commute.
 \begin{reduce}
 operator e_;
 noncom e_;
@@ -286,8 +315,8 @@ let { e_(~j,~k)*e_(~l,~m)=>0 when k neq l
     , e_(~j,~k)^2=>0 when j neq k
     , e_(~j,j)^2=>e_(j,j) };
 \end{reduce}
-Also need (once) a transpose operator: do complex conjugation
-explicitly when needed.
+Also need (once) a transpose operator: do complex
+conjugation explicitly when needed.
 \begin{reduce}
 operator tpe_; linear tpe_;
 let tpe_(e_(~i,~j),e_)=>e_(j,i);
@@ -308,8 +337,8 @@ shut "invarManReport.tex";
 
 
 \subsection{Check the dimensionality of specified system}
-Extract dimension information from the parameters of the procedure: seek $m$D~invariant manifold of an
-$n$D~system.
+Extract dimension information from the parameters of the
+procedure: seek $m$D~invariant manifold of an $n$D~system.
 \begin{reduce}
 write "total no. of variables ",
 n:=part(length(ee),1);
@@ -337,9 +366,10 @@ eyem:=for j:=1:m sum e_(j,j)$
 
 \section{Dissect the linear part}
 
-Use the exponential $\verb|exp|(u)=e^{u}$, but not with the myriad of inbuilt properties so clear it! Do not
-(yet) invoke the simplification of $\verb|exp|(0)$ as I want
-it to label modes of no oscillation, zero eigenvalue.
+Use the exponential $\verb|exp|(u)=e^{u}$, but not with the
+myriad of inbuilt properties so clear it! Do not (yet)
+invoke the simplification of $\verb|exp|(0)$ as I want it to
+label modes of no oscillation, zero eigenvalue.
 \begin{reduce}
 clear exp; operator exp;
 let { df(exp(~u),t) => df(u,t)*exp(u)
@@ -351,11 +381,11 @@ let { df(exp(~u),t) => df(u,t)*exp(u)
 Need function~\verb|conj_| to do parsimonious complex
 conjugation.   
 \begin{reduce}
-operator exp__;
 procedure conj_(a)$ sub(i=-i,a)$
 \end{reduce}
 
-Make an array of eigenvalues for simplicity (\verb|evals| not used hereafter).
+Make an array of eigenvalues for simplicity (\verb|evals|
+not used hereafter).
 \begin{reduce}
 array eval_(m);
 for j:=1:m do eval_(j):=evals(1,j);
@@ -367,11 +397,11 @@ for j:=1:m do eval_(j):=evals(1,j);
 When we include delay differential equations, then we need
 to account for the history of the eigenvector as well. Hence
 multiply each eigenvector by its oscillating
-factor,~\(e^{i\omega t},e^{\lambda t}\), and then take the mean. This
-multiplication by its oscillating factor should not make any
-difference for non-delay equations by the natural
-orthogonality of left and right eigenvectors of different
-eigenvalues. 
+factor,~\(e^{i\omega t}, e^{\lambda t}\), and then take the
+mean. This multiplication by its oscillating factor should
+not make any difference for non-delay equations by the
+natural orthogonality of left and right eigenvectors of
+different eigenvalues. 
 %Reduce implements \verb|conj| via \verb|repart|
 %and \verb|impart|, so let \verb|repart| do the conjugation
 %of the exp factors.
@@ -382,9 +412,12 @@ conjugate eigenvalue. This seems best: for example, when the
 linear operator is \(\begin{bmat} 0&1\\-1&0 \end{bmat}\)
 then the adjoint and the right eigenvectors are the same.
 
-For oscillations and un/stable manifolds we have to cope with imaginary and with real
-eigenvalues. Seems to need \verb|zz| to have negative complex
-conjugated frequency so store in~\verb|cexp_|---cannot remember why this appears to work!?  It may only work for pure real and for pure imaginary eigenvalues??
+For oscillations and un/stable manifolds we have to cope
+with imaginary and with real eigenvalues. Seems to need
+\verb|zz| to have negative complex conjugated frequency so
+store in~\verb|cexp_|---cannot remember why this appears to
+work!?  It may only work for pure real and for pure
+imaginary eigenvalues??
 
 \begin{reduce}
 matrix aa_(m,m),dexp_(m,m),cexp_(m,m);
@@ -405,7 +438,8 @@ zz:=zz*aa_^(-1);
 \subsection{Operator to represent delays}
 
 Introduce an operator to represent delay factors more
-conveniently for analysis.  The \verb|exp| rule probably only works for pure imaginary modes!?
+conveniently for analysis.  The \verb|exp| rule probably
+only works for pure imaginary modes!?
 \begin{reduce}
 operator d_; linear d_;
 let { d_(~a^~p,t,~dt)=>d_(a,t,dt)^p
@@ -419,9 +453,7 @@ let { d_(~a^~p,t,~dt)=>d_(a,t,dt)^p
 \end{reduce}
 
 Now rewrite the (delay) factors in terms of this operator.
-For the moment limit to a maximum of
-nine \ode{}s.
-
+For the moment limit to a maximum of nine \ode{}s.
 \begin{reduce}
 somerules:={}$
 depend u1,t; somerules:=(u1(~dt)=d_(u1,t,dt)).somerules$
@@ -446,7 +478,7 @@ to here make any non-zero forcing small at the equilibrium
 as it gets multiplied by \verb|small| later.  (For some
 reason using \verb|mkid(u,k)=>0| does not resolve the mkid,
 but \verb|mkid(u,k)=0| does; however, not clear if it is a
-problem??)
+problem.)
 \begin{reduce}
 ll:=ee*(tp ee)*0; %zero nxn matrix
 uzero:=(for k:=1:n collect (mkid(u,k)=0))$
@@ -475,7 +507,7 @@ specified correctly.
 write "Check invariant subspace linearisation ";
 for j:=1:m do for k:=1:m do aa_(j,k):=0;
 for j:=1:m do aa_(j,j):=eval_(j);
-% following maybe only for pure centre modes????
+% following maybe only for pure centre modes??
 reslin:=(ll*(ee*dexp_)-(ee*dexp_)*aa_
     where exp(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(-i*a)+i*sin(-i*a))*exp(a) )$ 
 if trace then write reslin:=reslin;
@@ -487,11 +519,11 @@ if ok then write "Linearisation is OK";
 
 Try to find a correction of the linear operator that is
 `close'. Multiply by the adjoint eigenvectors and then
-average over time: operator
-\(\cL_{\text{new}}:=\cL-\cL_{\text{adj}}\) should now have
-zero residual. Lastly, correspondingly adjust the \ode{}s,
-since \verb|lladj| does not involve delays we do not need
-delay operator transforms in the product.
+average over time: operator \(\cL_{\text{new}} := \cL
+-\cL_{\text{adj}}\) should now have zero residual. Lastly,
+correspondingly adjust the \ode{}s, since \verb|lladj| does
+not involve delays we do not need delay operator transforms
+in the product.
 \begin{reduce}
 if not ok then for iter:=1:2 do begin
 write "WARNING: I NEED TO ADJUST LINEAR OPERATOR";
@@ -501,7 +533,7 @@ write
 lladj:=(lladj where {exp(0)=>1, exp(~a)=>0 when a neq 0});
 write
 ll:=ll-lladj;
-% following maybe only for pure centre modes????
+% following maybe only for pure centre modes??
 write
 reslin:=(ll*(ee*dexp_)-(ee*dexp_)*aa_
     where exp(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(-i*a)+i*sin(-i*a))*exp(a) ); 
@@ -526,9 +558,9 @@ Anything not in the linear operator gets multiplied by
 feature of the second alternative is that when a user
 invokes~\verb|small| then the power of smallness is not then
 changed; however, causes issues in the relative scaling of
-some terms, so restore to the original version.
-This might need reconsidering??  The current \verb|if| always
-chooses the first simple alternative.
+some terms, so restore to the original version. This might
+need reconsidering??  The current \verb|if| always chooses
+the first simple alternative.
 \begin{reduce}
 somerules:=for j:=1:n collect 
   (d_(1,t,~dt)*mkid(u,j)=d_(mkid(u,j),t,dt))$
@@ -626,8 +658,8 @@ Code the operator \(\cL\hat v\) where the delay is to only
 act on the oscillation part.
 \begin{reduce}
   for ii:=1:n do for jj:=1:n do llzz_(ii,jj):=(
-      -sub(small=0,ll(ii,jj))
-      where d_(1,t,~dt)=>cos(i*eval_s(k)*dt)+i*sin(i*eval_s(k)*dt));
+      -sub(small=0,ll(ii,jj)) where d_(1,t,~dt)
+      => cos(i*eval_s(k)*dt)+i*sin(i*eval_s(k)*dt));
 \end{reduce}
 
 Code the operator \(\D t{\hat v}\) where it only acts on the
@@ -654,8 +686,8 @@ subtly affect the updates of the evolution.
 Force the updates to be orthogonal to the left-eigenvectors
 in the complex conjugate transpose adjoint.
 \begin{reduce}
-  for ii:=1:length(modes_(k)) do 
-    for j:=1:n do llzz_(n+ii,j):=conj_(zz(j,part(modes_(k),ii)));
+  for ii:=1:length(modes_(k)) do for j:=1:n do 
+      llzz_(n+ii,j):=conj_(zz(j,part(modes_(k),ii)));
   if trace then write "finished Force the updates to be orthogonal";
 \end{reduce}
 
@@ -693,17 +725,20 @@ orthogonality condition is non-trivial (in the slow manifold
 we assumed amplitudes were exactly orthogonal to the
 left-eigenvectors), so we need to remember more parts of the
 inverse of the matrix.  
-\begin{reduce}
 %  realgeneval:={repart(geneval)=>geneval, impart(geneval)=>0}$
-  l1_invs(k):=for ii:=1:n sum for j:=1:n sum 
+\begin{reduce}
+  l1_invs(k) := for ii:=1:n sum for j:=1:n sum 
       e_(ii,j)*conj_(llzz_(j,ii));
-  l2_invs(k):=for ii:=1:n sum for j:=1:length(modes_(k)) sum 
-      e_(ii,part(modes_(k),j))*conj_(llzz_(j+n,ii));
-  g1_invs(k):=for ii:=1:length(modes_(k)) sum for j:=1:n sum 
-      e_(part(modes_(k),ii),j)*conj_(llzz_(j,ii+n));
-  g2_invs(k):=
-    for ii:=1:length(modes_(k)) sum for j:=1:length(modes_(k)) sum 
-      e_(part(modes_(k),ii),part(modes_(k),j))*conj_(llzz_(j+n,ii+n));
+  l2_invs(k) := for ii:=1:n sum 
+      for j:=1:length(modes_(k)) sum 
+          e_(ii,part(modes_(k),j))*conj_(llzz_(j+n,ii));
+  g1_invs(k) := for ii:=1:length(modes_(k)) sum 
+      for j:=1:n sum 
+          e_(part(modes_(k),ii),j)*conj_(llzz_(j,ii+n));
+  g2_invs(k) := for ii:=1:length(modes_(k)) sum 
+      for j:=1:length(modes_(k)) sum 
+          e_(part(modes_(k),ii),part(modes_(k),j))
+          *conj_(llzz_(j+n,ii+n));
   if trace then write "finished Unpack the conjugate transpose";
 end;
 \end{reduce}
@@ -757,10 +792,14 @@ operator l1_inv; linear l1_inv;
 operator l2_inv; linear l2_inv;
 operator g1_inv; linear g1_inv;
 operator g2_inv; linear g2_inv;
-let { l1_inv(e_(~j,~k)*exp(~a),exp)=>inv_proc(a/t,l1_invs)*e_(j,k)
-    , l2_inv(e_(~j,~k)*exp(~a),exp)=>inv_proc(a/t,l2_invs)*e_(j,k)
-    , g1_inv(e_(~j,~k)*exp(~a),exp)=>inv_proc(a/t,g1_invs)*e_(j,k)
-    , g2_inv(e_(~j,~k)*exp(~a),exp)=>inv_proc(a/t,g2_invs)*e_(j,k)
+let { l1_inv(e_(~j,~k)*exp(~a),exp)
+      => inv_proc(a/t,l1_invs)*e_(j,k)
+    , l2_inv(e_(~j,~k)*exp(~a),exp)
+      => inv_proc(a/t,l2_invs)*e_(j,k)
+    , g1_inv(e_(~j,~k)*exp(~a),exp)
+      => inv_proc(a/t,g1_invs)*e_(j,k)
+    , g2_inv(e_(~j,~k)*exp(~a),exp)
+      => inv_proc(a/t,g2_invs)*e_(j,k)
     };
 \end{reduce}
 
@@ -939,7 +978,8 @@ gg_:=0$
 if trace then write uu_:=uu_;
 \end{reduce}
 
-For some temporary trace printing, where for simplicity \verb|small| is replaced by~\verb|s|.
+For some temporary trace printing, where for simplicity
+\verb|small| is replaced by~\verb|s|.
 \begin{reduce}
 procedure matify(a,m,n)$
   begin matrix z(m,n);
@@ -1146,9 +1186,10 @@ defindex tmp_zz(down,down);
 \end{reduce}
 
 Gather complicated result
-\begin{reduce}
 %for k:=1:m do tmp_z(k):=for j:=1:n collect (1*coeffn(zs,e_(j,k),1));
-for k:=1:m do for j:=1:n do tmp_zz(k,j):=(1*coeffn(zs,e_(j,k),1));
+\begin{reduce}
+for k:=1:m do for j:=1:n do 
+    tmp_zz(k,j):=(1*coeffn(zs,e_(j,k),1));
 \end{reduce}
 
 Write to a file the commands needed to write the LaTeX
