@@ -10,6 +10,12 @@ Coullet, P.~H. \harvardand\ Spiegel, E.~A.  \harvardyearleft
   1983\harvardyearright , `Amplitude equations for systems with competing
   instabilities', {\em SIAM J.~Appl. Math.} {\bf 43},~776--821.
 
+\harvarditem{Fateman}{2003}{Fateman2002}
+Fateman, R.  \harvardyearleft 2003\harvardyearright , `Comparing the speed of
+  programs for sparse polynomial multiplication', {\em ACM SIGSAM Bulletin}
+  {\bf 37}(1),~4--15.
+\newline\harvardurl{http://www.cs.berkeley.edu/~fateman/papers/fastmult.pdf}
+
 \harvarditem[Foias et~al.]{Foias, Jolly, Kevrekidis, Sell \harvardand\
   Titi}{1988}{Foias88b}
 Foias, C., Jolly, M.~S., Kevrekidis, I.~G., Sell, G.~R. \harvardand\ Titi,

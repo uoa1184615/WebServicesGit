@@ -55,6 +55,7 @@ uncertainty quantification.
 
 \section{Introduction}
 
+\paragraph{Installation}
 Download and install the computer algebra package
 \emph{Reduce} via \url{http://www.reduce-algebra.com}\quad
 Download and unzip the folder
@@ -62,10 +63,12 @@ Download and unzip the folder
 \quad Within the folder \verb|InvariantManifold|, start-up
 \emph{Reduce} and load the procedure by executing the
 command \verb|in_tex "invariantManifold.tex"$|
-\footnote{This script changes a lot of internal settings of
-\emph{Reduce}, so best only to do when needed.} Test your
+\footnote{This script changes many internal settings of
+\emph{Reduce}, so best to do only when needed.} Test your
 installation by then executing \verb|exampleslowman();|
+\quad(see \cref{ss:eg}).
 
+\paragraph{Execution}
 Thereafter, construct a specified invariant manifold of a
 specific dynamical system by executing the following command
 with specific values for the input parameters.  See
@@ -160,6 +163,11 @@ inertial manifolds \cite[]{Roberts89, Foias88b}, and further
 extended to the projection of initial conditions, forcing,
 uncertainty via the innovations of \cite{Roberts89b,
 Roberts97b}.
+
+We use the computer algebra package \emph{Reduce} 
+[\url{http://reduce-algebra.com/}] because it is both free 
+and perhaps the fastest general purpose computer algebra 
+system~\cite[e.g.]{Fateman2002}.
 
 
 
@@ -260,14 +268,14 @@ to be declared \verb|matrix|.  So, move to implement all
 arrays and operators to have underscores, and almost all
 scalars and most matrices to be declared local here.
 \begin{reduce}
-scalar ff, evalm, ee, zz, maxiter, ff0, trace, ll, uvec,
+scalar ff, evalm, ee, zz, maxiter, trace, ll, uvec,
 reslin, ok, rhsjact, jacadj, resd, resde, resz, rhsfn, zs,
-pp, est, eyem;
+pp, est, eyem, m;
 \end{reduce}
 
 Write an intro message.
 \begin{reduce}
-write "Construct an invariant manifold (version 8 Apr 2021)"$
+write "Construct an invariant manifold (version 16 Apr 2021)"$
 \end{reduce}
 
 
@@ -310,8 +318,8 @@ commute.
 operator e_;
 noncom e_;
 factor e_;
-let { e_(~j,~k)*e_(~l,~m)=>0 when k neq l
-    , e_(~j,~k)*e_(~l,~m)=>e_(j,m) when k=l 
+let { e_(~j,~k)*e_(~l,~p)=>0 when k neq l
+    , e_(~j,~k)*e_(~l,~p)=>e_(j,p) when k=l 
     , e_(~j,~k)^2=>0 when j neq k
     , e_(~j,j)^2=>e_(j,j) };
 \end{reduce}
@@ -362,6 +370,8 @@ the isochron projection.
 \begin{reduce}
 eyem:=for j:=1:m sum e_(j,j)$
 \end{reduce}
+
+
 
 
 \section{Dissect the linear part}
@@ -455,6 +465,7 @@ let { d_(~a^~p,t,~dt)=>d_(a,t,dt)^p
 Now rewrite the (delay) factors in terms of this operator.
 For the moment limit to a maximum of nine \ode{}s.
 \begin{reduce}
+if trace then write "setting somerules";
 somerules:={}$
 depend u1,t; somerules:=(u1(~dt)=d_(u1,t,dt)).somerules$
 depend u2,t; somerules:=(u2(~dt)=d_(u2,t,dt)).somerules$
@@ -496,6 +507,7 @@ We need a vector of unknowns for a little while.
 uvec:=0*ff; %nx1 zero matrix
 for j:=1:n do uvec(j,1):=mkid(u,j);
 \end{reduce}
+
 
 
 \subsection{Eigen-check}
@@ -559,7 +571,7 @@ feature of the second alternative is that when a user
 invokes~\verb|small| then the power of smallness is not then
 changed; however, causes issues in the relative scaling of
 some terms, so restore to the original version. This might
-need reconsidering??  The current \verb|if| always chooses
+need reconsidering.  The current \verb|if| always chooses
 the first simple alternative.
 \begin{reduce}
 somerules:=for j:=1:n collect 
@@ -573,14 +585,17 @@ ff:=(if 1 then small*ff
 Any constant term in the equations~\verb|ff| has to be
 multiplied by~\verb|exp(0)|.
 \begin{reduce}
-ff0:=(ff where uzero)$
-ff:=ff+(exp(0)-1)*ff0$
+%ff0:=(ff where uzero)$ % obliterates u1,... as operators
+ff:=ff+(exp(0)-1)*sub(uzero,ff)$
 \end{reduce}
+
+
 
 From the matrix versions of the equations, create algebraic
 form using the matrix basis.
 \begin{reduce}
 rhsfn:=for i:=1:n sum e_(i,1)*ff(i,1)$
+if trace then write "rhsfn=",rhsfn;
 \end{reduce}
 
 Also, create the algebraic form of the jacobian transpose
@@ -866,6 +881,7 @@ defid Omega,name=Omega;
 \end{reduce}
 
 
+
 \begin{reduce}
 defindex e_(down,down);
 defid e_,name="e";
@@ -961,7 +977,7 @@ let df(s(~j),t)=>coeffn(gg_,e_(j,1),1);
 Invoke the following procedure to substitute whatever the
 current approximation is into (nonlinear) expressions.
 \begin{reduce}
-procedure manifold_(uu);
+procedure manifold_(uu,n);
     for j:=1:n collect mkid(u,j)=coeffn(uu,e_(j,1),1)$
 \end{reduce}
 
@@ -981,7 +997,7 @@ if trace then write uu_:=uu_;
 For some temporary trace printing, where for simplicity
 \verb|small| is replaced by~\verb|s|.
 \begin{reduce}
-procedure matify(a,m,n)$
+procedure matify_(a,m,n)$
   begin matrix z(m,n);
     for i:=1:m do for j:=1:n do z(i,j):=coeffn(a,e_(i,j),1);
     return (z where {exp(0)=>1,small=>s}); 
@@ -1029,8 +1045,8 @@ ITERATION = ",iter,"
 Compute residual vector (matrix) of the dynamical system
 \cite{Roberts96a}.
 \begin{reduce}
-resde:=-df(uu_,t)+sub(manifold_(uu_),rhsfn);
-if trace then write "resde=",matify(resde,n,1);
+resde:=-df(uu_,t)+sub(manifold_(uu_,n),rhsfn);
+if trace then write "resde=",matify_(resde,n,1);
 \end{reduce}
 
 Get the local directions of the coordinate system on the
@@ -1038,7 +1054,7 @@ curving manifold: store transpose as \(m\times n\)~matrix.
 \begin{reduce}
 est:=tpe_(for j:=1:m sum df(uu_,s(j))*e_(1,j),e_);
 est:=conj_(est);
-if trace then write "est=",matify(est,m,n);
+if trace then write "est=",matify_(est,m,n);
 \end{reduce}
 
 Compute residual matrix for the isochron projection
@@ -1046,16 +1062,16 @@ Compute residual matrix for the isochron projection
 it if the \verb|eval_set| is for slow manifolds.
 \begin{reduce}
 if itisSlowMan_ then begin
-    jacadj:=conj_(sub(manifold_(uu_),rhsjact));
-    if trace then write "jacadj=",matify(jacadj,n,n);
+    jacadj:=conj_(sub(manifold_(uu_,n),rhsjact));
+    if trace then write "jacadj=",matify_(jacadj,n,n);
     resd:=df(zs,t)+jacadj*zs+zs*pp;
-    if trace then write "resd=",matify(resd,n,m);
+    if trace then write "resd=",matify_(resd,n,m);
 \end{reduce}
 
 Compute residual of the normalisation of the projection.
 \begin{reduce}
     resz:=est*zs-eyem*exp(0);
-    if trace then write "resz=",matify(resz,m,m);
+    if trace then write "resz=",matify_(resz,m,m);
 end else resd:=resz:=0; % for when not slow manifold
 \end{reduce}
 
@@ -1070,8 +1086,8 @@ the operators.
 \begin{reduce}
 uu_:=uu_+l_inv(resde,exp);
 gg_:=gg_+g_inv(resde,exp);
-if trace then write "gg=",matify(gg_,m,1);
-if trace then write "uu=",matify(uu_,n,1);
+if trace then write "gg=",matify_(gg_,m,1);
+if trace then write "uu=",matify_(uu_,n,1);
 \end{reduce}
 
 Now update the isochron projection, with normalisation.
@@ -1079,8 +1095,8 @@ Now update the isochron projection, with normalisation.
 if itisSlowMan_ then begin
 zs:=zs+l1_inv(resd,exp)-l2_inv(resz,exp);
 pp:=pp-g1_inv(resd,exp)+youshouldnotseethis*g2_inv(resz,exp);
-if trace then write "zs=",matify(zs,n,m);
-if trace then write "pp=",matify(pp,m,m);
+if trace then write "zs=",matify_(zs,n,m);
+if trace then write "pp=",matify_(pp,m,m);
 end;
 \end{reduce}
 
