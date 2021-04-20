@@ -1,0 +1,445 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{monahanFive}: Monahan's five examples} 
+\label{monahanFive}
+
+
+\cite{Monahan2011} discuss stochastic averaging and give several examples in the body and an appendix, of which we analyse five.
+They really need this approach as ``a large separation often does not exist in atmosphere or ocean dynamics'' between the fast and slow time scales.
+
+
+\subsubsection{Example four: `three' time scales}
+
+\cite{Monahan2011} comment that this, their fourth example, a linear system, has three time scales.
+But I do not see these time scales, I only see varying strength interactions.
+They consider
+\begin{equation*}
+\de tx=-x+\frac a{\sqrt\tau}y
+\qtq{and}
+\de t y=\frac1{\sqrt\tau}x-\frac1\tau y+\frac b{\sqrt{\tau}}\dot W.
+\end{equation*}
+Let's rescale time, $t=\tau t'$  so that $\de t{}=\frac1\tau\de{t'}{}$ and $\dot W=\frac1{\sqrt{\tau}}\de {t'}W$.
+Then, dropping dashes, the \sde\ system is
+\begin{equation*}
+\de tx=-\tau x+ a\sqrt\tau y
+\qtq{and}
+\de t y=\sqrt\tau x- y+b\dot W.
+\end{equation*}
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+Execute the construction of a normal form for this system.  Using the default inbuilt parametrisation of noise by \verb|sigma| to represent parameter~$b$, and using \verb|small| in the $x$-\sde\ so that it counts the number of small~$\sqrt\tau$, code these as the following.
+\begin{reduce}
+factor tau,yy,y,w,ou;
+stonormalform(
+    { sqrt(tau)*a*y(1)-small*tau*x(1) },
+    { sqrt(tau)*x(1)-y(1)+w(1) },
+    {},
+    4 )$
+%end; % optionally end examples here
+\end{reduce}
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}=\sqrt {\tau } y_{1} \eps a-\eps^{2} \tau  x_{1}
+&&
+\dot y_{1}=w_{1} \sigma -y_{1}+\sqrt {\tau } \eps x_{1}
+\end{align*}
+in which we indeed see~\eps\ only in the grouping \(\eps\sqrt\tau\).
+
+
+
+\paragraph{Time dependent coordinate transform}  This is linear as the system is linear.
+\begin{align*}&
+y_{1}=\ParMath{-\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) \sigma  \eps^{2} 
+\tau  a-\ou\big(w_{1},tt,-1\big) \sigma  \eps^{2} \tau  a+\ou\big(w_{1},
+tt,-1\big) \sigma +Y_{1}+\sqrt {\tau } \eps X_{1}
+}
+\\&
+x_{1}=-\sqrt {\tau } \ou\big(w_{1},tt,-1\big) \sigma  \eps a-\sqrt {
+\tau } Y_{1} \eps a+X_{1}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+The normal form dynamics is linear and decoupled, as per Hartman--Grobman, namely
+\begin{align*}&
+\dot Y_{1}=-Y_{1} \eps^{2} \tau  a-Y_{1}
+\\&
+\dot X_{1}=w_{1} \sigma  \eps^{3} \tau\sqrt {\tau }  \big(-2 a^{2}+
+ a\big)+\sqrt {\tau } w_{1} \sigma  \eps a+\eps^{2} \tau  
+\big(X_{1} a-X_{1}\big)
+\end{align*}
+\cite{Monahan2011} derive the last two terms in the $X$-equation, but not the first as it is too small for their averaging analysis.
+They comment that $a>1$ is some sort of difficulty, presumably because \(X\)~grows when \(a>1\): but here we have no problem with $a>1$, especially as the decay rate to the stochastic slow manifold, the $Y$-\sde, is $(1+\tau a)$ which gets stronger with increasing parameter~$a$.
+
+
+
+
+
+\subsubsection{Example one: simple rational nonlinear}
+
+With `small' scale-separation parameter~\(\tau\), \cite{Monahan2011} first consider the example
+\begin{equation*}
+\de tx=-x+\Sigma(x)y \qtq{and}
+\de ty=-\frac1\tau y+\frac1{\sqrt\tau}\dot W,
+\end{equation*}
+for general smooth functions~$\Sigma(x)$.
+Rescale time, $t=\tau t'$  so that $\de t{}=\frac1\tau\de{t'}{}$ and $\dot W=\frac1{\sqrt{\tau}}\de {t'}W$.
+Then, dropping dashes, the \sde\ is
+\begin{equation*}
+\de tx=-\tau x+\tau\Sigma(x)y
+\qtq{and}
+\de ty=- y+\dot W.
+\end{equation*}
+
+The \verb|stonormalform| procedure is already loaded.
+Write a message saying we are now analysing the next system.
+\begin{reduce}
+write "**** Example One of Monahan (2011) ****";
+\end{reduce}
+
+Execute the construction of a normal form for this system.  
+But let's restrict the general function~\(\Sigma(x)\) to the rational form $\Sigma(x):=(a_0+a_1x+a_2x^2)/(1+b_1x+b_2x^2)$. Code this form as the following (after multiplying through by the denominator).
+\begin{reduce}
+factor df;
+operator a; defindex a(down);
+operator b; defindex b(down);
+stonormalform(
+    { -tau*x(1)*(1+b(1)*x(1)+b(2)*x(1)^2)
+      -df(x(1),t)*(b(1)*x(1)+b(2)*x(1)^2)
+      +tau*y(1)*(a(0)+a(1)*x(1)+a(2)*x(1)^2) },
+    { -y(1)+w(1) },
+    {},
+    3 )$
+%end; % optionally end examples here
+\end{reduce}
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}=\ParMath{ \frac{{\rm d}\,x_{1}}{{\rm d}\,t} \eps \big(-b_{2} x_{1}^{2}-
+b_{1} x_{1}\big)+y_{1} \eps \tau  \big(a_{2} x_{1}^{2}+a_{1} x_{1}+a_{0}
+\big)+\eps \tau  \big(-b_{2} x_{1}^{3}-b_{1} x_{1}^{2}-x_{1}\big)
+}
+\\&
+\dot y_{1}=w_{1} \sigma -y_{1}
+\end{align*}
+so evaluate the results at \(\eps=1\) to compare with the modelling of \cite{Monahan2011}.
+
+\paragraph{Time dependent coordinate transform}
+\begin{align*}&
+y_{1}=\ou\big(w_{1},tt,-1\big) \sigma +Y_{1}
+\\&
+x_{1}=\ParMath{\ou\big(w_{1},tt,-1\big) \sigma  \eps \tau  \big(-a_{2} X_{1}^{2}-
+a_{1} X_{1}-a_{0}\big)+Y_{1} \eps \tau  \big(-a_{2} X_{1}^{2}-a_{1} X_{1
+}-a_{0}\big)+X_{1}
+}
+\end{align*}
+
+
+\paragraph{Result normal form DEs}
+\begin{align*}&
+\dot Y_{1}=-Y_{1}
+\\&
+\dot X_{1}=\ParMath{ w_{1} \sigma  \eps^{2} \tau ^{2} \big(a_{2} b_{2} X_{1}^{4}-a
+_{2} X_{1}^{2}+2 a_{1} b_{2} X_{1}^{3}+a_{1} b_{1} X_{1}^{2}+3 a_{0} b_{
+2} X_{1}^{2}+2 a_{0} b_{1} X_{1}+a_{0}\big)+w_{1} \sigma  \eps^{2} \tau 
+ \big(-a_{2} b_{2} X_{1}^{4}-a_{2} b_{1} X_{1}^{3}-a_{1} b_{2} X_{1}^{3}
+-a_{1} b_{1} X_{1}^{2}-a_{0} b_{2} X_{1}^{2}-a_{0} b_{1} X_{1}\big)+w_{1
+} \sigma  \eps \tau  \big(a_{2} X_{1}^{2}+a_{1} X_{1}+a_{0}\big)+\eps^{2
+} \tau  \big(b_{2}^{2} X_{1}^{5}+2 b_{2} b_{1} X_{1}^{4}+b_{2} X_{1}^{3}
++b_{1}^{2} X_{1}^{3}+b_{1} X_{1}^{2}\big)+\eps \tau  \big(-b_{2} X_{1}^{
+3}-b_{1} X_{1}^{2}-X_{1}\big)
+}
+\end{align*}
+\cite{Monahan2011} derive some of this $X$~equation.  
+The other terms here are higher order terms that become significant at finite parameter values.  
+For example, the next correction to their analysis, $w_{1}  \tau ^{2} 
+(-3 a_{4} X_{1}^{4}-2 a_{3} X_{1}^{3}-a_{2} X_{1}^{2}+a_{0})$, is probably derivable as $\tau^2(\Sigma-x\Sigma')\dot W$ (when rescaled).
+
+
+
+
+\subsubsection{Example three: several fast stable modes}
+
+\cite{Monahan2011} third considered the example
+\begin{equation*}
+\de tx=-x+\Sigma(x)\|\vec y\| \qtq{and}
+\de t{\vec y}=-\frac1\tau \vec y+\sqrt{\frac2\tau}\dot{\vec W},
+\end{equation*}
+for general smooth functions~$\Sigma(x)$, and `small' scale separation parameter~\(\tau\).
+As before, rescale time, $t=\tau t'$  so that $\de t{}=\frac1\tau\de{t'}{}$ and $\dot W=\frac1{\sqrt{\tau}}\de {t'}W$.
+Here I also cheat: they have $\|\vec y\|$ in the slow equation; but $\|\vec y\|$ is not a smooth multinomial and so my generic procedure cannot apply; instead I replace $\|\vec y\|$ with $\|\vec y\|^2$ which has the same symmetry but is multinomial.
+Then, upon the rescaling of time, and dropping dashes, the \sde\ is
+\begin{equation*}
+\de tx=-\tau x+\tau\Sigma(x)\|\vec y\|^2
+\qtq{and}
+\de t{\vec y}=- \vec y+\sigma\dot{\vec W}.
+\end{equation*}
+
+
+The \verb|stonormalform| procedure is already loaded.
+Write a message saying we are now analysing the next system.
+\begin{reduce}
+write "**** Example Three of Monahan (2011) ****";
+\end{reduce}
+
+Restrict analysis to the general quartic $\Sigma(x):=a_0+a_1x+\cdots+a_4x^4$, and so code the system as the following (the generic program automatically inserts the~$\sigma$ in the noise).
+Currently restrict to just a two component~$\vec y$ as I do not see any reason for any more, and \cite{Monahan2011} do not appear to specify.
+\begin{reduce}
+stonormalform(
+    { -tau*x(1)+tau*(y(1)^2+y(2)^2)
+      *(a(0)+a(1)*x(1)+a(2)*x(1)^2
+      +a(3)*x(1)^3+a(4)*x(1)^4) },
+    { -y(1)+w(1),
+      -y(2)+w(2) },
+    {},
+    3 )$
+%end; % optionally end examples here
+\end{reduce}
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}=\ParMath{ y_{2}^{2} \eps \tau  \big(a_{4} x_{1}^{4}+a_{3} x_{1}^{3}+a_{
+2} x_{1}^{2}+a_{1} x_{1}+a_{0}\big)+y_{1}^{2} \eps \tau  \big(a_{4} x_{1
+}^{4}+a_{3} x_{1}^{3}+a_{2} x_{1}^{2}+a_{1} x_{1}+a_{0}\big)-\eps \tau  
+x_{1}
+}
+\\&
+\dot y_{1}=w_{1} \sigma -y_{1}
+\\&
+\dot y_{2}=w_{2} \sigma -y_{2}
+\end{align*}
+in which we see~\eps\ only in the grouping \(\eps\tau\), so truncating to errors~\Ord{\eps^3} is the same as to errors~\Ord{\tau^3}.
+
+
+
+\paragraph{Time dependent coordinate transform}  
+\begin{align*}&
+y_{1}=\ou\big(w_{1},tt,-1\big) \sigma +Y_{1}
+\\&
+y_{2}=\ou\big(w_{2},tt,-1\big) \sigma +Y_{2}
+\\&
+x_{1}=\ParMath{ \ou\big(w_{2},tt,1\big) Y_{2} \sigma  \eps \tau  \big(-a_{4} X_{1}
+^{4}-a_{3} X_{1}^{3}-a_{2} X_{1}^{2}-a_{1} X_{1}-a_{0}\big)+\ou\big(w_{2
+},tt,-1\big) Y_{2} \sigma  \eps \tau  \big(-a_{4} X_{1}^{4}-a_{3} X_{1}
+^{3}-a_{2} X_{1}^{2}-a_{1} X_{1}-a_{0}\big)+\ou\big(w_{1},tt,1\big) Y_{1
+} \sigma  \eps \tau  \big(-a_{4} X_{1}^{4}-a_{3} X_{1}^{3}-a_{2} X_{1}^{
+2}-a_{1} X_{1}-a_{0}\big)+\ou\big(w_{1},tt,-1\big) Y_{1} \sigma  \eps 
+\tau  \big(-a_{4} X_{1}^{4}-a_{3} X_{1}^{3}-a_{2} X_{1}^{2}-a_{1} X_{1}-
+a_{0}\big)+Y_{2}^{2} \eps \tau  \big(-1/2 a_{4} X_{1}^{4}-1/2 a_{3} X_{1
+}^{3}-1/2 a_{2} X_{1}^{2}-1/2 a_{1} X_{1}-1/2 a_{0}\big)+Y_{1}^{2} \eps 
+\tau  \big(-1/2 a_{4} X_{1}^{4}-1/2 a_{3} X_{1}^{3}-1/2 a_{2} X_{1}^{2}-
+1/2 a_{1} X_{1}-1/2 a_{0}\big)+X_{1}
+}
+\end{align*}
+The complicated form of~\(x_1\) only reflects the transient effects of the decaying~\Yv: once \(\Yv\to0\), then \(x_1=X_1\).
+
+\paragraph{Result normal form DEs}
+\begin{align*}&
+\dot Y_{1}=-Y_{1}
+\\&
+\dot Y_{2}=-Y_{2}
+\\&
+\dot X_{1}=\ParMath{ \ou\big(w_{2},tt,-1\big) w_{2} \sigma ^{2} \eps^{2} \tau ^{2}
+ \big(-3/2 a_{4} X_{1}^{4}-a_{3} X_{1}^{3}-1/2 a_{2} X_{1}^{2}+1/2 a_{0}
+\big)+\ou\big(w_{2},tt,-1\big) w_{2} \sigma ^{2} \eps \tau  \big(a_{4} X
+_{1}^{4}+a_{3} X_{1}^{3}+a_{2} X_{1}^{2}+a_{1} X_{1}+a_{0}\big)+\ou\big(
+w_{1},tt,-1\big) w_{1} \sigma ^{2} \eps^{2} \tau ^{2} \big(-3/2 a_{4} X_
+{1}^{4}-a_{3} X_{1}^{3}-1/2 a_{2} X_{1}^{2}+1/2 a_{0}\big)+\ou\big(w_{1}
+,tt,-1\big) w_{1} \sigma ^{2} \eps \tau  \big(a_{4} X_{1}^{4}+a_{3} X_{1
+}^{3}+a_{2} X_{1}^{2}+a_{1} X_{1}+a_{0}\big)-\eps \tau  X_{1}
+}
+\end{align*}
+These show the decay of~\Yv, and that the irreducible noise-noise interactions are the only modifications to the slow decay of~\(X_1\), and hence of~\(x_1\).
+
+
+
+
+\subsubsection{Example two: irregular slow manifold}
+
+\cite{Monahan2011} second consider the example \sde{}s
+\begin{equation*}
+\de tx=x-x^3+\Sigma(x)y \qtq{and}
+\de ty=-\frac1{x\tau} y+\frac1{\sqrt\tau}\dot W,
+\end{equation*}
+for general smooth functions~$\Sigma(x)$, and `small' scale separation parameter~\(\tau\).
+Since the $y$-dynamics are exponentially unstable for negative~$x$, we restrict attention to $x>0$\,.
+Even for positive~$x$ the system is singular as $x\to0$ so the slow manifold is irregular in some sense (although `singular' in a good way in that the scale separation between fast and slow becomes infinite).
+Let's be more sophisticated in rescaling time: let's choose the new fast time~$t'$ so that $dt=x\tau\, dt'$\,; that is, $t'=\int (x\tau)^{-1}dt$ which would not be explicitly known until after a solution~$x(t')$ is found.
+I presume that the noise then transforms as $\dot W=\frac1{\sqrt{x\tau}}\de {t'}W$ (needs checking).
+Then, dropping dashes, the \sde{}s are
+\begin{equation*}
+\de tx=\tau \left[x^2-x^4+x\Sigma(x)y\right]
+\qtq{and}
+\de ty=- y+\sqrt x\dot W.
+\end{equation*}
+The $\sqrt x$ is a problem in my generic procedure as it requires multinomial systems, so transform to $x=x_1^2$ (\emph{not} the usual \(x=x_1\)) so that $2x_1dx_1=dx$\,.
+Then the \sde\ system becomes
+\begin{equation*}
+\de t{x_1}=\frac12\tau \left[x_1^3-x_1^7+x_1\Sigma(x_1^2)y\right]
+\qtq{and}
+\de ty=- y+x_1\dot W.
+\end{equation*}
+
+The \verb|stonormalform| procedure is already loaded.
+Write a message saying we are now analysing the next system.
+\begin{reduce}
+write "**** Example Two of Monahan (2011) ****";
+\end{reduce}
+
+Restricting to the general linear $\Sigma(x):=a_0+a_1x$, code the \sde\ system as the following (remember $\verb|x(1)|=x_1=\sqrt x$).
+\begin{reduce}
+stonormalform(
+    { 1/2*tau*( x(1)^3 -x(1)^7
+      +x(1)*(a(0)+a(1)*x(1)^2)*y(1) ) },
+    { -y(1) +x(1)*w(1) },
+    {},
+    3 )$
+%end; % optionally end examples here
+\end{reduce}
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}=y_{1} \eps \tau  \big(1/2 a_{1} x_{1}^{3}+1/2 a_{0} x_{1}
+\big)+\eps \tau  \big(-1/2 x_{1}^{7}+1/2 x_{1}^{3}\big)
+\\&
+\dot y_{1}=w_{1} \sigma  x_{1}-y_{1}
+\end{align*}
+Again, usefully, the artificial~\eps\ only occurs in the combination~\(\eps\tau\) and so just counts the number of factors of~\(\tau\) in each term.  That is, errors~\Ord{\eps^3} is the same as errors~\Ord{\tau^3}.
+
+\paragraph{Time dependent coordinate transform}  Straightforwardly
+\begin{align*}&
+y_{1}=\ParMath{ \ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) \sigma  \eps \tau  
+\big(1/2 X_{1}^{7}-1/2 X_{1}^{3}\big)+\ou\big(w_{1},tt,-1\big) \sigma  X
+_{1}+Y_{1}
+}
+\\&
+x_{1}=\ParMath{ \ou\big(w_{1},tt,-1\big) \sigma  \eps \tau  \big(-1/2 a_{1} X_{1}
+^{4}-1/2 a_{0} X_{1}^{2}\big)+Y_{1} \eps \tau  \big(-1/2 a_{1} X_{1}^{3}
+-1/2 a_{0} X_{1}\big)+X_{1}
+}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+As expected, \(Y_1=0\) is a stochastic slow manifold, that is almost surely emergent in some domain.
+\begin{align*}&
+\dot Y_{1}=\ParMath{ \ou\big(w_{1},tt,1\big) w_{1} Y_{1} \sigma ^{2} \eps^{2} 
+\tau ^{2} \big(1/4 a_{1}^{2} X_{1}^{6}+1/2 a_{1} a_{0} X_{1}^{4}+1/4 a_{
+0}^{2} X_{1}^{2}\big)+\ou\big(w_{1},tt,-1\big) w_{1} Y_{1} \sigma ^{2} 
+\eps^{2} \tau ^{2} \big(3/4 a_{1}^{2} X_{1}^{6}+a_{1} a_{0} X_{1}^{4}+1/
+4 a_{0}^{2} X_{1}^{2}\big)+w_{1} Y_{1} \sigma  \eps^{2} \tau ^{2} \big(-
+a_{1} X_{1}^{9}-3/2 a_{0} X_{1}^{7}+1/2 a_{0} X_{1}^{3}\big)+w_{1} Y_{1}
+ \sigma  \eps \tau  \big(-1/2 a_{1} X_{1}^{3}-1/2 a_{0} X_{1}\big)-Y_{1}
+ }
+\\&
+\dot X_{1}=\ParMath{ \ou\big(w_{1},tt,-1\big) w_{1} \sigma ^{2} \eps^{2} \tau ^{2}
+ \big(-1/4 a_{1}^{2} X_{1}^{7}-1/2 a_{1} a_{0} X_{1}^{5}-1/4 a_{0}^{2} X
+_{1}^{3}\big)+w_{1} \sigma  \eps^{2} \tau ^{2} \big(a_{1} X_{1}^{10}+3/2
+ a_{0} X_{1}^{8}-1/2 a_{0} X_{1}^{4}\big)+w_{1} \sigma  \eps \tau  \big(
+1/2 a_{1} X_{1}^{4}+1/2 a_{0} X_{1}^{2}\big)+\eps \tau  \big(-1/2 X_{1}
+^{7}+1/2 X_{1}^{3}\big)
+}
+\end{align*}
+Using just the leading order terms for~\(\dot X_1\), the terms linear in~$\tau$, and recalling $X_1\approx x_1=\sqrt x$\,, the last \sde\ gives the model
+\begin{equation*}
+\de{t'}x\approx \tau\left[ x^2-x^4+x^{3/2}\Sigma(x)\sigma \de{t'} W\right].
+\end{equation*}
+But recall that $dt'=dt/(x\tau)$ (although one should be more careful as $X_1\approx \sqrt x$\,, not exact equality) and similarly $\de{t'}W=\sqrt{x\tau}\dot W$ so that this model becomes
+\begin{equation*}
+\de{t}x\approx x-x^3+\sqrt{\tau}x \Sigma(x)\sigma \de{t} W\,.
+\end{equation*}
+This agrees with the Stratonovich part of~(A28) by \cite{Monahan2011}.
+But again, the above derivation has the systematic higher order corrections that are needed for finite scale separation~$\tau$.
+
+
+
+\subsubsection{Idealised Stommel-like model of meridional overturning circulation}
+
+\cite{Monahan2011} also analyse the Idealised Stommel-like model, for small scale-separation parameter~\(\tau\),
+\begin{align*}
+&\de tx=\mu-|y-x|x+\sigma_A\dot W_1\,,
+\\&\de ty=+\frac1\tau(1-y)-|y-x|y+\sqrt{\frac2\tau}\sigma_M\dot W_2\,.
+\end{align*}
+The mod-functions do not fit into my generic computer algebra so replace them with squares to preserve the symmetry.
+As before, rescale time, $t=\tau t'$  so that $\de t{}=\frac1\tau\de{t'}{}$ and $\dot W_j=\frac1{\sqrt{\tau}}\de {t'}{W_j}$.
+Since for small~$\tau$, the fast variable~$y$ is strongly attracted to one, change the reference point for~$y$ by setting $y=1+y_1(t)$.
+Then the \sde{}s becomes akin to
+\begin{align*}
+&\de {t'}x=\epsilon^2\left[\mu-(1+y_1-x)^2x\right]+\epsilon\sigma_A\de{t'}{W_1}\,,
+\\&\de {t'}{y_1}=-y_1-\epsilon^2(1+y_1-x)^2(1+y_1)+\sqrt{2}\sigma_M\de{t'}{W_2}\,.
+\end{align*}
+
+The \verb|stonormalform| procedure is already loaded.
+Write a message saying we are now analysing the next system.
+\begin{reduce}
+write "**** Stommel-like model of Monahan (2011) ****";
+factor rho;
+\end{reduce}
+
+Let $\rho:=\sigma_A/(\sqrt2\sigma_M)$\,, use the inbuilt $\sigma:=\sqrt2\sigma_M$\,, and invoke \verb|small| to correctly count the number of small~$\sqrt\tau$s in the analysis.
+Code the above dynamics as the following.
+\begin{reduce}
+stonormalform(
+    { small*tau*(mu-(1+y(1)-x(1))^2*x(1))
+      +small*sqrt(tau)*rho*w(1) },
+    { -y(1)-small*tau*(1+y(1)-x(1))^2*(1+y(1))+w(2) },
+    {},
+    4 )$
+end; % finish here if not before
+\end{reduce}
+
+
+The procedure reports that it analyses the following family, an expended version of the prescribed system,
+\begin{align*}&
+\dot x_{1}=\ParMath{ \sqrt {\tau } w_{1} \rho  \sigma  \eps-y_{1}^{2} \eps^{2} 
+\tau  x_{1}+y_{1} \eps^{2} \tau  \big(2 x_{1}^{2}-2 x_{1}\big)+\eps^{2} 
+\tau  \big(-x_{1}^{3}+2 x_{1}^{2}-x_{1}+\mu \big)
+}
+\\&
+\dot y_{1}=\ParMath{ w_{2} \sigma -y_{1}^{3} \eps^{2} \tau +y_{1}^{2} \eps^{2} 
+\tau  \big(2 x_{1}-3\big)+y_{1} \eps^{2} \tau  \big(-x_{1}^{2}+4 x_{1}-3
+\big)-y_{1}+\eps^{2} \tau  \big(-x_{1}^{2}+2 x_{1}-1\big)
+}
+\end{align*}
+Again the artificial~\eps\ only occurs in the combination~\(\eps^2\tau\) and so just counts the number of factors of~\(\tau\) in each term.  That is, errors~\Ord{\eps^4} is the same as errors~\Ord{\tau^2}.
+
+\paragraph{Time dependent coordinate transform}  Straightforward but complicated in detail:
+\begin{align*}&
+y_{1}=\ParMath{ \ou\big(\ou\big(w_{2},tt,-1\big),tt,-1\big) \sigma  \eps^{2} \tau 
+ \big(-X_{1}^{2}+4 X_{1}-3\big)+3/2 \ou\big(w_{2},tt,1\big) Y_{1}^{2} 
+\sigma  \eps^{2} \tau +3/2 \ou\big(w_{2},tt,-1\big) Y_{1}^{2} \sigma  
+\eps^{2} \tau +\ou\big(w_{2},tt,-1\big) Y_{1} \sigma  \eps^{2} \tau  
+\big(-4 X_{1}+6\big)+\ou\big(w_{2},tt,-1\big) \sigma +1/2 Y_{1}^{3} \eps
+^{2} \tau +Y_{1}^{2} \eps^{2} \tau  \big(-2 X_{1}+3\big)+Y_{1}+\eps^{2} 
+\tau  \big(-X_{1}^{2}+2 X_{1}-1\big)
+}
+\\&
+x_{1}=\ParMath{ \ou\big(w_{2},tt,1\big) Y_{1} \sigma  \eps^{2} \tau  X_{1}+\ou
+\big(w_{2},tt,-1\big) Y_{1} \sigma  \eps^{2} \tau  X_{1}+\ou\big(w_{2},
+tt,-1\big) \sigma  \eps^{2} \tau  \big(-2 X_{1}^{2}+2 X_{1}\big)+1/2 Y_{
+1}^{2} \eps^{2} \tau  X_{1}+Y_{1} \eps^{2} \tau  \big(-2 X_{1}^{2}+2 X_{
+1}\big)+X_{1}
+}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+As expected, \(Y_1=0\) is a stochastic slow manifold which is almost surely emergent:
+\begin{align*}&
+\dot Y_{1}=\ParMath{ -3 \ou\big(w_{2},tt,-1\big) w_{2} Y_{1} \sigma ^{2} \eps^{2} 
+\tau +4 \sqrt {\tau } \ou\big(w_{2},tt,-1\big) w_{1} Y_{1} \rho  \sigma 
+^{2} \eps^{3} \tau +w_{2} Y_{1} \sigma  \eps^{2} \tau  \big(4 X_{1}-6
+\big)+Y_{1} \eps^{2} \tau  \big(-X_{1}^{2}+4 X_{1}-3\big)-Y_{1}
+}
+\\&
+\dot X_{1}=\ParMath{ -\ou\big(w_{2},tt,-1\big) w_{2} \sigma ^{2} \eps^{2} \tau  X_
+{1}+\ou\big(w_{2},tt,-1\big) w_{1} \rho  \sigma ^{2} \eps^{3} \tau^{3/2}  
+\big(4 X_{1}-2\big)+w_{2} \sigma  \eps^{2} 
+\tau  \big(2 X_{1}^{2}-2 X_{1}\big)+\sqrt {\tau } w_{1} \rho  \sigma  
+\eps+\eps^{2} \tau  \big(-X_{1}^{3}+2 X_{1}^{2}-X_{1}+\mu \big)
+}
+\end{align*}
+Deterministically, this model has multiple equilibria for small~$\mu$, but only one equilibria for $\mu>4/27$\,, at finite amplitude.
+The noise~$\dot W_1$ causes transitions between such multiple equilibria, and the multiplicative noise~$\dot W_2$ contributes as well.
+But the same order of smallness is the \emph{first} term in the $X_1$~\sde\ above which is a quadratic noise-noise interaction that has a mean drift effect which should enhance the stability of the small~$x$ equilibrium.
+

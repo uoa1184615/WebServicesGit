@@ -1,0 +1,193 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{majdaTriad}: Majda's two triad models} 
+\label{majdaTriad}
+
+
+\cite{Majda02} investigated averaging in two 3D \sde\ systems.
+Let's compare with their stochastic normal form.
+
+
+
+\subsubsection{Multiplicative triad model}
+
+The multiplicative triad model of \cite{Majda02} consists of three modes, $v_1$, $v_2$~and~$v_3$.
+These evolve in time according to
+\begin{equation*}
+	\frac{dv_1}{dt}=b_1v_2v_3\,,\quad
+	\frac{dv_2}{dt}=b_2v_1v_3\,,\quad
+	\frac{dv_3}{dt}=-v_3+b_3v_1v_2+\sigma\dot W,
+	\label{eq:triad}
+\end{equation*}
+where $b_j$~and~$\sigma$ are some constants, and the noise forces the third mode.
+Here I have already scaled the equations so that the rate of decay of the third mode is one.
+Thus on long time scales we expect the third mode to be essentially negligible and the system to be modelled by the relatively slow evolution of the first two modes.
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+The system uses parameters~\(b_j\) so define
+\begin{reduce}
+operator b; defindex b(down);
+\end{reduce}
+Execute the construction of a normal form for this system using \(x_j=v_j\) and \(y_1=v_3\)\,.
+\begin{reduce}
+factor yy;
+stonormalform(
+    { b(1)*x(2)*y(1),
+      b(2)*x(1)*y(1) },
+    { -y(1)+b(3)*x(1)*x(2)+w(3) },
+    {},
+    4 )$
+%end; % optionally end examples here
+\end{reduce}
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}= \eps b_{1} x_{2}y_{1}
+&&
+\dot x_{2}= \eps b_{2} x_{1}y_{1}
+&&
+\dot y_{1}=w_{3} \sigma +\eps b_{3} x_{2} x_{1} -y_{1}
+\end{align*}
+Here, \eps\ counts the order of nonlinearity so that errors~\Ord{\eps^4} are errors~\Ord{|\vv|^5+\sigma^5} (due to the noise driving fluctuations of size~\(\sigma\)).
+
+
+
+\paragraph{Time dependent coordinate transform}  Straightforwardly,
+\begin{align*}&
+y_{1}=\ParMath{\ou\big(\ou\big(w_{3},tt,-1\big),tt,-1\big) \sigma  \eps^{2} \big(
+-b_{3} b_{2} X_{1}^{2}-b_{3} b_{1} X_{2}^{2}\big)+\ou\big(w_{3},tt,-1
+\big) \sigma  \eps^{2} \big(-b_{3} b_{2} X_{1}^{2}-b_{3} b_{1} X_{2}^{2}
+\big)+\ou\big(w_{3},tt,-1\big) \sigma +Y_{1}+\eps b_{3} X_{2} X_{1}
+}
+\\&
+x_{1}=\ParMath{ \ou\big(w_{3},tt,-1\big) Y_{1} \sigma  \eps^{2} b_{2} b_{1} X_{1}-
+\ou\big(w_{3},tt,-1\big) \sigma  \eps b_{1} X_{2}+1/2 Y_{1}^{2} \eps^{2}
+ b_{2} b_{1} X_{1}-Y_{1} \eps b_{1} X_{2}+X_{1}
+}
+\\&
+x_{2}=\ParMath{ \ou\big(w_{3},tt,-1\big) Y_{1} \sigma  \eps^{2} b_{2} b_{1} X_{2}-
+\ou\big(w_{3},tt,-1\big) \sigma  \eps b_{2} X_{1}+1/2 Y_{1}^{2} \eps^{2}
+ b_{2} b_{1} X_{2}-Y_{1} \eps b_{2} X_{1}+X_{2}
+ }
+\end{align*}
+
+\paragraph{Result normal form DEs}
+As expected, \(Y_1=0\) is the emergent (almost always) stochastic slow manifold.
+\begin{align*}&
+\dot Y_{1}=\ParMath{ 4 w_{3} Y_{1} \sigma  \eps^{3} b_{3} b_{2} b_{1} X_{2} X_{1}+
+Y_{1} \eps^{2} \big(-b_{3} b_{2} X_{1}^{2}-b_{3} b_{1} X_{2}^{2}\big)-Y_
+{1}
+}
+\\&
+\dot X_{1}=\ParMath{ w_{3} \sigma  \eps^{3} \big(-2 b_{3} b_{2} b_{1} X_{2} X_{1}
+^{2}-2 b_{3} b_{1}^{2} X_{2}^{3}\big)+w_{3} \sigma  \eps b_{1} X_{2}+
+\eps^{2} b_{3} b_{1} X_{2}^{2} X_{1}
+}
+\\&
+\dot X_{2}=\ParMath{ w_{3} \sigma  \eps^{3} \big(-2 b_{3} b_{2}^{2} X_{1}^{3}-2 b_
+{3} b_{2} b_{1} X_{2}^{2} X_{1}\big)+w_{3} \sigma  \eps b_{2} X_{1}+\eps
+^{2} b_{3} b_{2} X_{2} X_{1}^{2}
+}
+\end{align*}
+\cite{Majda02} predicts, their equation~(52), the two leading order terms in the deterministic part and the linear noise part.
+I suspect their first term in each equation is an Ito version of my Stratonovich modelling.
+All higher order terms are missed by their averaging, but easily constructed here by increasing the argument~\(4\) to the procedure.
+
+
+
+
+\subsubsection{Additive triad model}
+
+The additive triad model of \cite{Majda02} consists of three modes, 
+$v_1$, $v_2$~and~$v_3$, as before.
+However, these now evolve in time according to
+\begin{align*}&
+	\frac{dv_1}{dt}=b_1v_2v_3\,,
+	\\&
+	\frac{dv_2}{dt}=-v_2+b_2v_1v_3+\sigma_2\dot W_2\,,
+	\\&
+	\frac{dv_3}{dt}=-v_3+b_3v_1v_2+\sigma_3\dot W_3\,,
+\end{align*}
+where $b_j$~and~$\sigma_j$ are some constants, and there is independent stochastic forcing of the second and third modes.
+Here I have already scaled the equations so that the rate of decay of \emph{both} the second and third mode is one.\footnote{In contrast, \cite{Majda02} set the two modes to have different decay rates.
+Do not expect much difference in using the same decay rate, it is just more convenient that the memory convolutions are then identical for the two modes rather than being different.
+Having the decay rates the same is also closer to my expected application to spatial problems.} Thus on long time scales we expect the second and third modes to be essentially negligible and the system to be modelled by the relatively slow evolution of the first mode.
+This section constructs the stochastic normal form of its centre manifold model as the basis for a model over long time scales with new noise processes.
+
+The procedure \verb|stonormalform| is already loaded.
+Write a message saying we are now analysing the next system.
+\begin{reduce}
+write "**** Additive Triad system of Majda (2002) ****";
+\end{reduce}
+Execute the construction of a normal form for this system using \(x_1=v_1\)\,, \(y_j=v_{j+1}\)\,, and \(b_{j1}\sigma=\sigma_j\)\,.
+\begin{reduce}
+stonormalform(
+    { b(1)*y(2)*y(1) },
+    { -y(1)+b(2)*x(1)*y(2)+b(21)*w(2),
+      -y(2)+b(3)*x(1)*y(1)+b(31)*w(3) },
+    {},
+    3 )$
+end; % finish here if not before
+\end{reduce}
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}=\eps b_{1} y_{2} y_{1}
+\\&
+\dot y_{1}=\sigma  b_{21}w_{2} +\eps b_{2} x_{1} y_{2}-y_{1}
+\\&
+\dot y_{2}=\sigma  b_{31}w_{3} +\eps b_{3} x_{1} y_{1}-y_{2}
+\end{align*}
+Here, \eps\ counts the order of nonlinearity so that the errors~\Ord{\eps^3} are errors~\Ord{|\vv|^4+\sigma^4} (due to the noise driving fluctuations of size~\(\sigma\)).
+
+
+
+\paragraph{Time dependent coordinate transform}  Straightforwardly,
+\begin{align*}&
+y_{1}=Y_{1}+\sigma  \eps b_{31} b_{2} \ou\big(\ou\big(w_{3},tt,-1\big),
+tt,-1\big) X_{1}+\sigma  b_{21} \ou\big(w_{2},tt,-1\big)
+\\&
+y_{2}=Y_{2}+\sigma  \eps b_{21} b_{3} \ou\big(\ou\big(w_{2},tt,-1\big),
+tt,-1\big) X_{1}+\sigma  b_{31} \ou\big(w_{3},tt,-1\big)
+\\&
+x_{1}=\ParMath{ -1/2 Y_{2} Y_{1} \eps b_{1}+Y_{2} \sigma  \eps \big(-1/2 b_{21} b_
+{1} \ou\big(w_{2},tt,1\big)-1/2 b_{21} b_{1} \ou\big(w_{2},tt,-1\big)
+\big)+Y_{1} \sigma  \eps \big(-1/2 b_{31} b_{1} \ou\big(w_{3},tt,1\big)-
+1/2 b_{31} b_{1} \ou\big(w_{3},tt,-1\big)\big)+X_{1}
+}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+As expected, \(Y_1=Y_2=0\) is the emergent (almost always) stochastic slow manifold.  Unusually, on this slow manifold \(x_1=X_1\) exactly (to at least the next few orders).
+\begin{align*}&
+\dot Y_{1}=\ParMath{ Y_{2} \sigma ^{2} \eps^{2} \big(-1/2 b_{31} b_{21} b_{2} b_{1
+} \ou\big(\ou\big(w_{3},tt,-1\big),tt,-1\big) w_{2}-1/2 b_{31} b_{21} b_
+{2} b_{1} \ou\big(w_{3},tt,-1\big) w_{2}-1/2 b_{31} b_{21} b_{2} b_{1} 
+\ou\big(w_{2},tt,-1\big) w_{3}\big)+Y_{2} \eps b_{2} X_{1}+Y_{1} \sigma 
+^{2} \eps^{2} \big(-1/2 b_{31}^{2} b_{2} b_{1} \ou\big(\ou\big(w_{3},tt,
+-1\big),tt,-1\big) w_{3}-1/2 b_{31}^{2} b_{2} b_{1} \ou\big(w_{3},tt,-1
+\big) w_{3}\big)-Y_{1}
+}
+\\&
+\dot Y_{2}=\ParMath{ Y_{2} \sigma ^{2} \eps^{2} \big(-1/2 b_{21}^{2} b_{3} b_{1} 
+\ou\big(\ou\big(w_{2},tt,-1\big),tt,-1\big) w_{2}-1/2 b_{21}^{2} b_{3} b
+_{1} \ou\big(w_{2},tt,-1\big) w_{2}\big)-Y_{2}+Y_{1} \sigma ^{2} \eps^{2
+} \big(-1/2 b_{31} b_{21} b_{3} b_{1} \ou\big(\ou\big(w_{2},tt,-1\big),
+tt,-1\big) w_{3}-1/2 b_{31} b_{21} b_{3} b_{1} \ou\big(w_{3},tt,-1\big) 
+w_{2}-1/2 b_{31} b_{21} b_{3} b_{1} \ou\big(w_{2},tt,-1\big) w_{3}\big)+
+Y_{1} \eps b_{3} X_{1}
+}
+\\&
+\dot X_{1}=\ParMath{ \sigma ^{2} \eps^{2} \big(1/2 b_{31}^{2} b_{2} b_{1} \ou\big(
+\ou\big(w_{3},tt,-1\big),tt,-1\big) w_{3} X_{1}+1/2 b_{31}^{2} b_{2} b_{
+1} \ou\big(w_{3},tt,-1\big) w_{3} X_{1}+1/2 b_{21}^{2} b_{3} b_{1} \ou
+\big(\ou\big(w_{2},tt,-1\big),tt,-1\big) w_{2} X_{1}+1/2 b_{21}^{2} b_{3
+} b_{1} \ou\big(w_{2},tt,-1\big) w_{2} X_{1}\big)+\sigma ^{2} \eps \big(
+1/2 b_{31} b_{21} b_{1} \ou\big(w_{3},tt,-1\big) w_{2}+1/2 b_{31} b_{21}
+ b_{1} \ou\big(w_{2},tt,-1\big) w_{3}\big)
+}
+\end{align*}
+The only terms in the model for~\(\dot X_1\) are the quadratic noise-noise interaction terms. \cite{Majda02} recognise the last, $\sigma^2$~term, but not the first, $X_1\sigma^2$~term.
+They represent the last as a mean drift and independent noise (the mean drift comes from the Ito representation of the above Stratonovich noise-noise interaction).
