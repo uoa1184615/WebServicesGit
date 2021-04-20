@@ -1,0 +1,130 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{offdiagonal}: Levy area contraction: off-diagonal example} 
+\label{offdiagonal}
+
+\cite{Pavliotis07} assert the following system of five coupled \sde{}s are interesting for various parameters~\(a\) and for small~\(\epsilon\).
+\begin{align*}&
+dx_1=\epsilon y_1\,dt \,,\\&
+dx_2=\epsilon y_2\,dt \,,\\&
+dx_3=\epsilon (x_1y_2-x_2y_1)dt \,,\\&
+dy_1=(-y_1-a y_2)dt +dW_1 \,,\\&
+dy_2=(+a y_1-y_2)dt +dW_2 \,.
+\end{align*}
+This stochastic system has two noise sources.
+We treat~$W_i(t,\omega)$ as Stratonovich Wiener processes.
+Use \verb|x(i)| to denote variable~$x_i$, \verb|y(i)| to denote variable~$y_i$, and \verb|w(i)| to denote noise~$dW_i/dt$.
+
+
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+It is convenient to factor written results on the two given parameters~\(\epsilon,a\):
+\begin{reduce}
+factor epsilon,a;
+\end{reduce}
+Execute the construction of a normal form for this system.
+A coding is to specify the system as given: specify the slow \sde{}s via a three component list; and the fast stable \sde{}s via a two component list.
+\begin{reduce}
+stonormalform(
+    {epsilon*y(1),
+     epsilon*y(2),
+     epsilon*(x(1)*y(2)-x(2)*y(1))},
+    {-y(1)-a*y(2)+w(1),
+     -y(2)+a*y(1)+w(2)},
+    {},
+    4)$
+end;
+\end{reduce}
+
+Now the approach can only analyse systems which are linearly diagonalised, but this system has two off-diagonal terms in the \yv-\sde{}s (terms that cause oscillations in~\yv\ with frequency~\(a\) as \yv~decays in magnitude like~\(e^{-t}\)).  In order to make some sort of progress, the procedure is brutal with such off-diagonal terms.  \emph{Anything linear and off-diagonal is multiplied by the parameter~\texttt{small} and so is treated as asymptotically small.}  When it does so, it gives the warning message
+\begin{verbatim}
+***** Warning ****
+Off diagonal linear terms in y- or z- equations 
+assumed small.  Answers are rubbish if not 
+asymptotically appropriate. 
+\end{verbatim}  
+As the message says, the results may consequently be rubbish. 
+
+Here then, the procedure analyses the following system which reduce to the given one for \(\eps=1\)\,:
+\begin{align*}&
+\dot x_{1}=\epsilon  \eps y_{1}
+\\&
+\dot x_{2}=\epsilon  \eps y_{2}
+\\&
+\dot x_{3}=\epsilon  \eps \big(-x_{2} y_{1}+x_{1} y_{2}\big)
+\\&
+\dot y_{1}=-a \eps y_{2}+\sigma  w_{1}-y_{1}
+\\&
+\dot y_{2}=a \eps y_{1}+\sigma  w_{2}-y_{2}
+\end{align*}
+That is, the code treats the frequency parameter~\(a\) as small, and so the results are appropriate only for small~\(a\), as well as only for small~\(\epsilon\).
+
+If one really needs to analyse non-small~\(a\), then more sophisticated code has to be developed.
+
+
+
+\paragraph{Time dependent coordinate transform}
+This transform is quite complicated, due to the noise, and involve fast-time future and history integrals. 
+\begin{align*}&
+y_{1}=\ParMath{-a^{2} \sigma  \eps^{2} \ou\big(\ou\big(\ou\big(w_{1},tt,-1\big),
+tt,-1\big),tt,-1\big)-a \sigma  \eps \ou\big(\ou\big(w_{2},tt,-1\big),tt
+,-1\big)+\sigma  \ou\big(w_{1},tt,-1\big)+Y_{1}
+}\\&
+y_{2}=\ParMath{-a^{2} \sigma  \eps^{2} \ou\big(\ou\big(\ou\big(w_{2},tt,-1\big),
+tt,-1\big),tt,-1\big)+a \sigma  \eps \ou\big(\ou\big(w_{1},tt,-1\big),tt
+,-1\big)+\sigma  \ou\big(w_{2},tt,-1\big)+Y_{2}
+}\\&
+x_{1}=\ParMath{a \epsilon  \sigma  \eps^{2} \big(\ou\big(\ou\big(w_{2},tt,-1\big)
+,tt,-1\big)+\ou\big(w_{2},tt,-1\big)\big)+a \epsilon  \eps^{2} Y_{2}-
+\epsilon  \sigma  \eps \ou\big(w_{1},tt,-1\big)-\epsilon  \eps Y_{1}+X_{
+1}
+}\\&
+x_{2}=\ParMath{a \epsilon  \sigma  \eps^{2} \big(-\ou\big(\ou\big(w_{1},tt,-1
+\big),tt,-1\big)-\ou\big(w_{1},tt,-1\big)\big)-a \epsilon  \eps^{2} Y_{1
+}-\epsilon  \sigma  \eps \ou\big(w_{2},tt,-1\big)-\epsilon  \eps Y_{2}+X
+_{2}
+}\\&
+x_{3}=\ParMath{a \epsilon  \sigma  \eps^{2} \big(-\ou\big(\ou\big(w_{2},tt,-1
+\big),tt,-1\big) X_{2}-\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) X_{1}
+-\ou\big(w_{2},tt,-1\big) X_{2}-\ou\big(w_{1},tt,-1\big) X_{1}\big)+a 
+\epsilon  \eps^{2} \big(-X_{2} Y_{2}-X_{1} Y_{1}\big)+\epsilon ^{2} 
+\sigma  \eps^{2} \big(\ou\big(w_{2},tt,1\big) Y_{1}-\ou\big(w_{1},tt,1
+\big) Y_{2}\big)+\epsilon  \sigma  \eps \big(-\ou\big(w_{2},tt,-1\big) X
+_{1}+\ou\big(w_{1},tt,-1\big) X_{2}\big)+\epsilon  \eps \big(X_{2} Y_{1}
+-X_{1} Y_{2}\big)+X_{3}
+}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+\begin{align*}&
+\dot Y_{1}=-a \eps Y_{2}-Y_{1}
+\\&
+\dot Y_{2}=a \eps Y_{1}-Y_{2}
+\\&
+\dot X_{1}=\ParMath{-a^{2} \epsilon  \sigma  \eps^{3} w_{1}-a \epsilon  \sigma  
+\eps^{2} w_{2}+\epsilon  \sigma  \eps w_{1}
+}
+\\&
+\dot X_{2}=\ParMath{-a^{2} \epsilon  \sigma  \eps^{3} w_{2}+a \epsilon  \sigma  
+\eps^{2} w_{1}+\epsilon  \sigma  \eps w_{2}
+}
+\\&
+\dot X_{3}=\ParMath{a^{2} \epsilon  \sigma  \eps^{3} \big(-w_{2} X_{1}+w_{1} X_{2
+}\big)+a \epsilon ^{2} \sigma ^{2} \eps^{3} \big(\ou\big(\ou\big(w_{2},
+tt,-1\big),tt,-1\big) w_{2}+\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) 
+w_{1}+\ou\big(w_{2},tt,-1\big) w_{2}+\ou\big(w_{1},tt,-1\big) w_{1}\big)
++a \epsilon  \sigma  \eps^{2} \big(w_{2} X_{2}+w_{1} X_{1}\big)+
+\epsilon ^{2} \sigma ^{2} \eps^{2} \big(\ou\big(w_{2},tt,-1\big) w_{1}-
+\ou\big(w_{1},tt,-1\big) w_{2}\big)+\epsilon  \sigma  \eps \big(w_{2} X_
+{1}-w_{1} X_{2}\big)
+}
+\end{align*}
+\begin{itemize}
+\item As expected, \(\Yv=0\) is the stochastic slow manifold, and is exponentially attractive (almost always) in some domain about the origin.
+\item The slow~\Xv\ evolution is independent of~\Yv: \(X_1,X_2\)~undergo a correlated `slow' random walk; whereas~\(X_3\) is dominantly some multiplicative random walk.
+\item The time-dependent coordinate transform maps these predictions back into the \(\xv,\yv\)-space.
+\end{itemize}
+
+

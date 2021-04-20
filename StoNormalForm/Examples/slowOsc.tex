@@ -1,0 +1,77 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{slowOsc}: Radek's slow oscillation with fast noise} 
+\label{slowOsc}
+
+Consider Radek's system
+\begin{displaymath}
+\dot x=-\epsilon xz\,,\quad
+ \dot y=+\epsilon yz \qtq{and} 
+ \dot z=-(z-1)+\sigma w(t)\,.
+\end{displaymath}
+In this linear system, \(x,y\)~oscillate with `frequency'~\(\epsilon z\).  But~\(z(t)\) is an Ornstein--Uhlenbeck process with mean one.
+What are \text{the dynamics?}
+
+Transform to our standard form via
+\begin{displaymath}
+x=x_1 \,,\quad
+y=x_2 \qtq{and}
+z=1+y_1\,.
+\end{displaymath}
+Then start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+Execute the construction of a normal form for this system.
+\begin{reduce}
+factor x;
+stonormalform(
+    { -x(2)*(1+y(1)),
+      x(1)*(1+y(1)) },
+    { -y(1)+w(1) },
+    {},
+    4 )$
+end;
+\end{reduce}
+
+With the above input the procedure analyses the following system:
+\begin{align*}&
+\dot x_{1}=x_{2} \eps \big(-y_{1}-1\big)
+\\&
+\dot x_{2}=x_{1} \eps \big(y_{1}+1\big)
+\\&
+\dot y_{1}=\sigma  w_{1}-y_{1}
+\end{align*}
+This is precisely the original system, but with variables changed as above, and with parameter \(\eps=\epsilon\) (here we use the procedure's multiplication by~\(\eps\) to incorporate Radek's~\(\epsilon\)).
+
+\paragraph{Time dependent coordinate transform}
+\begin{align*}&
+y_{1}=\sigma  \ou\big(w_{1},tt,-1\big)+Y_{1}
+\\&
+x_{1}=\ParMath{-\sigma  \eps^{2} \ou\big(w_{1},tt,-1\big) X_{1} Y_{1}+\sigma  
+\eps \ou\big(w_{1},tt,-1\big) X_{2}-1/2 \eps^{2} X_{1} Y_{1}^{2}+\eps X_
+{2} Y_{1}+X_{1}
+}
+\\&
+x_{2}=\ParMath{-\sigma  \eps^{2} \ou\big(w_{1},tt,-1\big) X_{2} Y_{1}-\sigma  
+\eps \ou\big(w_{1},tt,-1\big) X_{1}-1/2 \eps^{2} X_{2} Y_{1}^{2}-\eps X_
+{1} Y_{1}+X_{2}
+}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+In such linear systems, the following normal form is straightforward.
+\begin{align*}&
+\dot Y_{1}=-Y_{1}
+\\&
+\dot X_{1}=-\sigma  \eps w_{1} X_{2}-\eps X_{2}
+\\&
+\dot X_{2}=\sigma  \eps w_{1} X_{1}+\eps X_{1}
+\end{align*}
+\begin{itemize}
+\item As expected, \(Y_1=0\) is the emergent stochastic slow manifold.
+\item The slow~\Xv\ evolution clearly oscillates in~$(X_1,X_2)$, \(X_j\propto e^{i\theta}\), with phase angle $\theta=\eps (t+\sigma W(t,\omega))$, recalling \(W=\int w\,dt\)\,.  This phase grows linearly with a superposed random walk.
+\item The time-dependent coordinate transform maps these predictions back into the \(\xv,y_1\)-plane, and thence to the original \(xyz\)-space.
+\item In this system, higher-order terms in~\(\eps\) only affect the coordinate transform, they do not change the evolution of~\Xv.
+\end{itemize}
+
+

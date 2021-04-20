@@ -1,0 +1,24 @@
+\begin{thebibliography}{xx}
+
+\harvarditem{Fateman}{2003}{Fateman2002}
+Fateman, R.  \harvardyearleft 2003\harvardyearright , `Comparing the speed of
+  programs for sparse polynomial multiplication', {\em ACM SIGSAM Bulletin}
+  {\bf 37}(1),~4--15.
+\newline\harvardurl{http://www.cs.berkeley.edu/~fateman/papers/fastmult.pdf}
+
+\harvarditem{Monahan \harvardand\ Culina}{2011}{Monahan2011}
+Monahan, A.~H. \harvardand\ Culina, J.  \harvardyearleft 2011\harvardyearright
+  , `Stochastic averaging of idealized climate models', {\em Journal of
+  Climate} {\bf 24}(12),~3068--3088.
+
+\harvarditem{Pavliotis \harvardand\ Stuart}{2008}{Pavliotis07}
+Pavliotis, G.~A. \harvardand\ Stuart, A.~M.  \harvardyearleft
+  2008\harvardyearright , {\em Multiscale methods: averaging and
+  homogenization}, Vol.~53 of {\em Texts in Applied Mathematics}, Springer.
+
+\harvarditem[Sun et~al.]{Sun, Kan \harvardand\ Duan}{2011}{Sun2011}
+Sun, X., Kan, X. \harvardand\ Duan, J.  \harvardyearleft 2011\harvardyearright
+  , Approximation of invariant foliations for stochastic dynamical systems,
+  Technical report, Illinois Institute of Technology.
+
+\end{thebibliography}

@@ -117,7 +117,7 @@ an invariant manifold, and evolution thereon, of the
 embedding system to the asymptotic error~\Ord{\eps^{\tt
 toosmall}} (as \(\eps\to0\)). Often the introduced
 artificial~\(\eps\) has a useful physical meaning, but
-strictly you should  evaluate the output at \(\eps=1\) to
+strictly you should evaluate the output at \(\eps=1\) to
 recover results for the specified system, and then interpret
 the results in terms of actual `small' parameters.
 
@@ -837,7 +837,6 @@ mathstyle math;
 Define the Greek alphabet with \verb|small| as well.
 \begin{reduce}
 defid small,name="\eps";%varepsilon;
-%defid small,name=varepsilon;
 defid alpha,name=alpha;
 defid beta,name=beta;
 defid gamma,name=gamma;
@@ -880,8 +879,7 @@ defid Psi,name=Psi;
 defid Omega,name=Omega;
 \end{reduce}
 
-
-
+For the variables names I use, as operators, define how they appear in the \LaTeX, and also define that their arguments appear as subscripts.
 \begin{reduce}
 defindex e_(down,down);
 defid e_,name="e";
@@ -901,7 +899,6 @@ defindex s(down);
 defid exp,name="\exp";
 defindex exp(arg);
 \end{reduce}
-
 
 Can we write the system? Not in matrices apparently. So
 define a dummy array \verb|tmp_| that we use to get the
@@ -1101,7 +1098,7 @@ end;
 \end{reduce}
 
 
-Terminate the loop once residuals are zero.
+Terminate the iteration loop once residuals are zero.
 \begin{reduce}
 showtime;
 if {resde,resd,resz}={0,0,0} then write iter:=iter+10000;

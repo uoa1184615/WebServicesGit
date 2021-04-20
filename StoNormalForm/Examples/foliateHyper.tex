@@ -1,0 +1,48 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{foliateHyper}: Duan's hyperbolic system for foliation} 
+\label{foliateHyper}
+
+
+To illustrate a stochastic\slash non-autonomous Hartman--Grobman Theorem, \cite{Sun2011} used the following simple hyperbolic system with one stable variable, and one unstable variable:
+\begin{align*}&
+\dot y_{1}=-y_1+\sigma w_{1} y_{1}  
+\\&
+\dot z_{1}= z_1+y_1^2+\sigma w_{1} z_{1} 
+\end{align*}
+The stable \(y\)-dynamics is simply an Ornstein--Uhlenbeck process, independent of~\(z(t)\).  The unstable \(z\)-dynamics is similar, but with a quadratic forcing by the stable variable~\(y\).  Let's unfold this effect.
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+Execute the construction of a normal form for this system: the parameter~\(\sigma\) is automatically inserted by the procedure.
+\begin{reduce}
+stonormalform(
+    {},
+    { -y(1)+y(1)*w(1) },
+    { +z(1)+y(1)^2+z(1)*w(1) },
+    9 )$
+end;
+\end{reduce}
+In the procedure, the \(y_1^2\)~term is automatically multiplied by~\eps, and so, in the results, \eps~counts the order of nonlinearity of each term.
+We analyse to high-order, errors~\Ord{\eps^9,\sigma^3}, because the results are simple.
+
+
+\paragraph{Time dependent coordinate transform}  
+To decouple the stochastic dynamics, we just need to stochastically `bend' the \(z\)-variable.  This bending forms a stochastic foliation of the system.
+\begin{align*}&
+z_{1}=-1/3 \sigma  \eps \ou\big(w_{1},tt,3\big) Y_{1}^{2}-1/3 \eps Y_{1}
+^{2}+Z_{1}
+\\&
+y_{1}=Y_{1}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+The normal form dynamics is linear and decoupled, as per Hartman--Grobman, namely
+\begin{align*}&
+\dot Z_{1}=\sigma  w_{1} Z_{1}+Z_{1}
+&&
+\dot Y_{1}=\sigma  w_{1} Y_{1}-Y_{1}
+\end{align*}
+
+

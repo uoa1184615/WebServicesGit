@@ -1,0 +1,62 @@
+\begin{thebibliography}{xx}
+
+\harvarditem{Carr}{1981}{Carr81}
+Carr, J.  \harvardyearleft 1981\harvardyearright , {\em Applications of centre
+  manifold theory}, Vol.~35 of {\em Applied Math. Sci.}, Springer--Verlag.
+\newline\harvardurl{http://books.google.com.au/books?id=93BdN7btysoC}
+
+\harvarditem{Chao \harvardand\ Roberts}{1996}{Chao95}
+Chao, X. \harvardand\ Roberts, A.~J.  \harvardyearleft 1996\harvardyearright ,
+  `On the low-dimensional modelling of {Stratonovich} stochastic differential
+  equations', {\em Physica~A} {\bf 225},~62--80.
+
+\harvarditem{Cox \harvardand\ Roberts}{1991}{Cox91}
+Cox, S.~M. \harvardand\ Roberts, A.~J.  \harvardyearleft 1991\harvardyearright
+  , `Centre manifolds of forced dynamical systems', {\em J.~Austral. Math.
+  Soc.~B} {\bf 32},~401--436.
+
+\harvarditem{Fateman}{2003}{Fateman2002}
+Fateman, R.  \harvardyearleft 2003\harvardyearright , `Comparing the speed of
+  programs for sparse polynomial multiplication', {\em ACM SIGSAM Bulletin}
+  {\bf 37}(1),~4--15.
+\newline\harvardurl{http://www.cs.berkeley.edu/~fateman/papers/fastmult.pdf}
+
+\harvarditem{Haragus \harvardand\ Iooss}{2011}{Haragus2011}
+Haragus, M. \harvardand\ Iooss, G.  \harvardyearleft 2011\harvardyearright ,
+  {\em Local Bifurcations, Center Manifolds, and Normal Forms in
+  Infinite-Dimensional Dynamical Systems}, Springer.
+
+\harvarditem{Knobloch \harvardand\ Aulbach}{1982}{Knobloch82}
+Knobloch, H.-W. \harvardand\ Aulbach, B.  \harvardyearleft
+  1982\harvardyearright , The role of center manifolds in ordinary differential
+  equations, {\em in} M.~Gregus, ed., `Proceedings of the fifth Czechoslovak
+  conference on differential equations and their applications', BSB B.G.
+  Teubner Verlagsgesellschaft, Leipzig, pp.~179--189.
+\newline\harvardurl{http://dml.cz/bitstream/handle/10338.dmlcz/702285/Equadiff_05-1982-1_40.pdf}
+
+\harvarditem{Roberts}{1997}{Roberts96a}
+Roberts, A.~J.  \harvardyearleft 1997\harvardyearright , `Low-dimensional
+  modelling of dynamics via computer algebra', {\em Computer Phys. Comm.} {\bf
+  100},~215--230.
+
+\harvarditem{Roberts}{2008}{Roberts06k}
+Roberts, A.~J.  \harvardyearleft 2008\harvardyearright , `Normal form
+  transforms separate slow and fast modes in stochastic dynamical systems',
+  {\em Physica~A} {\bf 387},~12--38.
+
+\harvarditem{Roberts}{2009--\the\year}{Roberts07d}
+Roberts, A.~J.  \harvardyearleft 2009--\the\year\harvardyearright , Normal form
+  of stochastic or deterministic multiscale differential equations, Technical
+  report, \url{http://www.maths.adelaide.edu.au/anthony.roberts/sdenf.php}.
+
+\harvarditem{Roberts}{2015}{Roberts2014a}
+Roberts, A.~J.  \harvardyearleft 2015\harvardyearright , {\em Model emergent
+  dynamics in complex systems}, SIAM, Philadelphia.
+\newline\harvardurl{http://bookstore.siam.org/mm20/}
+
+\harvarditem{Roberts}{2019}{Roberts2018a}
+Roberts, A.~J.  \harvardyearleft 2019\harvardyearright , Backwards theory
+  supports modelling via invariant manifolds for non-autonomous dynamical
+  systems, Technical report, [\url{http://arxiv.org/abs/1804.06998}].
+
+\end{thebibliography}

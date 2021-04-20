@@ -1,0 +1,48 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{futureNoise}: Future noise in the transform} 
+\label{futureNoise}
+
+An interesting pair of fast/slow \sde{}s derived from stochastic advection\slash dispersion is
+\begin{equation}
+\dot x=-\sigma yw(t) \qtq{and} \dot y=-y+\sigma x w(t)\,,
+\end{equation}
+where lowercase~$w(t)$ denotes the formal derivative~$dW/dt$ of a Stratonovich Wiener process~$W(t,\omega)$.
+Parameter~$\sigma$ controls the strength of the noise.
+In stochastic advection\slash dispersion parameter~$\sigma$ represents the lateral wavenumber of the concentration profile.  
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+Execute the construction of a normal form for this system.
+\begin{reduce}
+stonormalform(
+    {-y(1)*w(1)},
+    {-y(1)+x(1)*w(1)},
+    {},
+    5)$
+end;
+\end{reduce}
+
+Being linear in~\(x,y\) the nonlinear parameter~\(\eps\) does not appear in the analysis and results.  Consequently, the procedure analyses the system as prescribed (since given~\(w\) changed to~\(\sigma w\)).  The interest in this example is the noise and the noise-noise interactions.  As usual, the noise-noise interactions are truncated to errors~\Ord{\sigma^3}.
+
+
+\paragraph{Time dependent coordinate transform}
+\begin{align*}&
+y_{1}=\sigma  \ou\big(w_{1},tt,-1\big) X_{1}+Y_{1}
+\\&
+x_{1}=\sigma  \ou\big(w_{1},tt,1\big) Y_{1}+X_{1}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+\begin{align*}&
+\dot Y_{1}=\sigma ^{2} \ou\big(w_{1},tt,1\big) w_{1} Y_{1}-Y_{1}
+\\&
+\dot X_{1}=-\sigma ^{2} \ou\big(w_{1},tt,-1\big) w_{1} X_{1}
+\end{align*}
+The interesting aspect of this example is the explicit presence of non-Markovian, future time integrals, anticipation integrals, in the convolutions~\(\ou\big(w_{1},tt,1\big)\).  These appear in both the coordinate transform, and the evolution \emph{off} the stochastic slow manifold.  But, as guaranteed by theory, they do not appear on the stochastic \text{slow manifold.}
+
+Further, this example could go to higher order noise-noise interactions very quickly, that is, to higher orders in~$\sigma$.
+However, I do not compute such higher order terms in this code.
+
+

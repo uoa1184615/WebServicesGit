@@ -1,0 +1,97 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{othersFail}: Other methodologies fail} 
+\label{othersFail}
+
+Consider, for small bifurcation parameter~$\epsilon$, the system
+\begin{align*}
+\text{slow mode }& \dot x=\epsilon x+x^3-(1-\sigma w)xy\,,\\
+\text{fast mode }& \dot y= -y+x^2+y^2+\sigma yw\,.
+\end{align*}
+Deterministically, there is a bifurcation to two equilibria for small $\epsilon>0$\,.
+The noise~$w$ affects this bifurcation somehow.
+
+Why is this tricky? \emph{Cross-sectional averaging} is simply projection onto the slow space $y=0$ which predicts instability of subcritical bifurcation $\dot x=\epsilon x+x^3$\,.
+Whereas \emph{adiabatic approximation}, \emph{singular perturbation}, and \emph{multiple scales} set $\dot y=0$ whence $y\approx x^2$ and thus predict only the linear growth of $\dot x= \epsilon x$\,.
+Our normal form transforms get the deterministic dynamics correctly.
+But what happens for stochastic dynamics?
+
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+Execute the construction of a normal form for this system.
+Multiply a cubic terms in the $x$~\sde\ in order to count orders of approximation best (since the right-hand side is multiplied by~\verb|small|).
+Multiply the bifurcation parameter by~\verb|small| in order to make it scale with~\(\eps^2\). 
+\begin{reduce}
+stonormalform(
+    {small*epsilon*x(1)+small*x(1)^3
+        -x(1)*y(1)*(1-small*w(1))},
+    {-y(1)+x(1)^2+y(1)^2+y(1)*w(1)},
+    {},
+    5)$
+end;
+\end{reduce}
+
+With the above artifices, the procedure analyses the following system which reduce to the given one for \(\eps=1\)\,:
+\begin{align*}&
+\dot x_{1}=\sigma  \eps w_{1} x_{1} y_{1}+\eps^{2} \big(x_{1}^{3}+x_{1} 
+\epsilon \big)-\eps x_{1} y_{1}
+\\&
+\dot y_{1}=\sigma  w_{1} y_{1}+\eps \big(x_{1}^{2}+y_{1}^{2}\big)-y_{1}
+\end{align*}
+
+
+\paragraph{Time dependent coordinate transform}
+This transform is quite complicated, due to the noise, and involve fast-time future and history integrals. 
+The deterministic terms at the end.
+\begin{align*}&
+y_{1}=\ParMath{\sigma  \eps^{3} \big(-4 \ou\big(\ou\big(w_{1},tt,1\big),tt,1\big)
+ X_{1}^{2} Y_{1}^{2}+4 \ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) X_{1}
+^{4}-2 \ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) X_{1}^{2} \epsilon +2
+ \ou\big(w_{1},tt,2\big) X_{1}^{2} Y_{1}^{2}-10 \ou\big(w_{1},tt,1\big) 
+X_{1}^{2} Y_{1}^{2}-3 \ou\big(w_{1},tt,1\big) Y_{1}^{4}+\ou\big(w_{1},tt
+,-1\big) X_{1}^{4}+3 \ou\big(w_{1},tt,-1\big) X_{1}^{2} Y_{1}^{2}-2 \ou
+\big(w_{1},tt,-1\big) X_{1}^{2} \epsilon \big)+\sigma  \eps^{2} \big(2 
+\ou\big(w_{1},tt,1\big) Y_{1}^{3}-2 \ou\big(w_{1},tt,-1\big) X_{1}^{2} Y
+_{1}\big)+\sigma  \eps \big(-\ou\big(w_{1},tt,1\big) Y_{1}^{2}+\ou\big(w
+_{1},tt,-1\big) X_{1}^{2}\big)+\eps^{3} \big(X_{1}^{4}-7 X_{1}^{2} Y_{1}
+^{2}-2 X_{1}^{2} \epsilon -Y_{1}^{4}\big)+\eps^{2} Y_{1}^{3}+\eps \big(X
+_{1}^{2}-Y_{1}^{2}\big)+Y_{1}
+}
+\\&
+x_{1}=\ParMath{\sigma  \eps^{3} \big(-\ou\big(w_{1},tt,3\big) X_{1} Y_{1}^{3}+\ou
+\big(w_{1},tt,2\big) X_{1} Y_{1}^{3}+3 \ou\big(w_{1},tt,1\big) X_{1}^{3}
+ Y_{1}\big)+\sigma  \eps^{2} \big(\ou\big(w_{1},tt,2\big) X_{1} Y_{1}^{2
+}-\ou\big(w_{1},tt,1\big) X_{1} Y_{1}^{2}+\ou\big(w_{1},tt,-1\big) X_{1}
+^{3}\big)+2 \eps^{3} X_{1}^{3} Y_{1}+\eps X_{1} Y_{1}+X_{1}
+}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+\begin{align*}&
+\dot Y_{1}=\ParMath{\sigma ^{2} \eps^{4} \big(8 \ou\big(\ou\big(w_{1},tt,-1\big),
+tt,-1\big) w_{1} X_{1}^{4} Y_{1}-4 \ou\big(\ou\big(w_{1},tt,-1\big),tt,
+-1\big) w_{1} X_{1}^{2} Y_{1} \epsilon +6 \ou\big(w_{1},tt,1\big) w_{1} 
+X_{1}^{4} Y_{1}+22 \ou\big(w_{1},tt,-1\big) w_{1} X_{1}^{4} Y_{1}-4 \ou
+\big(w_{1},tt,-1\big) w_{1} X_{1}^{2} Y_{1} \epsilon \big)+2 \sigma ^{2}
+ \eps^{2} \ou\big(w_{1},tt,-1\big) w_{1} X_{1}^{2} Y_{1}+\sigma  \eps^{4
+} \big(22 w_{1} X_{1}^{4} Y_{1}-4 w_{1} X_{1}^{2} Y_{1} \epsilon \big)+2
+ \sigma  \eps^{2} w_{1} X_{1}^{2} Y_{1}+\sigma  w_{1} Y_{1}+\eps^{4} 
+\big(6 X_{1}^{4} Y_{1}-4 X_{1}^{2} Y_{1} \epsilon \big)+4 \eps^{2} X_{1}
+^{2} Y_{1}-Y_{1}
+}
+\\&
+\dot X_{1}=\ParMath{-3 \sigma ^{2} \eps^{4} \ou\big(w_{1},tt,-1\big) w_{1} X_{1}
+^{5}-2 \sigma  \eps^{4} w_{1} X_{1}^{5}+\eps^{4} \big(-X_{1}^{5}+2 X_{1}
+^{3} \epsilon \big)+\eps^{2} X_{1} \epsilon 
+}
+\end{align*}
+\begin{itemize}
+\item As expected, \(Y_1=0\) is the stochastic slow manifold, and is exponentially attractive (almost always) in some domain about the origin.
+\item The slow \(X_1\) evolution is independent of~\(Y_1\).  
+Deterministically (\(\sigma=0\)), we predict a bifurcation to \(X_1\approx \pm\epsilon^{1/4}\).  The noise appears to modify this slightly.
+\item The time-dependent coordinate transform maps these predictions back into the \(xy\)-plane.
+\end{itemize}
+
+

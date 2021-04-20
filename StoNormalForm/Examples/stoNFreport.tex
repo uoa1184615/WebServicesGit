@@ -1,0 +1,51 @@
+\documentclass[11pt,a5paper]{article}
+\usepackage[a5paper,margin=13mm]{geometry}
+\usepackage{parskip,time} \raggedright
+\def\ou\big(#1,#2,#3\big){{{\rm e}^{\if#31\else#3\fi t}\star}#1\,}
+\def\eps{\varepsilon}
+\title{Normal form of your dynamical system}
+\author{A. J. Roberts, University of Adelaide\\
+\texttt{http://orcid.org/0000-0001-8930-1552}}
+\date{\now, \today}
+\begin{document}
+\maketitle
+Throughout and generally: the lowest order, most
+important, terms are near the end of each expression.
+\input{stoNFreportSys}
+
+off echo;
+
+
+\begin{math}
+\end{math}
+\paragraph{Time dependent coordinate transform}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+y_{1}=-\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) \sigma  \eps^{2} 
+\tau  a-\ou\big(w_{1},tt,-1\big) \sigma  \eps^{2} \tau  a+\ou\big(w_{1},
+tt,-1\big) \sigma +Y_{1}+\sqrt {\tau } \eps X_{1}
+\end{math}\par
+
+\begin{math}
+x_{1}=-\sqrt {\tau } \ou\big(w_{1},tt,-1\big) \sigma  \eps a-\sqrt {
+\tau } Y_{1} \eps a+X_{1}
+\end{math}\par
+
+\begin{math}
+\end{math}
+\paragraph{Result normal form DEs}
+\begin{math}
+\end{math}\par
+
+\begin{math}
+\dot Y_{1}=-Y_{1} \eps^{2} \tau  a-Y_{1}
+\end{math}\par
+
+\begin{math}
+\dot X_{1}=w_{1} \sigma  \eps^{3} \tau  \big(-2 \sqrt {\tau } a^{2}+
+\sqrt {\tau } a\big)+\sqrt {\tau } w_{1} \sigma  \eps a+\eps^{2} \tau  
+\big(X_{1} a-X_{1}\big)
+\end{math}\par
+\end{document}

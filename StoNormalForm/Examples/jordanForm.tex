@@ -1,0 +1,89 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{jordanForm}: the Jordan form of position-momentum variables} 
+\label{jordanForm}
+
+Suppose \(x(t)\) is the spatial position of some particle, and you want to analyse the `mechanical' system of \sde{}s 
+\begin{equation*}
+\ddot x=-xy \qtq{and} \dot y=-2y+x^2+{\dot x}^2+\sigma w(t)\,,
+\end{equation*}
+where $w(t)$ denotes the formal derivative~$dW/dt$ of a Stratonovich Wiener process~$W(t,\omega)$, or some other time-dependent forcing, called noise.
+Introduce position and velocity variables $x_1=x$ and $x_2=\dot x$\,, and also $y_1=y$ to convert to the system of three coupled first-order \sde{}s
+\begin{align*}&
+\dot x_1=x_2 \,, \\&
+\dot x_2=-x_1y_1 \,, \\&
+\dot y_1=-2y_1+x_1^2+x_2^2+\sigma w(t)\,.
+\end{align*}
+
+
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+Execute the construction of a normal form for this system.
+\begin{reduce}
+stonormalform(
+    { x(2)/small,
+      -x(1)*y(1) },
+    { -2*y(1)+x(1)^2+x(2)^2+w(y) },
+    {},
+    3 )$
+end;
+\end{reduce}
+Why divide~\verb|x(2)| by~\verb|small|?  A possible coding is to specify the system as given, but recall that the slow \sde{}s are always multiplied by~\verb|small| thus changing the first \sde\ to \(\dot x_1=\eps x_2\) and hence changing the relation between position and velocity---this would be OK if~\(x_2\) was viewed as momentum \emph{and} the particle had large mass.  But what if really do we want \(x_2\) to be velocity.  Fortunately, the coded iteration scheme works for systems with linear part in Jordan form, but one has to code the system as follows. Namely, divide the off-diagonal term of the Jordan form by~\verb|small| to cancel out the procedure's brutal multiplication by~\verb|small|. 
+
+Then the coded procedure reports that it analyses the following system which not only reduces to the given one for \(\eps=1\)\,, but also preserves the physical relation between position~\(x_1\) and velocity~\(x_2\):
+\begin{align*}&
+\dot x_{1}=x_{2}
+\\&
+\dot x_{2}=-\eps x_{1} y_{1}
+\\&
+\dot y_{1}=\sigma  w_{y}+\eps \big(x_{2}^{2}+x_{1}^{2}\big)-2 y_{1}
+\end{align*}
+Further, here \(\eps\) counts the order of nonlinearity so truncating to errors \Ord{\eps^3} is the same as truncating to errors \Ord{|(\xv,y)|^4}.
+
+The cost of preserving the physical relation between position~\(x_1\) and velocity~\(x_2\) is that more iterations are needed in the construction.
+
+
+
+
+\paragraph{Time dependent coordinate transform}
+This transform is quite complicated, due to the noise, and involve fast-time future and history integrals. 
+\begin{align*}&
+y_{1}=\sigma  \ou\big(w_{y},tt,-2\big)+\eps \big(3/4 X_{2}^{2}-1/2 X_{2}
+ X_{1}+1/2 X_{1}^{2}\big)+Y_{1}
+\\&
+x_{1}=\ParMath{\sigma  \eps \big(-1/4 \ou\big(w_{y},tt,-2\big) X_{2}-1/4 \ou\big(
+w_{y},tt,-2\big) X_{1}\big)+\eps \big(-1/4 X_{2} Y_{1}-1/4 X_{1} Y_{1}
+\big)+X_{1}
+}
+\\&
+x_{2}=\ParMath{\sigma  \eps \big(1/4 \ou\big(w_{y},tt,-2\big) X_{2}+1/2 \ou\big(w
+_{y},tt,-2\big) X_{1}\big)+\eps \big(1/4 X_{2} Y_{1}+1/2 X_{1} Y_{1}
+\big)+X_{2}
+}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+\begin{align*}&
+\dot Y_{1}=\eps^{2} \big(1/2 X_{2}^{2} Y_{1}+1/2 X_{2} X_{1} Y_{1}-1/2 X
+_{1}^{2} Y_{1}\big)-2 Y_{1}
+\\&
+\dot X_{1}=\ParMath{\sigma ^{2} \eps^{2} \big(-3/64 \ou\big(w_{y},tt,-2\big) w_{y
+} X_{2}-3/32 \ou\big(w_{y},tt,-2\big) w_{y} X_{1}\big)+\sigma  \eps 
+\big(1/4 w_{y} X_{2}+1/4 w_{y} X_{1}\big)+X_{2}
+}
+\\&
+\dot X_{2}=\ParMath{\sigma ^{2} \eps^{2} \big(3/32 \ou\big(w_{y},tt,-2\big) w_{y}
+ X_{2}+1/8 \ou\big(w_{y},tt,-2\big) w_{y} X_{1}\big)+\sigma  \eps \big(-
+1/4 w_{y} X_{2}-1/2 w_{y} X_{1}\big)+\eps^{2} \big(-3/4 X_{2}^{2} X_{1}+
+1/2 X_{2} X_{1}^{2}-1/2 X_{1}^{3}\big)
+}
+\end{align*}
+\begin{itemize}
+\item As expected, \(Y_1=0\) is the stochastic slow manifold, and is exponentially attractive (almost always) in some domain about the origin.
+\item As expected, the slow~\Xv\ evolution is independent of~\(Y_1\): \(X_2\)~is approximately a `velocity' variable for `position'~\(X_1\), and shows some nonlinear noise affected dynamics.
+\item The time-dependent coordinate transform maps these predictions back into the \(\xv,y\)-space.  Observe that~\Xv\ are not precisely the physical position-veloxity~\xv, but instead are affected by nonlinearity, and the noise, and their interaction.
+\end{itemize}
+
+

@@ -1,0 +1,1140 @@
+\documentclass[11pt,a5paper]{article}
+
+\title{Computer algebra derives normal forms of general stochastic and non-autonomous differential equations}
+
+\author{A.~J. Roberts\thanks{School of Mathematical
+Sciences, University of Adelaide, South Australia~5005,
+\textsc{Australia}. \url{https://profajroberts.github.io/}}}
+
+\date{November 19, 2008; modified \today}
+
+
+
+\usepackage{url,natbib,amsmath,defns,reducecode}
+\RaisedNamesfalse
+\let\harvardurl\url
+\IfFileExists{ajr.sty}{\usepackage{ajr}}{}
+\usepackage{mycleveref}
+
+%\allowdisplaybreaks
+\def\ou\big(#1,#2,#3\big){{{\rm e}^{\if#31\else#3\fi t}\star}#1\,}
+\newcommand{\Z}[1]{{\rm e}^{#1t}{\star}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\res}{\operatorname{Res}}
+\newcommand{\pdf}{\textsc{pdf}}
+\newcommand{\ssm}{\textsc{ssm}}
+\def\eps{\varepsilon}
+\def\sde{\textsc{s/ode}}
+
+\begin{document}
+\sloppy
+
+\maketitle
+
+\begin{abstract}
+Construct stochastic normal form of a wide class of non-autonomous or stochastic differential equations (herein abbreviated by \sde{}s), based upon earlier research~\cite[]{Cox91, Chao95, Roberts06k}.
+Interpret all \sde{}s in the Stratonovich sense so the analysis applies to deterministic differential equations, both non-autonomous and autonomous.
+To construct normal forms of deterministic autonomous differential equations, simply omit specifying any noise.
+This article documents code designed for an interactive web site~\cite[]{Roberts07d} that is available to all to use.
+
+Modelling stochastic systems has many important applications.
+Stochastic coordinate transforms to a normal form is a powerful way of disentangling emergent long term dynamics.
+Since the analysis involves classic calculus, then the approach also applies to a wide class of non-autonomous dynamical systems.
+Further, cater for deterministic autonomous systems by simply omitting the time dependence in the system.
+For generality, this approach now caters for unstable modes, and for differential equation systems with a rational right-hand side.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+\paragraph{Installation}
+Download and install the computer algebra package
+\emph{Reduce} via \url{http://www.reduce-algebra.com}\quad
+Download and unzip the folder
+\url{https://profajroberts.github.io/StoNormForm.zip}
+\quad Within the folder \verb|StoNormForm|, start-up
+\emph{Reduce} and load the procedure by executing the
+command \verb|in_tex "invariantManifold.tex"$|
+\footnote{This script changes many internal settings of
+\emph{Reduce}, so best to do only when needed.} Test your
+installation by then executing \verb|examplenormform();|
+\quad(see \cref{ss:eg}).
+
+\paragraph{Execution}
+Thereafter, construct a specified invariant manifold of a
+specific dynamical system by executing the following command
+with specific values for the input parameters.  See
+\verb|allExamples.pdf| for many examples.
+\begin{verbatim}
+stonormalform(dxdt, dydt, dzdt, toosmall);
+\end{verbatim}
+
+%thecases:={sdesimple, oderat, sdemulti, sdebif, sdelac,
+%sdemom, sderadek, sdehyper, sdeduan, sdehifour, sdeMona1,
+%sdeMona2, sdeMona3, sdeMona4, sdeMonaSS, sdeMajda3m,
+%sdeMajda3a, sdePRLorenz, sdehe, sdehebc, sdeheqr, sdemmh,
+%sdePRKdV }$
+
+\paragraph{Inputs}
+Write your \sde\ system in terms of slow variables~\(x_j(t)\), fast stable variables~\(y_j(t)\) (linearly decaying), and fast unstable variables~\(z_j(t)\) (linearly growing). 
+For an \sde\ with $n_x$~slow modes, $n_y$~fast stable modes, and/or \(n_z\)~fast unstable modes, you must denote the slow modes by \verb|x(1)| through to~\verb|x(nx)|, the stable fast modes by \verb|y(1)| through to~\verb|y(ny)|, and the unstable fast modes by \verb|z(1)| through to~\verb|z(nz)|.
+Each Stratonovich white noise, derivative of a Stratonovich Wiener process, must be denoted by~\verb|w(.)| where the dot denotes almost any label you care to choose: simple numbers such as~\verb|w(1)| and/or~\verb|w(2)| are the usual choices; but other labels for the noise may be used.
+Deterministic, autonomous, normal forms are constructed simply by omitting any noise term~\verb|w()| in the differential equations.
+The \sde{}s must be linearly diagonalised.\footnote{Although a Jordan form is also acceptable, there are issues in the error control.}  
+
+Then, as in the example of the next \cref{ss:eg}, the input
+parameters to the procedure are the following:
+\begin{itemize}
+\item \verb|dxdt|, a comma separated list within braces, \(\{\ldots\}\), of the right-hand sides of the \sde{}s for the slow variables~\(x_j(t)\);
+
+\item \verb|dydt|, a comma separated list within braces, \(\{\ldots\}\), of the right-hand sides of the \sde{}s for the fast stable variables~\(y_j(t)\);
+
+\item \verb|dzdt|, a comma separated list within braces, \(\{\ldots\}\), of the right-hand sides of the \sde{}s for the fast unstable variables~\(z_j(t)\);
+
+\item \verb|toosmall|, an integer giving the desired order
+of error in the asymptotic approximation that is
+constructed.  The procedure embeds the specified system in a
+family of systems parametrised by~\(\eps\), and constructs
+an invariant manifold, and evolution thereon, of the
+embedding system to the asymptotic error~\Ord{\eps^{\tt
+toosmall}} (as \(\eps\to0\)). Often the introduced
+artificial~\(\eps\) has a useful physical meaning, but
+strictly you should evaluate the output at \(\eps=1\) to
+recover results for the specified system, and then interpret
+the results in terms of actual `small' parameters.
+\end{itemize}
+
+The above right-hand side expressions for the time-derivatives must?? be multinomial in variables~$x_i$, $y_i$, $z_i$~and~$w_i$ (and also may include some~\(\dot x_i\), \(\dot y_i\), \text{and~\(\dot z_i\) effects).}
+
+
+\paragraph{Outputs}  This procedure reports the specified
+system, the embedded system it actually analyses, the number
+of iterations taken, the invariant manifold approximation,
+the evolution on the invariant manifold, and optionally a
+basis for projecting onto the invariant manifold.
+\begin{itemize}
+\item A plain text report to the Terminal window in which
+\verb|Reduce| is executing---the invariant manifold is
+parametrised by variables \verb|s(1)|, \verb|s(2)|, \ldots,
+and the dynamics by their evolution in time.
+\item A \LaTeX\ source report written to the file
+\verb|stoNFreport.tex| (and
+\verb|stoNFreportSys.tex|)---the invariant manifold is
+parametrised by variables \(s_1\), \(s_2\), \ldots, and the
+dynamics by their evolution in time.  Generate a pdf version
+by executing \verb|pdflatex stoNFreport|\,.
+\end{itemize}
+One may change the appearance of the output somewhat. For
+example, it is often useful to execute  \verb|factor s;|
+before executing \verb|stonormalform(...)| in order to
+group terms with the same powers of amplitudes\slash
+order-parameters\slash coarse-variables.
+
+
+\paragraph{Background}
+The theoretical support for the results of the analysis of
+this procedure is centre\slash stable\slash unstable
+manifold theory \cite[e.g.,][]{Carr81, Knobloch82, Haragus2011,
+Roberts2014a}, and an embryonic backwards theory
+\cite[]{Roberts2018a}. 
+This particular procedure is developed from that for human-efficient computer
+algebra \cite[]{Roberts96a}, and extended to stochastic\slash non-autonomous systems \cite[]{Chao95, Roberts06k}.
+
+We use the computer algebra package \emph{Reduce} 
+[\url{http://reduce-algebra.com/}] because it is both free 
+and perhaps the fastest general purpose computer algebra 
+system~\cite[e.g.]{Fateman2002}.
+
+
+
+\subsection{A simple example: \texttt{examplenormform()}} 
+\label{ss:eg}
+Execute this example by invoking the command
+\verb|examplenormform();|\quad The classically basic non-trivial system of fast/slow \sde{}s \cite[\S19.1]{Roberts2014a} is
+\begin{equation*}
+\dot x=-xy \qtq{and} \dot y=-y+x^2-2y^2+\sigma w(t),
+\end{equation*}
+where lowercase~$w(t)$, called a \emph{noise} within this document,  often denotes the formal derivative~$dW/dt$ of a Stratonovich Wiener process~$W(t,\omega)$.
+Alternatively, \(w(t)\)~represents an arbitrary deterministic time-dependent forcing, or some control, or some `coloured' random process, or some other extrinsic input to the system.
+Parameter~$\sigma$ controls the strength of the so-called noise.
+
+Use slow variable~\verb|x(1)| to denote~$x(t)$, stable variable~\verb|y(1)| to denote~$y(t)$, there is no unstable variable in this \sde, and use \verb|w(1)| to denote the Stratonovich noise~$w$.
+Hence this system is analysed for `small'~\(x,y,\sigma\) by executing the \text{following procedure:}
+\begin{reduce}
+procedure examplenormform;  
+    stonormalform(
+    {-x(1)*y(1)},
+    {-y(1)+x(1)^2-2*y(1)^2+w(1)},
+    {},
+    3 )$
+\end{reduce}
+The procedure automatically multiplies the noise factors by a parameter~\verb|sigma| so there is no need include the parameter~$\sigma$ in the specification of the problem (unless you particularly want to), as it will be done for you.
+
+Further, the procedure uses the parameter~\verb|small| to control truncation in nonlinearity, also denoted by~\(\eps\).  The last parameter in the above specifies to construct the normal form to errors~\Ord{\eps^3}.
+
+Consequently, the procedure embeds the given system as the \(\eps=1\) version of the following system that it actually analyses:
+\begin{equation*}
+\dot x_{1}=-\eps x_{1} y_{1} 
+\qtq{and} 
+\dot y_{1}=\sigma  w_{1}+\eps \big(x_{1}^{2}-2 y_{1}^{2}\big)-y_{1}
+\end{equation*}
+using analysis and theory based upon the equilibrium at \(\eps=\sigma=0\)\,.
+
+
+\paragraph{The stochastic coordinate transform}
+(to one order lower in both~\(\eps\) and~\(\sigma\) than actually constructed)
+\begin{align*}&
+x_{1}=\sigma  \eps \ou\big(w_{1},tt,-1\big) X_{1}+\eps X_{1} Y_{1}+X_{1}
+\\&
+y_{1}=4 \sigma  \eps \ou\big(w_{1},tt,-1\big) Y_{1}+\sigma  \ou\big(w_{1
+},tt,-1\big)+\eps \big(X_{1}^{2}+2 Y_{1}^{2}\big)+Y_{1}
+\end{align*}
+
+
+
+\paragraph{Result normal form SDEs}
+\begin{align*}&
+\dot X_{1}=2 \sigma ^{2} \eps^{2} \ou\big(w_{1},tt,-1\big) w_{1} X_{1}-
+\sigma  \eps w_{1} X_{1}-\eps^{2} X_{1}^{3}
+\\&
+\dot Y_{1}=8 \sigma ^{2} \eps^{2} \ou\big(w_{1},tt,-1\big) w_{1} Y_{1}-4
+ \sigma  \eps w_{1} Y_{1}-2 \eps^{2} X_{1}^{2} Y_{1}-Y_{1}
+\end{align*}
+\begin{itemize}
+\item The \(\dot Y_1\) \sde\ shows that \(Y_1=0\) is invariant, and since dominantly is \(\dot Y_1\approx-Y_1\) then it is almost always exponentially quickly attractive in some domain about the origin.
+\item The \(\dot X_1\) \sde is independent of~\(Y_1\) and indicates an algebraic attraction to zero, albeit affected by a multiplicative noise, and moderated by some irreducible noise-noise interactions.
+\item These deductions are transformed into the original \(xy\)-space by the constructed time-dependent coordinate transformation.
+\end{itemize}
+
+
+
+
+\section{Header of the procedure}
+
+Need a couple of things established before defining the
+procedure: the \verb|rlfi| package for a nicer version of the output via \LaTeX; and operator names for
+the variables of the \sde{}s.
+\begin{reduce}
+load_package rlfi; 
+operator x;
+operator y;
+operator z;
+operator w;
+\end{reduce}
+Cater for rational function \sde{}s by allowing time dependence in these variables at specification.  
+Then users must multiply each \sde\ by a common denominator, and put on the right-hand side the nonlinear terms involving the time derivative.
+\begin{reduce}
+depend x,t;
+depend y,t;
+depend z,t;
+\end{reduce}
+
+
+Now define the procedure as an operator so we can define
+procedures internally, and may be flexible with its
+arguments.
+\begin{reduce}
+operator stonormalform;
+for all dxdt, dydt, dzdt, toosmall let
+    stonormalform(dxdt, dydt, dzdt, toosmall) 
+    = begin 
+\end{reduce}
+
+
+\subsection{Preamble to the procedure}
+Operators and arrays are always global, but we can make
+variables and matrices local, except for matrices that need
+to be declared \verb|matrix|.  So, move to implement all
+arrays and operators to have underscores, and almost all
+scalars and most matrices to be declared local here (for some reason \verb|x/y/zrhs| must be global).
+\begin{reduce}
+scalar maxiter, trace, nx, ny, nz, offdiag, jac, ok, res, res0, res1, lengthresx, lengthresy, lengthresz;
+\end{reduce}
+
+Write an intro message.
+\begin{reduce}
+write "Construct a stochastic normal form (version 19 Apr 2021)"$
+\end{reduce}
+
+
+
+Define default parameters for the iteration:
+\verb|maxiter|~is the maximum number of allowed iterations;
+\verb|toosmall|~is the order of errors in the analysis in terms of the parameter~\verb|small|.
+Specific problems may override these defaults.
+\begin{reduce}
+maxiter:=29$
+factor small,sigma; 
+\end{reduce}
+
+The code cannot handle any cubic or higher order in noise amplitude~\verb|sigma|.
+\begin{reduce}
+let sigma^3=>0;
+\end{reduce}
+
+
+For optional trace printing of test cases: comment out
+second line when not needed.
+\begin{reduce}
+trace:=0$
+%trace:=1; maxiter:=5; 
+\end{reduce}
+
+The \verb|rationalize| switch may make code much faster with
+complex numbers. The switch \verb|gcd| seems to wreck
+convergence, so leave it off.
+\begin{reduce}
+on div; off allfac; on revpri; 
+on rationalize;
+\end{reduce}
+
+
+
+
+
+
+
+
+
+%\paragraph{Easy stochastic bifurcation} For example, modifying the $x$~equation to $\dot x=ax-xy$ induces a stochastic bifurcation as parameter~$a$ crosses zero.
+%Construct the stochastic normal form for this by simply changing to
+%\begin{verbatim}
+%    dxdt:={small*a*x(1)-x(1)*y(1)};
+%\end{verbatim}
+%The extra factor of \verb|small| causes only low powers of parameter~$a$ to be retained, as appropriate for such a bifurcation.
+%Some may like to consider it analogous to scaling~$a$ with~$\epsilon^2$ and scaling~$x$ with~$\epsilon$.
+
+
+
+
+\subsection{Extract and scale slow equations}
+
+The number of slow equations is the number of terms in the list in~\verb|dxdt|.
+\begin{reduce}
+xrhs_:=dxdt$
+write "no. of slow modes ",nx:=length(xrhs_);
+\end{reduce}
+
+Multiply all the right-hand sides by~\verb|small| so we can control the truncation of the asymptotic construction through discarding high powers of~\verb|small|.
+Users could use~\verb|small| in their equations for appropriate effects. 
+\begin{reduce}
+xrhs_:=for i:=1:nx collect small*part(xrhs_,i)$
+\end{reduce}
+
+Adjust the noise terms.
+Remove the \verb|small|~multiplication of noise terms, and instead multiply by~\verb|sigma| to empower me to independently control the truncation in noise amplitude.
+\begin{reduce}
+xrhs_:=(xrhs_ where w(~j)=>sigma*w(j,1)/small)$
+xrhs_:=(xrhs_ where w(~j,1)=>w(j))$
+\end{reduce}
+
+Section~\ref{sec:dwti} writes the resulting differential equations for information.
+\begin{reduce}
+if trace then for i:=1:nx do 
+    write "dx(",i,")/dt = ",1*part(xrhs_,i);
+\end{reduce}
+
+
+\subsection{Extract and scale stable fast equations}
+
+The number of stable fast equations is the number of terms in the list in~\verb|dydt|.
+\begin{reduce}
+yrhs_:=dydt$
+write "no. of stable fast modes ",ny:=length(yrhs_);
+\end{reduce}
+
+\paragraph{Extract decay rates}
+Extract the linear decay rates of the fast equations into an array.
+For each expression in the provided set of right-hand sides:
+\begin{reduce}
+clear rats_; array rats_(ny);
+for i:=1:ny do begin
+\end{reduce}
+
+For the $i$th right-hand side get the linear dependence upon~\verb|y(i)|, then set other dynamic variables to zero to get just the coefficient.
+\begin{reduce}
+  rats_(i):=coeffn(part(yrhs_,i),y(i),1);
+  rats_(i):=(rats_(i) where {x(~j)=>0,y(~j)=>0,z(~j)=>0,w(~j)=>0});
+\end{reduce}
+
+However, the coefficient may depend upon parameters, so if it is not simply a number, but is a sum, then trawl through the sum looking for a simple number to use as the decay rate.
+\begin{reduce}
+  if not numberp(rats_(i)) then 
+  if part(rats_(i),0)=plus then begin
+    rr:=0;
+    for j:=1:arglength(rats_(i)) do 
+      if numberp(part(rats_(i),j)) 
+      then rr:=part(rats_(i),j);
+    rats_(i):=rr;
+  end;
+\end{reduce}
+
+Change sign to make \verb|rats_| into positive decay rates, rather than negative growth rates.
+\begin{reduce}
+  rats_(i):=-rats_(i); 
+\end{reduce}
+
+If all the above has not ended up with a simple number, then exit with an error message. 
+\begin{reduce}
+  if numberp(rats_(i))and rats_(i)>0 then
+  else begin 
+    write "***** Error *****
+    Linear coeffs of y-decay must be negative numbers";
+    return;
+  end;
+\end{reduce}
+
+End the loop over all right-hand sides.
+\begin{reduce}
+end;
+if trace then write "End loop over all dydt";
+\end{reduce}
+
+Flag later warning if the linear part not diagonal.
+\begin{reduce}
+offdiag:=0$
+for i:=1:ny do for j:=1:ny do if i neq j then begin
+  jac:=coeffn(part(yrhs_,i),y(j),1);
+  if (jac where {x(~k)=>0,y(~k)=>0,z(~k)=>0,w(~k)=>0}) neq 0 
+  then offdiag:=1$
+end;
+if trace then write offdiag:=offdiag;
+\end{reduce}
+
+Multiply all the `nonlinear' terms right-hand sides by~\verb|small| so we control the truncation of the asymptotic construction through discarding high powers of~\verb|small|.
+Leave the identified linear decay terms intact.
+Users could use~\verb|small| in their equations for interesting effects. 
+\begin{reduce}
+yrhs_:=for i:=1:ny collect 
+  small*part(yrhs_,i)+(1-small)*(-rats_(i)*y(i))$
+\end{reduce}
+
+Remove the \verb|small|~multiplication of noise terms, and instead multiply by~\verb|sigma| to empower independent control of the truncation in noise amplitude.
+\begin{reduce}
+yrhs_:=( yrhs_ where w(~j)=>sigma*w(j,1)/small )$
+yrhs_:=( yrhs_ where w(~j,1)=>w(j) )$
+\end{reduce}
+
+\cref{sec:dwti} writes the resulting differential equations for information.
+\begin{reduce}
+if trace then for i:=1:ny do 
+    write "dy(",i,")/dt = ",1*part(yrhs_,i);
+\end{reduce}
+
+
+
+\subsection{Extract and scale unstable fast equations}
+
+The number of unstable fast equations is the number of terms in the list in~\verb|dzdt|.
+\begin{reduce}
+zrhs_:=dzdt$
+write "no. of unstable fast modes ",nz:=length(zrhs_);
+\end{reduce}
+
+\paragraph{Extract growth rates}
+Extract the linear growth rates of the fast equations into an array.
+For each expression in the provided set of right-hand sides:
+\begin{reduce}
+array ratu_(nz);
+for i:=1:nz do begin
+\end{reduce}
+
+For the $i$th right-hand side get the linear dependence upon~\verb|z(i)|, then set other dynamic variables to zero to get just the coefficient.
+\begin{reduce}
+  ratu_(i):=coeffn(part(zrhs_,i),z(i),1);
+  ratu_(i):=(ratu_(i) where {x(~j)=>0,y(~j)=>0,z(~j)=>0,w(~j)=>0});
+\end{reduce}
+
+However, the coefficient may depend upon parameters, so if it is not simply a number, but is a sum, then trawl through the sum looking for a simple number to use as the growth rate.
+\begin{reduce}
+  if not numberp(ratu_(i)) then 
+  if part(ratu_(i),0)=plus then begin
+    rr:=0;
+    for j:=1:arglength(ratu_(i)) do 
+      if numberp(part(ratu_(i),j)) 
+      then rr:=part(ratu_(i),j);
+    ratu_(i):=rr;
+  end;
+\end{reduce}
+
+If all the above has not ended up with a simple number, then exit with an error message. 
+\begin{reduce}
+  if numberp(ratu_(i))and ratu_(i)>0 then
+  else begin 
+    write "***** Error *****
+    Linear coeffs of z-growth must be positive numbers";
+    return;
+  end;
+\end{reduce}
+
+End the loop over all \(z\)-right-hand sides.
+\begin{reduce}
+end;
+if trace then write "End loop over all dzdt";
+\end{reduce}
+
+Flag warning if the linear part not diagonal.
+\begin{reduce}
+for i:=1:nz do for j:=1:nz do if i neq j then begin
+  jac:=coeffn(part(zrhs_,i),z(j),1);
+  if (jac where {x(~k)=>0,y(~k)=>0,z(~k)=>0,w(~k)=>0}) neq 0 
+  then offdiag:=1$
+end;
+if trace then write offdiag:=offdiag;
+\end{reduce}
+
+Multiply all the `nonlinear' terms right-hand sides by~\verb|small| so we control the truncation of the asymptotic construction through discarding high powers of~\verb|small|.
+Leave the identified linear growth terms intact.
+Users could use~\verb|small| in their equations for interesting effects. 
+\begin{reduce}
+zrhs_:=for i:=1:nz collect 
+  small*part(zrhs_,i)+(1-small)*(+ratu_(i)*z(i))$
+\end{reduce}
+
+Remove the \verb|small|~multiplication of noise terms, and instead multiply by~\verb|sigma| to empower me to independently control the truncation in noise amplitude.
+\begin{reduce} 
+zrhs_:=( zrhs_ where w(~j)=>sigma*w(j,1)/small )$
+zrhs_:=( zrhs_ where w(~j,1)=>w(j) )$
+\end{reduce}
+
+\cref{sec:dwti} writes the resulting differential equations for information.
+\begin{reduce}
+if trace then for i:=1:nz do 
+    write "dz(",i,")/dt = ",1*part(zrhs_,i);
+\end{reduce}
+
+
+
+
+
+
+
+
+\section{Setup LaTeX output using rlfi}
+
+Use inline math environment so that long lines, the norm, get line breaks.
+The command \verb|\raggedright| in the \LaTeX\ preamble appears the best option for the line breaking, but \verb|\sloppy| would also work reasonably.
+\begin{reduce}
+mathstyle math;
+\end{reduce}
+
+\paragraph{Define names for \LaTeX\ formatting}
+
+Define some names I use, so that rlfi translates them to Greek characters in the \LaTeX.
+\begin{reduce}
+defid small,name="\eps";%varepsilon;
+defid alpha,name=alpha;
+defid beta,name=beta;
+defid gamma,name=gamma;
+defid delta,name=delta;
+defid epsilon,name=epsilon;
+defid varepsilon,name=varepsilon;
+defid zeta,name=zeta;
+defid eta,name=eta;
+defid theta,name=theta;
+defid vartheta,name=vartheta;
+defid iota,name=iota;
+defid kappa,name=kappa;
+defid lambda,name=lambda;
+defid mu,name=mu;
+defid nu,name=nu;
+defid xi,name=xi;
+defid pi,name=pi;
+defid varpi,name=varpi;
+defid rho,name=rho;
+defid varrho,name=varrho;
+defid sigma,name=sigma;
+defid varsigma,name=varsigma;
+defid tau,name=tau;
+defid upsilon,name=upsilon;
+defid phi,name=phi;
+defid varphi,name=varphi;
+defid chi,name=chi;
+defid psi,name=psi;
+defid omega,name=omega;
+defid Gamma,name=Gamma;
+defid Delta,name=Delta;
+defid Theta,name=Theta;
+defid Lambda,name=Lambda;
+defid Xi,name=Xi;
+defid Pi,name=Pi;
+defid Sigma,name=Sigma;
+defid Upsilon,name=Upsilon;
+defid Phi,name=Phi;
+defid Psi,name=Psi;
+defid Omega,name=Omega;
+\end{reduce}
+
+For the variables names I use, as operators, define how they appear in the \LaTeX, and also define that their arguments appear as subscripts.
+\begin{reduce}
+defindex w(down);
+defindex x(down);
+defindex y(down);
+defindex z(down);
+defid xx,name="X";
+defid yy,name="Y";
+defid zz,name="Z";
+defindex xx(down);
+defindex yy(down);
+defindex zz(down);
+defindex hh(down);
+defindex gg(down);
+defindex ff(down);
+\end{reduce}
+
+First use these for the specified dynamical system, later use them for the normal form equations.
+\begin{reduce}
+defid hh,name="\dot z";
+defid gg,name="\dot y";
+defid ff,name="\dot x";
+\end{reduce}
+
+The Ornstein--Uhlenbeck operator is to translate into a \LaTeX\ command, see the preamble, that typesets the convolution in a reasonable manner.
+The definition of the \LaTeX\ command is a bit dodgy as convolutions of convolutions are not printed in the correct order; however,  convolutions commute so it does not matter.
+\begin{reduce}
+defid ou,name="\ou";
+defindex ou(arg,arg,arg);
+\end{reduce}
+
+
+\paragraph{Write the \LaTeX\ dynamical system}
+
+Because of the way rfli works, to get good quality output to the \LaTeX\ document, I need to write the algebraic expressions to a file, then read them back in again.
+While being read back in, I send the output to the \LaTeX\ file.
+In this convoluted way I avoid extraneous output lines polluting the \LaTeX. 
+
+Temporarily use these arrays for the right-hand sides of the dynamical system.
+\begin{reduce}
+array ff(nx),gg(ny),hh(nz);
+\end{reduce}
+
+Write expressions to the file \verb|scratchfile.red| for later reading.
+Prepend the expressions with an instruction to write a heading, and surround the heading with anti-math mode to cancel the math environment that rlfi puts in.
+\begin{reduce}
+out "scratchfile.red"$
+write "off echo;"$  % do not understand why needed in 2021??
+write "write ""\end{math}
+\paragraph{Specified dynamical system}
+\begin{math}""$";
+for i:=1:nx do write "ff(",i,"):=1*part(xrhs_,",i,");"; 
+for i:=1:ny do write "gg(",i,"):=1*part(yrhs_,",i,");";
+for i:=1:nz do write "hh(",i,"):=1*part(zrhs_,",i,");"; 
+write "end;";
+shut "scratchfile.red";
+\end{reduce}
+
+Then switch on \LaTeX\ output before writing to file as this \LaTeX\ file is to be input from the main \LaTeX\ file and hence does not need a header.
+The header here gets sent to the `terminal' instead.
+Then write to \verb|stoNFreportSys.tex| the expressions we stored in \verb|scratchfile.red| as nice \LaTeX.
+\begin{reduce}
+write "Ignore the following 15 lines of LaTeX"$
+on latex$
+out "stoNFreportSys.tex"$
+in "scratchfile.red"$
+shut "stoNFreportSys.tex"$
+off latex$
+\end{reduce}
+
+
+
+\section{Delayed write of text info}
+\label{sec:dwti}
+
+Because it is messy to interleave \LaTeX\ and plain output, I delay writing anything much in plain text until here.
+
+Write the delayed warning message about off-diagonal terms.
+\begin{reduce}
+if offdiag then write "
+***** Warning ****
+Off diagonal linear terms in y- or z- equations 
+assumed small.  Answers are rubbish if not 
+asymptotically appropriate. "$
+\end{reduce}
+
+Write the plain text versions of the dynamical system.
+\begin{reduce}
+write "no. of slow modes ",nx:=length(xrhs_);
+for i:=1:nx do write "dx(",i,")/dt = ",1*part(xrhs_,i);
+write "no. of stable fast modes ",ny:=length(yrhs_);
+for i:=1:ny do write "dy(",i,")/dt = ",1*part(yrhs_,i);
+write "no. of unstable fast modes ",nz:=length(zrhs_);
+for i:=1:nz do write "dz(",i,")/dt = ",1*part(zrhs_,i);
+\end{reduce}
+
+
+
+\section{Represent the noise}
+
+The white noises~\verb|w| depend upon time.
+But we find it useful to discriminate upon the notionally fast time fluctuations of the noise processes, and the notionally ordinary time variations of the dynamic variables~$x_i$, $y_i$ and~$z_i$.
+Thus introduce a notionally fast time variable~\verb|tt|, which depends upon the ordinary time~\verb|t|.
+Equivalently, view~\verb|tt|, a sort of `partial~$t$', as representing variations in time independent of those in the variables~$x_i$, $y_i$ and~$z_i$.
+\begin{reduce}
+depend w,tt;
+depend tt,t,ttyz;
+\end{reduce}
+
+In the construction, convolutions of the noise arise, both backwards over history and also forwards to anticipate the noise \cite[]{Roberts06k, Roberts2018a}.
+For any non-zero parameter~$\mu$, define the Ornstein--Uhlenbeck convolution
+\begin{equation}
+    \Z{\mu}\phi=
+    \begin{cases}
+        \int_{-\infty}^t \exp[\mu(t-\tau)]\phi(\tau)\,d\tau\,,
+        &\mu<0\,, \\
+        \int_t^{+\infty} \exp[\mu(t-\tau)]\phi(\tau)\,d\tau\,,
+        &\mu>0\,,             
+    \end{cases}
+    \label{eq:zmuf}
+\end{equation}
+so that the convolution is always with a bounded exponential.
+Five useful properties of this convolution are
+\begin{eqnarray}&&
+    \Z\mu1=\frac1{|\mu|}\,,
+    \label{eq:conv1}\\&&
+    \frac{d\ }{dt}\Z{\mu}\phi=-\sgn\mu\,\phi+\mu\Z{\mu}\phi\,,
+    \label{eq:ddtconv}
+    \\&&
+    E[\Z{\mu}\phi]=\Z{\mu}E[\phi]\,,
+    \label{eq:exz}
+    \\&&
+    E[(\Z{\mu}\phi)^2]=\frac1{2|\mu|}\,,
+    \label{eq:exzz}
+    \\&&
+    \Z\mu\Z\nu=\begin{cases}
+    \frac1{|\mu-\nu|}\big[ \Z\mu+\Z\nu \big]\,, &\mu\nu<0\,, \\
+    \frac{-\sgn\mu}{\mu-\nu}\big[ \Z\mu-\Z\nu \big]\,, 
+    &\mu\nu>0\ \&\ \mu\neq\nu\,.
+    \end{cases}
+    \label{eq:twoconv}
+\end{eqnarray}
+Also remember that although with $\mu<0$ the convolution~$\Z\mu$
+integrates over the past, with $\mu>0$ the convolution~$\Z\mu$ integrates into the future---both over a time scale of order~$1/|\mu|$.
+
+The operator~\verb|ou(f,tt,mu)| represents the convolution~$\Z\mu f$ as defined by~\eqref{eq:zmuf}: called \verb|ou| because it is an Ornstein--Uhlenbeck process.
+The operator~\verb|ou| is `linear' over fast time~\verb|tt| as the convolution only arises from solving \pde{}s in the operator
+$\partial_t-\mu$\,.
+Code its derivative~\eqref{eq:ddtconv} and its action upon deterministic terms~\eqref{eq:conv1}:
+\begin{reduce}
+operator ou; linear ou;
+let { df(ou(~f,tt,~mu),t)=>-sign(mu)*f+mu*ou(f,tt,mu)
+    , ou(1,tt,~mu)=>1/abs(mu)
+\end{reduce}
+Also code the transform~\eqref{eq:twoconv} that successive convolutions at different rates may be transformed into several single convolutions.
+\begin{reduce}
+    , ou(ou(~r,tt,~nu),tt,~mu) => 
+      (ou(r,tt,mu)+ou(r,tt,nu))/abs(mu-nu) when (mu*nu<0)
+    , ou(ou(~r,tt,~nu),tt,~mu) => 
+      -sign(mu)*(ou(r,tt,mu)-ou(r,tt,nu))/(mu-nu)
+      when (mu*nu>0)and(mu neq nu)
+    };
+\end{reduce}
+The above properties are \emph{critical}: they must be correct for the results to be correct.
+
+Second, identify the resonant parts, some of which must go into the evolution~\verb|gg(i)|, and some into the transform.
+It depends upon the exponent of~\verb|yz| compared to the decay rate of this mode, here~\verb|r|.
+\begin{reduce}
+operator reso_; linear reso_;
+let { reso_(~a,yz,~r)=>1 when df(a,yz)*yz=r*a
+    , reso_(~a,yz,~r)=>0 when df(a,yz)*yz neq r*a
+    };
+\end{reduce}
+
+Lastly, the remaining terms get convolved at the appropriate rate to solve their respective homological equation by the operator~\verb|zres_|.
+\begin{reduce}
+depend yz,ttyz;
+operator zres_; linear zres_;
+let zres_(~a,ttyz,~r)=>ou(sign(df(a,yz)*yz/a-r)
+    *sub(yz=1,a),tt,df(a,yz)*yz/a-r);
+\end{reduce}
+
+
+
+
+\section{Operators to solve noisy homological equation}
+
+When solving homological equations of the form $F+\xi_t=\res$ (the resonant case $\mu=0$), we separate the terms in the right-hand side~$\res$ into those that are integrable in fast time, and hence modify the coordinate transform by changing~$\xi$, and those that are not, and hence must remain in the evolution by changing~$F$.  the operator \verb|zint_| extracts those parts of a term that we know are integrable; the operator \verb|znon_| extracts those parts which are not.
+With more research, more types of terms may be found to be integrable; hence what is extracted by \verb|zint_| and what is left by \verb|zint_| may change with more research.
+These transforms are not critical: changing the transforms may change intermediate computations, but as long as the iteration converges, the computer algebra results will be algebraically correct.
+\begin{reduce}
+operator zint_; linear zint_;
+operator znon_; linear znon_;
+\end{reduce}
+
+First, avoid obvious secularity.
+\begin{reduce}
+let { zint_(w(~i),tt)=>0, znon_(w(~i),tt)=>w(i)
+    , zint_(1,tt)=>0, znon_(1,tt)=>1
+    , zint_(w(~i)*~r,tt)=>0, znon_(w(~i)*~r,tt)=>w(i)*r
+\end{reduce}
+Second, by~\eqref{eq:ddtconv} a convolution may be split into an integrable part, and a part in its argument which in turn may be integrable or not.
+\begin{reduce}
+    , zint_(ou(~r,tt,~mu),tt)=>ou(r,tt,mu)/mu+zint_(r,tt)/abs(mu)
+    , znon_(ou(~r,tt,~mu),tt)=>znon_(r,tt)/abs(mu)
+\end{reduce}
+Third, squares of convolutions may be integrated by parts to an integrable term and a part that may have integrable or non-integrable parts.
+\begin{reduce}
+    , zint_(ou(~r,tt,~mu)^2,tt)=>ou(~r,tt,~mu)^2/(2*mu)
+                              +zint_(r*ou(r,tt,mu),tt)/abs(mu)
+    , znon_(ou(~r,tt,~mu)^2,tt)=>znon_(r*ou(r,tt,mu),tt)/abs(mu)
+\end{reduce}
+Fourth, different products of convolutions may be similarly separated using integration by parts.  
+\begin{reduce}
+    , zint_(ou(~r,tt,~mu)*ou(~s,tt,~nu),tt)
+      =>ou(r,tt,mu)*ou(s,tt,nu)/(mu+nu)
+      +zint_(sign(mu)*r*ou(s,tt,nu)+sign(nu)*s*ou(r,tt,mu),tt)
+      /(mu+nu) when mu+nu neq 0
+    , znon_(ou(~r,tt,~mu)*ou(~s,tt,~nu),tt)=>
+      +znon_(sign(mu)*r*ou(s,tt,nu)+sign(nu)*s*ou(r,tt,mu),tt)
+      /(mu+nu) when mu+nu neq 0
+\end{reduce}
+However, a zero divisor arises when $\mu+\nu=0$ in the above.
+Here code rules to cater for such terms by increasing the depth of convolutions over past history.
+\begin{reduce}
+    , zint_(ou(~r,tt,~mu)*ou(~s,tt,~nu),tt)=>
+      ou(ou(r,tt,-nu),tt,-nu)*ou(s,tt,nu)
+      +zint_(ou(ou(r,tt,-nu),tt,-nu)*s,tt) when (mu+nu=0)and(nu>0)
+    , znon_(ou(~r,tt,~mu)*ou(~s,tt,~nu),tt)=>
+      znon_(ou(ou(r,tt,-nu),tt,-nu)*s,tt) when (mu+nu=0)and(nu>0)
+\end{reduce}
+The above handles quadratic products of convolutions.
+Presumably, if we seek cubic noise effects then we may need cubic products of convolutions.
+However, I do not proceed so far and hence terminate the separation rules.
+\begin{reduce}
+};
+\end{reduce}
+
+
+
+
+\section{Initialise approximate transform}
+
+Truncate asymptotic approximation of the coordinate transform depending upon the parameter~\verb|toosmall|.
+Use the `instant evaluation' property of a loop index to define the truncation so that Reduce omits small terms on the fly.
+\begin{reduce}
+for j:=toosmall:toosmall do let small^j=>0;
+\end{reduce}
+
+Variables \verb|x|, \verb|y| and~\verb|z| were operators in the specification of the equations.
+We now want them to store the approximation to the coordinate transform, so clear and reallocate as storage for the normal form expressions.
+\begin{reduce}
+clear x,y,z;
+array x(nx),y(ny),z(nz);
+\end{reduce}
+
+Express the normal form in terms of new evolving variables $X_i$,$Y_i$ and~$Z_i$, denoted by operators \verb|xx(i)|, \verb|yy(i)| and~\verb|zz(i)|, which are nonlinear modifications to $x_i$, $y_i$ and~$z_i$.
+The expressions for the normal form \sde{}s are stored in~\verb|ff|, \verb|gg| and~\verb|hh|.
+\begin{reduce}
+operator xx; operator yy; operator zz;
+depend xx,t; depend yy,t; depend zz,t;
+let { df(xx(~i),t)=>ff(i) 
+    , df(yy(~i),t)=>gg(i) 
+    , df(zz(~i),t)=>hh(i) };
+\end{reduce}
+
+The first linear approximation is then $x_i\approx X_i$\,, $y_i\approx Y_i$ and $z_i=Z_i$\,, such that $\dot X_i\approx 0$\,, in~\verb|ff(i)|, $\dot Y_i\approx -r_iY_i$\,, in~\verb|gg(i)|, and  $\dot Z_i\approx +r_iZ_i$\,, in~\verb|hh(i)|.
+\begin{reduce}
+for i:=1:nx do x(i):=xx(i);
+for i:=1:ny do y(i):=yy(i);
+for i:=1:nz do z(i):=zz(i);
+for i:=1:nx do ff(i):=0;
+for i:=1:ny do gg(i):=-rats_(i)*yy(i);
+for i:=1:nz do hh(i):=+ratu_(i)*zz(i);
+\end{reduce}
+
+Update the $Y_i$~evolution \verb|gg(i)| and the $y_i$~transform.
+The residual is of the form of a sum of terms $\prod_{j}Y_j^{q_j}Z_k^{r_k} \in\res$.
+So updates involve dividing by, or convolving with,~$\beta_i-\sum_j\beta_jq_j+\sum_k\gamma_kr_k$.
+First, form the substitutions needed to introduce~\verb|yz| to count the number of variables $Y_i$~and~$Z_i$ in any given term, weighted according to their rate coefficient in the \text{homological equation.}
+\begin{reduce}
+y4y:=for i:=1:ny collect yy(i)=yy(i)*yz^rats_(i)$
+z4z:=for i:=1:nz collect zz(i)=zz(i)/yz^ratu_(i)$
+y4y:=append(y4y,z4z)$
+\end{reduce}
+
+
+
+
+\section{Iterative updates}
+
+We iterate to a solution of the governing \sde{}s to residuals of some order of error.
+For the moment, iterate for a maximum of nineteen iterations and to the pre-specified errors.
+\begin{reduce}
+for iter:=1:maxiter do begin
+  ok:=1;
+  if trace then write "
+  ITERATION = ",iter,"
+  -------------";
+\end{reduce}
+
+
+
+\subsection{Fast stable modes}
+
+Compute the residual of each of the $y_i$~\sde{}s, updating \verb|ok| to track whether all \sde{}s are satisfied.  Keep track of the lengths of the residuals to indicate progress in the iteration.
+\begin{reduce}
+  lengthresy:={};
+  for i:=1:ny do begin  
+    res:=-df(y(i),t)+part(yrhs_,i);
+    ok:=if res=0 then ok else 0;
+    lengthresy:=append(lengthresy,{length(res)});
+    if trace then write "resy",i," = ",res;
+\end{reduce}
+
+Within the loop: first insert the weighted count of $Y$~and~$Z$ variables;
+then split the residual into two parts of possibly resonant, \verb|res0| and the rest,~\verb|res1|; then allocate to the evolution or the transform.
+\begin{reduce}
+    res:=sub(y4y,res);
+    res0:=reso_(res,yz,+rats_(i));
+    res1:=res-res0*yz^rats_(i);
+    gg(i):=gg(i)+znon_(res0,tt);
+    if trace then write "dY",i,"/dt = ",gg(i);
+    y(i):=y(i) +zint_(res0,tt) -zres_(res1,ttyz,rats_(i));
+    if trace then write "y",i," = ",y(i);
+  end;
+  if ny>0 then write lengthresy:=lengthresy;
+\end{reduce}
+
+
+
+\subsection{Fast unstable modes}
+
+Compute the residual of each of the $z_i$~\sde{}s, updating \verb|ok| to track whether all \sde{}s are satisfied.  Keep track of the lengths of the residuals to indicate progress in the iteration.
+\begin{reduce}
+  lengthresz:={};
+  for i:=1:nz do begin  
+    res:=-df(z(i),t)+part(zrhs_,i);
+    ok:=if res=0 then ok else 0;
+    lengthresz:=append(lengthresz,{length(res)});
+    if trace then write "resz",i," = ",res;
+\end{reduce}
+
+Update the $Z_i$~evolution \verb|hh(i)| and the $z_i$~transform.
+Within the loop: first insert the weighted count of $Y$~and~$Z$ variables;
+then split the residual into two parts of possibly resonant,~\verb|res0|, and the rest,~\verb|res1|; then allocate to the evolution or the transform.
+\begin{reduce}
+    res:=sub(y4y,res);
+    res0:=reso_(res,yz,-ratu_(i));
+    res1:=res-res0/yz^ratu_(i);
+    hh(i):=hh(i)+znon_(res0,tt);
+    z(i):=z(i) +zint_(res0,tt) -zres_(res1,ttyz,-ratu_(i));
+  end;
+  if nz>0 then write lengthresz:=lengthresz;
+\end{reduce}
+
+
+
+
+
+\subsection{Slow modes}
+
+Compute the residual of each of the $x$~\sde{}s, updating \verb|ok| to track whether all \sde{}s are satisfied.  Keep track of the lengths of the residuals to indicate progress in the iteration.
+\begin{reduce}
+  lengthresx:={};
+  for i:=1:nx do begin
+    res:=-df(x(i),t) +part(xrhs_,i);
+    ok:=if res=0 then ok else 0;
+    lengthresx:=append(lengthresx,{length(res)});
+    if trace then write "resx",i," = ",res;
+\end{reduce}
+
+Update the $X_i$~evolution \verb|ff(i)| and the $x_i$~transform.
+Use the same process as for the fast variables; the difference is that here the mode rate is zero.
+\begin{reduce}
+    res:=sub(y4y,res);
+    res0:=reso_(res,yz,0);
+    res1:=res-res0;
+    ff(i):=ff(i)+znon_(res0,tt);
+    if trace then write "dX",i,"/dt = ",ff(i);
+    x(i):=x(i) +zint_(res0,tt) -zres_(res1,ttyz,0);
+    if trace then write "x",i," = ",x(i);
+  end;
+  if nx>0 then write lengthresx:=lengthresx;
+\end{reduce}
+
+Terminate the iteration loop once all residuals are zero.
+\begin{reduce}
+  showtime;
+  if ok then write "Number of iterations ",
+    iter:=1000000+iter;
+end;
+\end{reduce}
+
+
+
+
+
+\section{Output results}
+
+Only proceed to print if terminated successfully.
+\begin{reduce}
+if ok 
+  then write "SUCCESS: converged to an expansion"
+  else <<write "FAILED TO CONVERGE; I EXIT";
+    return; >>;
+\end{reduce}
+
+
+\subsection{Plain text version}
+
+Print the resultant coordinate transform: but only print to one lower power in~\verb|small| and~\verb|sigma| in order to keep output relatively small.
+\begin{reduce}
+write "The stochastic/non-autonomous coordinate transform,
+(to one order lower in both small and sigma)";
+for i:=1:nz do begin z(i):=sigma*small*z(i); 
+               write z(i):=z(i)/small/sigma; end;
+for i:=1:ny do begin y(i):=sigma*small*y(i); 
+               write y(i):=y(i)/small/sigma; end;
+for i:=1:nx  do begin x(i):=sigma*small*x(i); 
+               write x(i):=x(i)/small/sigma; end;
+\end{reduce}
+
+Lastly print the normal form \sde{}s: first the fast, second the slow.
+\begin{reduce}
+write "The normal form S/ODEs";
+for i:=1:nz do write "dzz(",i,")/dt = ",hh(i);
+for i:=1:ny do write "dyy(",i,")/dt = ",gg(i);
+for i:=1:nx do write "dxx(",i,")/dt = ",ff(i);
+\end{reduce}
+
+
+
+\subsection{\LaTeX\ version}
+
+As before, we have to write expressions to file for later reading so they get printed without extraneous dross in the \LaTeX\ source.
+First open up the temporary file \verb|scratchfile.red| again.
+\begin{reduce}
+out "scratchfile.red";
+write "off echo;"$ % do not understand why needed in 2021??
+\end{reduce}
+
+Write the stochastic coordinate transform to file, with a heading, and with an anti-math environment to cancel the auto-math of rlfi.
+For some reason we have to keep these writes short as otherwise it generates a spurious fatal blank line in the \LaTeX.
+\begin{reduce}
+write "write ""\end{math}
+\paragraph{Time dependent coordinate transform}
+\begin{math}"";";
+for i:=1:nz do write "z(",i,"):=z(",i,");"; 
+for i:=1:ny do write "y(",i,"):=y(",i,");";
+for i:=1:nx do write "x(",i,"):=x(",i,");"; 
+\end{reduce}
+
+Write the resultant stochastic normal form to file, with a heading, and with an anti-math environment to cancel the auto-math of rlfi.
+\begin{reduce}
+write "write ""\end{math}
+\paragraph{Result normal form DEs}
+\begin{math}"";";
+for i:=1:nz do write "hh(",i,"):=hh(",i,");";
+for i:=1:ny do write "gg(",i,"):=gg(",i,");";
+for i:=1:nx do write "ff(",i,"):=ff(",i,");";
+write "end;";
+\end{reduce}
+
+Shut the temporary output file.
+\begin{reduce}
+shut "scratchfile.red";
+\end{reduce}
+
+Get expressions from file and write the main \LaTeX\ file.
+But first redefine how these names get printed, namely as the normal form time derivatives. 
+\begin{reduce}
+defid hh,name="\dot Z";
+defid gg,name="\dot Y";
+defid ff,name="\dot X";
+\end{reduce}
+
+Finally write to the main \LaTeX\ file so switch on latex after starting to write to the file.
+Then write expressions in \verb|scratchfile.red| to \verb|stoNFreport.tex| as nice \LaTeX.
+Switch off latex, to get the end of the document, and finish writing.
+\begin{reduce}
+out "stoNFreport.tex"$
+on latex$
+in "scratchfile.red"$
+off latex$
+shut "stoNFreport.tex"$
+\end{reduce}
+
+
+\section{Fin}
+That's all folks, so end the procedure. 
+\begin{reduce}
+return Finished_constructing_normal_form_of_system$ 
+end$
+\end{reduce}
+
+
+
+
+
+\section{Override some rlfi procedures}
+
+Now setup the rlfi package to write a \LaTeX\ version of the output.  
+It is all a bit tricky and underhand.  
+We override some stuff from \verb|rlfi.red|.\footnote{Find it in \url{reduce-algebra/trunk/packages/misc/rlfi.red}}  
+
+First, change \verb|name| to get Big delimiters, not left-right delimiters, so \LaTeX\ can break lines.
+\begin{reduce}
+deflist('((!( !\!b!i!g!() (!) !\!b!i!g!)) (!P!I !\!p!i! )
+         (!p!i !\!p!i! ) (!E !e) (!I !i) (e !e) (i !i)),'name)$
+\end{reduce}
+
+Override the procedure that prints annoying messages about multicharacter symbols.
+It ends the output of one expression.
+This is just a copy from \verb|rlfi.red| with the appropriate if-statement deleted.
+\begin{reduce}
+symbolic procedure prinlaend;
+<<terpri();
+  prin2 "\end{";
+  prin2 mstyle!*;
+  prin2t "}\par";
+  if !*verbatim then
+      <<prin2t "\begin{verbatim}";
+        prin2t "REDUCE Input:">>;
+  ncharspr!*:=0;
+  if ofl!* then linelength(car linel!*)
+    else laline!*:=cdr linel!*;
+  nochar!*:=append(nochar!*,nochar1!*);
+  nochar1!*:=nil >>$
+\end{reduce}
+
+Override the procedure that outputs the \LaTeX\ preamble upon the command \verb|on latex|.
+\begin{reduce}
+symbolic procedure latexon;
+<<!*!*a2sfn:='texaeval;
+  !*raise:=nil;
+  prin2t "\documentclass[11pt,a5paper]{article}";
+  prin2t "\usepackage[a5paper,margin=13mm]{geometry}";
+  prin2t "\usepackage{parskip,time} \raggedright";
+  prin2t "\def\ou\big(#1,#2,#3\big){{{\rm e}^{\if#31\else#3\fi t}\star}#1\,}";
+  prin2t "\def\eps{\varepsilon}";
+  prin2t "\title{Normal form of your dynamical system}";
+  prin2t "\author{A. J. Roberts, University of Adelaide\\";
+  prin2t "\texttt{http://orcid.org/0000-0001-8930-1552}}";
+  prin2t "\date{\now, \today}";
+  prin2t "\begin{document}";
+  prin2t "\maketitle";
+  prin2t "Throughout and generally: the lowest order, most";
+  prin2t "important, terms are near the end of each expression.";
+  prin2t "\input{stoNFreportSys}";
+  if !*verbatim then
+      <<prin2t "\begin{verbatim}";
+        prin2t "REDUCE Input:">>;
+  put('tex,'rtypefn,'(lambda(x) 'tex)) >>$
+\end{reduce}
+
+End the file when input to Reduce
+\begin{reduce}
+end;
+\end{reduce}
+
+
+
+
+
+
+\bibliographystyle{agsm}
+\bibliography{ajr,bib}
+
+
+\end{document}
+ 

@@ -1,0 +1,111 @@
+\documentclass[11pt,a4paper]{refart}
+
+\title{Many examples of normal forms for stochastic or non-autonomous differential equations}
+
+\author{A.~J. Roberts\thanks{School of Mathematical Sciences, University of Adelaide, South Australia~5005, \textsc{Australia}.
+\url{https://profajroberts.github.io/}}}
+
+\date{Nov 2008 -- \today}
+
+
+
+\usepackage{url,natbib,amsmath,defns,reducecode}
+\RaisedNamesfalse
+\let\harvardurl\url
+\IfFileExists{ajr.sty}{\usepackage{ajr}}{}
+\usepackage{mycleveref}
+\allowdisplaybreaks
+\Cal L \Cal E \Cal Z
+\Vec x\Vec y\Vec z
+\Vec X\Vec Y\Vec Z
+%\def\dde{\textsc{dde}}
+%\newcommand{\adj}[1]{#1^\dagger} % denotes cc transpose
+% for output of coordinate transform
+\def\ou\big(#1,#2,#3\big){{{\rm e}^{\if#31\else#3\fi t}\star}#1\,}
+\newcommand{\Z}[1]{{\em e}^{#1t}{\star}}
+%\def\exp\big(#1\big){\,{\rm e}^{#1}}
+\def\eps{\ensuremath{\varepsilon}}
+\newcommand{\ParMath}[1]%
+    {\parbox[t]{0.9\linewidth}{\raggedright\(#1\)}}
+
+\begin{document}
+
+\maketitle
+
+
+\paragraph{Instructions}
+\begin{itemize}
+\item Download and install the computer algebra package
+\emph{Reduce}\footnote{Use the computer algebra package \emph{Reduce} 
+because it is both free 
+and perhaps the fastest general purpose computer algebra 
+system~\cite[e.g.]{Fateman2002}.} via \url{http://www.reduce-algebra.com}
+
+
+
+\item Navigate to folder \verb|Examples| within folder \verb|StoNormForm|.
+
+\item For each example of interest, start-up \emph{Reduce} and enter the command \verb|in_tex "filename.tex"$|  where filename is the root name of the example (as listed in the following table of contents).
+
+\end{itemize}
+
+
+\tableofcontents
+
+
+\atBegin{section}{\newpage}%??
+
+
+\section{Some representative examples}
+
+\input{Examples/ratodes}
+\input{Examples/futureNoise}
+\input{Examples/othersFail}
+\input{Examples/offdiagonal}
+\input{Examples/jordanForm}
+\input{Examples/slowOsc}
+\input{Examples/linearHyper}
+\input{Examples/foliateHyper}
+\input{Examples/monahanFour}
+\input{Examples/monahanOne}
+
+
+
+
+
+%\section{Slow invariant manifolds}
+%
+%Also see \cref{simple3d,metastable4}.
+%\input{Examples/simple2d}
+%\input{Examples/lorenz86sm}
+%
+%
+%
+%
+%\section{Oscillation in a centre manifold}
+%
+%Also see \cref{nonlinNormModes}.
+%\input{Examples/simpleosc}
+%\input{Examples/quasidde}
+%\input{Examples/lorenz86nf}
+%\input{Examples/stoleriu2}
+%
+%
+%
+%\section{Stable invariant manifolds}
+%
+%Also see \cref{stable3d}.
+%\input{Examples/stable2d}
+%
+%
+%
+%\section{Invariant manifolds in delay DEs}
+%
+%Also see \cref{doubleHopfDDE}
+%\input{Examples/simple1dde}
+%\input{Examples/logistic1dde}
+
+
+\bibliographystyle{agsm}
+\bibliography{bib,ajr}
+\end{document}
