@@ -15,15 +15,11 @@
 \IfFileExists{ajr.sty}{\usepackage{ajr}}{}
 \usepackage{mycleveref}
 \allowdisplaybreaks
-\Cal L \Cal E \Cal Z
 \Vec x\Vec y\Vec z \Vec v
 \Vec X\Vec Y\Vec Z
-%\def\dde{\textsc{dde}}
-%\newcommand{\adj}[1]{#1^\dagger} % denotes cc transpose
 % for output of coordinate transform
 \def\ou\big(#1,#2,#3\big){{{\rm e}^{\if#31\else#3\fi t}\star}#1\,}
 \newcommand{\Z}[1]{{\em e}^{#1t}{\star}}
-%\def\exp\big(#1\big){\,{\rm e}^{#1}}
 \def\eps{\ensuremath{\varepsilon}}
 \newcommand{\ParMath}[1]%
     {\parbox[t]{0.9\linewidth}{\raggedright\(#1\)}}
@@ -53,10 +49,11 @@ system~\cite[e.g.]{Fateman2002}.} via \url{http://www.reduce-algebra.com}
 \tableofcontents
 
 
-\atBegin{section}{\newpage}%??
-
-
-\section{Some representative examples}
+%\atBegin{section}{\newpage}%??
+%
+%\section{Some representative examples}
+\let\subsubsection\subsection
+\let\subsection\section
 
 \input{Examples/ratodes}
 \input{Examples/futureNoise}

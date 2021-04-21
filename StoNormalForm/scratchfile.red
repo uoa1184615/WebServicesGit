@@ -5,9 +5,9 @@ write "\end{math}
 \paragraph{Time dependent coordinate transform}
 \begin{math}";
 
-y(1):=y(1);
+y_(1):=y_(1);
 
-x(1):=x(1);
+x_(1):=x_(1);
 
 write "\end{math}
 \paragraph{Result normal form DEs}

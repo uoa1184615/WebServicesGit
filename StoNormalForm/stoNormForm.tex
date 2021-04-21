@@ -16,15 +16,14 @@ Sciences, University of Adelaide, South Australia~5005,
 \let\harvardurl\url
 \IfFileExists{ajr.sty}{\usepackage{ajr}}{}
 \usepackage{mycleveref}
-
 %\allowdisplaybreaks
 \def\ou\big(#1,#2,#3\big){{{\rm e}^{\if#31\else#3\fi t}\star}#1\,}
 \newcommand{\Z}[1]{{\rm e}^{#1t}{\star}}
+\Vec x\Vec y\Vec z
+\Vec X\Vec Y\Vec Z
 \newcommand{\sgn}{\operatorname{sgn}}
 \newcommand{\res}{\operatorname{Res}}
-\newcommand{\pdf}{\textsc{pdf}}
-\newcommand{\ssm}{\textsc{ssm}}
-\def\eps{\varepsilon}
+\def\eps{\ensuremath{\varepsilon}}
 \def\sde{\textsc{s/ode}}
 
 \begin{document}
@@ -33,31 +32,27 @@ Sciences, University of Adelaide, South Australia~5005,
 \maketitle
 
 \begin{abstract}
-Construct stochastic normal form of a wide class of
-non-autonomous or stochastic differential equations (herein
-abbreviated by \sde{}s), based upon earlier
-research~\cite[]{Cox91, Chao95, Roberts06k}. Interpret all
-\sde{}s in the Stratonovich sense so the analysis applies to
-deterministic differential equations, both non-autonomous
-and autonomous. To construct normal forms of deterministic
-autonomous differential equations, simply omit specifying
-any noise. This article documents code designed for an
-interactive web site~\cite[]{Roberts07d} that is available
-to all to use.
-
-Modelling stochastic systems has many important
-applications. Stochastic coordinate transforms to a normal
-form is a powerful way of disentangling emergent long term
-dynamics. Since the analysis involves classic calculus, then
-the approach also applies to a wide class of non-autonomous
-dynamical systems. Further, cater for deterministic
-autonomous systems by simply omitting the time dependence in
-the system. For generality, this approach now caters for
-unstable modes, and for differential equation systems with a
-rational right-hand side.
+Provides a coded procedure to construct stochastic normal
+form of a wide class of systems of non-autonomous or
+stochastic differential equations (herein abbreviated by
+\sde{}s).  The methodology is based upon  earlier
+research~\cite[]{Cox91, Chao95, Roberts06k}.  Interpret all
+\sde{}s in the Stratonovich sense so the analysis applies 
+to deterministic differential equations, both non-autonomous
+and autonomous. Cater for deterministic autonomous systems
+by simply omitting the `noise'.  For generality, this coded
+procedure now caters  for unstable modes, and for
+differential equation systems with  a rational right-hand
+side.  This code also underlies an interactive web
+service~\cite[]{Roberts07d}.  Modelling stochastic systems
+has many important applications.  The constructed stochastic
+coordinate  transforms are a powerful way of disentangling
+emergent long term dynamics.  
 \end{abstract}
 
 \tableofcontents
+
+
 
 \section{Introduction}
 
@@ -68,7 +63,7 @@ Download and unzip the folder
 \url{https://profajroberts.github.io/StoNormForm.zip}
 \quad Within the folder \verb|StoNormForm|, start-up
 \emph{Reduce} and load the procedure by executing the
-command \verb|in_tex "invariantManifold.tex"$|
+command \verb|in_tex "stoNormForm.tex"$|
 \footnote{This script changes many internal settings of
 \emph{Reduce}, so best to do only when needed.} Test your
 installation by then executing \verb|examplenormform();|
@@ -78,7 +73,7 @@ installation by then executing \verb|examplenormform();|
 Thereafter, construct a specified invariant manifold of a
 specific dynamical system by executing the following command
 with specific values for the input parameters.  See
-\verb|allExamples.pdf| for many examples.
+\verb|manyExamples.pdf| for many examples.
 \begin{verbatim}
 stonormalform(dxdt, dydt, dzdt, toosmall);
 \end{verbatim}
@@ -88,25 +83,24 @@ stonormalform(dxdt, dydt, dzdt, toosmall);
 Write your \sde\ system in terms of slow
 variables~\(x_j(t)\), fast stable variables~\(y_j(t)\)
 (linearly decaying), and fast unstable variables~\(z_j(t)\)
-(linearly growing). For an \sde\ with $n_x$~slow modes,
+(linearly growing).  For an \sde\ with $n_x$~slow modes,
 $n_y$~fast stable modes, and/or \(n_z\)~fast unstable modes,
-you must denote the slow modes by \verb|x(1)| through
-to~\verb|x(nx)|, the stable fast modes by \verb|y(1)|
-through to~\verb|y(ny)|, and the unstable fast modes by
-\verb|z(1)| through to~\verb|z(nz)|. Each Stratonovich white
-noise, derivative of a Stratonovich Wiener process, must be
+you must denote the slow modes by~\verb|x(1)| through
+to~\verb|x(nx)|, the stable fast modes by~\verb|y(1)|through
+to~\verb|y(ny)|, and the unstable fast modes by~\verb|z(1)|
+through to~\verb|z(nz)|. Each non-autonomous factor must be
 denoted by~\verb|w(.)| where the dot denotes almost any
 label you care to choose: simple numbers such as~\verb|w(1)|
 and/or~\verb|w(2)| are the usual choices; but other labels
-for the noise may be used. Deterministic, autonomous, normal
-forms are constructed simply by omitting any noise
-term~\verb|w()| in the differential equations. The \sde{}s
-must be linearly diagonalised.\footnote{Although a Jordan
-form is also acceptable, there are issues in the error
-control.}  
-
-Then, as in the example of the next \cref{ss:eg}, the input
-parameters to the procedure are the following:
+may be used. Often \verb|w(.)| is a Stratonovich white
+noise, a derivative of a Stratonovich Wiener process. 
+Deterministic, autonomous, systems are analysed by omitting
+any noise term~\verb|w()| in the differential equations. 
+The \sde{}s must be linearly diagonalised.\footnote{Although
+a Jordan form is also acceptable, there are issues in the
+error control.}  Then, as in the example of the next
+\cref{ss:eg}, the input parameters to the procedure are the
+following:
 \begin{itemize}
 \item \verb|dxdt|, a comma separated list within braces,
 \(\{\ldots\}\), of the right-hand sides of the \sde{}s for
@@ -126,41 +120,57 @@ constructed.  The procedure embeds the specified system in a
 family of systems parametrised by~\(\eps\), and constructs
 an invariant manifold, and evolution thereon, of the
 embedding system to the asymptotic error~\Ord{\eps^{\tt
-toosmall}} (as \(\eps\to0\)). Often the introduced
+toosmall}} (as \(\eps\to0\)).  Often the introduced
 artificial~\(\eps\) has a useful physical meaning, but
 strictly you should evaluate the output at \(\eps=1\) to
-recover results for the specified system, and then interpret
-the results in terms of actual `small' parameters.
+recover results for the specified system, and then
+reinterpret the results, and errors, in terms of your
+systems actual `small' parameters.
+
+The code \emph{also} truncates to errors~\Ord{\sigma^3}
+where \(\sigma\)~characterises the magnitude of the
+non-autonomous\slash stochastic effects~\verb|w(j)|.
 \end{itemize}
 
 The above right-hand side expressions for the
-time-derivatives must?? be multinomial in variables~$x_i$,
-$y_i$, $z_i$~and~$w_i$ (and also may include some~\(\dot
-x_i\), \(\dot y_i\), \text{and~\(\dot z_i\) effects).}
+time-derivatives must be multinomial in variables~$x_i$,
+$y_i$, $z_i$~and~$w_i$ (and, to cater for rational function
+right-hand sides, also may include some~\(\dot x_i\), \(\dot
+y_i\), \text{and~\(\dot z_i\) effects).}
 
 
 \paragraph{Outputs}  This procedure reports the specified
 system, the embedded system it actually analyses, the number
-of iterations taken, the invariant manifold approximation,
-the evolution on the invariant manifold, and optionally a
-basis for projecting onto the invariant manifold.
+of iterations taken, the constructed time dependent
+coordinate transform from new variables~\((\Xv,\Yv,\Zv)\) to
+the original~\((\xv,yv,zv)\), and the corresponding
+evolution in the new variables in terms of \sde{}s
+for~\((\Xv,\Yv,\Zv)\).
 \begin{itemize}
-\item A plain text report to the Terminal window in which
-\verb|Reduce| is executing---the invariant manifold is
-parametrised by variables \verb|s(1)|, \verb|s(2)|, \ldots,
-and the dynamics by their evolution in time.
+\item A plain report to the Terminal window in which
+\emph{Reduce} is executing.
+
 \item A \LaTeX\ source report written to the file
-\verb|stoNFreport.tex| (and
-\verb|stoNFreportSys.tex|)---the invariant manifold is
-parametrised by variables \(s_1\), \(s_2\), \ldots, and the
-dynamics by their evolution in time.  Generate a pdf version
-by executing \verb|pdflatex stoNFreport|\,.
+\verb|stoNFreport.tex| (and \verb|stoNFreportSys.tex|).
+Generate a pdf version by executing 
+\verb|pdflatex stoNFreport|\,.
+
+\item Global arrays such that \verb|x_(i)|, \verb|y_(j)|,
+and~\verb|z_(k)| are respectively the coordinate transforms
+\(x_i(\Xv,\Yv,\Zv,\sigma,\eps)\), 
+\(y_j(\Xv,\Yv,\Zv,\sigma,\eps)\),
+and~\(z_k(\Xv,\Yv,\Zv,\sigma,\eps)\).
+
+\item Global arrays \verb|ff(i)|, \verb|gg(j)|,
+and~\verb|hh(k)| give the corresponding evolution \(\dot
+X_i=\verb|ff(i)|\), \(\dot Y_j=\verb|gg(j)|\), and \(\dot
+Z_k=\verb|hh(j)|\) ---all as functions
+of~\((\Xv,\Yv,\Zv,\sigma,\eps)\).
 \end{itemize}
 One may change the appearance of the output somewhat. For
-example, it is often useful to execute  \verb|factor s;|
-before executing \verb|stonormalform(...)| in order to
-group terms with the same powers of amplitudes\slash
-order-parameters\slash coarse-variables.
+example, in order to group terms in output expressions,
+execute a \verb|factor| command before executing the
+procedure \verb|stonormalform(...)|.
 
 
 \paragraph{Background}
@@ -168,7 +178,7 @@ The theoretical support for the results of the analysis of
 this procedure is centre\slash stable\slash unstable
 manifold theory \cite[e.g.,][]{Carr81, Knobloch82,
 Haragus2011, Roberts2014a}, and an embryonic backwards
-theory \cite[]{Roberts2018a}. This particular procedure is
+theory \cite[]{Roberts2018a}.  This particular procedure is
 developed from that for human-efficient computer algebra
 \cite[]{Roberts96a}, and extended to stochastic\slash
 non-autonomous systems \cite[]{Chao95, Roberts06k}.
@@ -190,7 +200,7 @@ non-trivial system of fast/slow \sde{}s
 \dot x=-xy \qtq{and} \dot y=-y+x^2-2y^2+\sigma w(t),
 \end{equation*}
 where lowercase~$w(t)$, called a \emph{noise} within this
-document,  often denotes the formal derivative~$dW/dt$ of a
+document, often denotes the formal derivative~$dW/dt$ of a
 Stratonovich Wiener process~$W(t,\omega)$. Alternatively,
 \(w(t)\)~represents an arbitrary deterministic
 time-dependent forcing, or some control, or some `coloured'
@@ -201,9 +211,9 @@ noise.
 Use slow variable~\verb|x(1)| to denote~$x(t)$, stable
 variable~\verb|y(1)| to denote~$y(t)$, there is no unstable
 variable in this \sde, and use \verb|w(1)| to denote the
-Stratonovich noise~$w$. Hence this system is analysed for
-`small'~\(x,y,\sigma\) by executing the \text{following
-procedure:}
+Stratonovich noise~$w$.  Hence this system is analysed for
+`small'~\((x,y,\sigma)\) by executing the following
+procedure \verb|examplenormform()|:
 \begin{reduce}
 procedure examplenormform;  
     stonormalform(
@@ -212,16 +222,15 @@ procedure examplenormform;
     {},
     3 )$
 \end{reduce}
-The procedure automatically multiplies the noise factors by
-a parameter~\verb|sigma| so there is no need include the
-parameter~$\sigma$ in the specification of the problem
-(unless you particularly want to), as it will be done for
-you.
+The procedure \verb|stonormalform| automatically multiplies
+the noise factors by a parameter~\verb|sigma| so there is no
+need include the parameter~$\sigma$ in the specification of
+the problem, as it will be done for you.
 
-Further, the procedure uses the parameter~\verb|small| to
-control truncation in nonlinearity, also denoted
-by~\(\eps\).  The last parameter in the above specifies to
-construct the normal form to errors~\Ord{\eps^3}.
+Further, the procedure uses the parameter~\verb|small|, also
+denoted by~\(\eps\), to control truncation in nonlinearity. 
+The last parameter in the above specifies to construct the
+normal form to errors~\Ord{\eps^3}.
 
 Consequently, the procedure embeds the given system as the
 \(\eps=1\) version of the following system that it actually
@@ -232,8 +241,10 @@ analyses:
 \dot y_{1}=\sigma  w_{1}+\eps \big(x_{1}^{2}-2
 y_{1}^{2}\big)-y_{1}
 \end{equation*}
-using analysis and theory based upon the equilibrium at
-\(\eps=\sigma=0\)\,.
+using analysis and theory based upon the subspace of
+equilibria \(y_1=\eps=\sigma=0\)\,.  The constructed
+coordinate transform and corresponding \sde{}s are the
+following.
 
 
 \paragraph{The stochastic coordinate transform} (to one
@@ -249,7 +260,6 @@ Y_{1}^{2}\big)+Y_{1}
 \end{align*}
 
 
-
 \paragraph{Result normal form SDEs}
 \begin{align*}&
 \dot X_{1}=2 \sigma ^{2} \eps^{2} \ou\big(w_{1},tt,-1\big)
@@ -260,17 +270,42 @@ w_{1} Y_{1}-4 \sigma  \eps w_{1} Y_{1}-2 \eps^{2} X_{1}^{2}
 Y_{1}-Y_{1}
 \end{align*}
 \begin{itemize}
-\item The \(\dot Y_1\) \sde\ shows that \(Y_1=0\) is
-invariant, and since dominantly is \(\dot Y_1\approx-Y_1\)
-then it is almost always exponentially quickly attractive in
-some domain about the origin.
-\item The \(\dot X_1\) \sde is independent of~\(Y_1\) and
-indicates an algebraic attraction to zero, albeit affected
-by a multiplicative noise, and moderated by some irreducible
-noise-noise interactions.
+\item Since these construction is based upon the subspace of
+equilibria \(y_1=\eps=\sigma=0\), these constructed
+expressions are asymptotic as \((Y_1,\eps,\sigma)\to0\). 
+However, evaluation at \(\eps=1\) typically means that the
+expressions should be reinterpreted as asymptotic  as
+\((Y_1,X_1,\sigma)\to0\).
+
+Alternatively, since~\eps\ multiplies only quadratic terms, 
+then one could view it as counting the order of 
+nonlinearity in the new variables~\((X_1,Y_1)\).  For 
+example, the errors~\Ord{\eps^3} are equivalent to 
+errors~\Ord{|(X_1,Y_1,\sigma)|^4}.  Parameter~\(\sigma\) 
+arises in this error because the term~\(\sigma w_1\) drives 
+effects of size~\(\sigma\) in~\(y_1\).
+
+\item The \(\dot Y_1\) \sde\ shows that \(Y_1=0\) is exactly
+invariant, and since dominantly is \(\dot Y_1 \approx
+-Y_1\)\,, then \(Y_1=0\) is almost always exponentially
+quickly attractive (emergent) in some domain about the
+origin.
+
+\item The \(\dot X_1\) \sde\ is independent of~\(Y_1\) and
+here indicates an algebraic attraction to zero, albeit
+affected by a multiplicative noise, and moderated by some
+irreducible noise-noise interactions.  The independence
+implies that the \(\dot X_1\) \sde\ precisely predicts the
+system dynamics from its initial value over all time.
+
 \item These deductions are transformed into the original
 \(xy\)-space by the constructed time-dependent coordinate
 transformation.
+
+\item Backwards theory \cite[]{Roberts2018a} would assert
+that the \(X_1,Y_1\)-system and the coordinate transform
+together defines a system in the original \(xy\)-space, a
+system that is close to the original specified \sde{}s.
 \end{itemize}
 
 
@@ -326,18 +361,17 @@ res0, res1, lengthresx, lengthresy, lengthresz;
 
 Write an intro message.
 \begin{reduce}
-write "Construct a stochastic normal form (version 20 Apr 2021)"$
+write "Construct a stochastic normal form (version 22 Apr 2021)"$
 \end{reduce}
 
-
-
-Define default parameters for the iteration:
-\verb|maxiter|~is the maximum number of allowed iterations;
-\verb|toosmall|~is the order of errors in the analysis in
-terms of the parameter~\verb|small|. Specific problems may
-override these defaults.
+Parameter \verb|maxiter|~is the maximum number of allowed
+iterations; this default may be changed.
 \begin{reduce}
 maxiter:=29$
+\end{reduce}
+In the printed expressions, by default, factor
+\verb|small|~(\eps) and \verb|sigma|~($\sigma$).
+\begin{reduce}
 factor small,sigma; 
 \end{reduce}
 
@@ -345,7 +379,6 @@ The code cannot handle any cubic or higher order in noise amplitude~\verb|sigma|
 \begin{reduce}
 let sigma^3=>0;
 \end{reduce}
-
 
 For optional trace printing of test cases: comment out
 second line when not needed.
