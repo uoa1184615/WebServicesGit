@@ -1,0 +1,305 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{heatXchanger}: Local analysis of heat exchanger} 
+\label{heatXchanger}
+
+
+\cite{Roberts2013a} provides novel theoretical support for the method of multiple scales in spatio-temporal systems, and then extends this important method.
+Perhaps the simplest example is the heat exchanger: the non-autonomous slow manifold analysis that is at the heart of the novel methodology is determined here.
+An internal technical report\footnote{AJR (2012), \emph{Derive boundary conditions for heat exchanger modelling using near boundary dynamics}, \texttt{dbefhem.pdf}} considered the scenario where hot fluid enters one pipe from the right having temperature field~$a(x,t)$, and cold fluid enters the other pipe from the left with temperature field~$b(x,t)$.  
+Non-dimensional governing \pde{}s are
+\begin{equation*}
+\D ta=+\D xa+\rat12(b-a),\quad
+\D tb=-\D xb+\rat12(a-b).
+\label{eq:hepde}
+\end{equation*}
+
+Transform to mean and difference fields:
+\begin{equation*}
+c(x,t):=\rat12(a+b),\quad d(x,t):=\rat12(a-b),
+\quad\text{i.e., }
+a=c+d,\quad b=c-d.
+\label{eq:meandiff}
+\end{equation*}
+The mean and difference of the \pde{}s gives the equivalent \pde\ system
+\begin{equation*}
+\D tc=\D xd,\quad
+\D td=-d+\D xc.
+\label{eq:hecan}
+\end{equation*}
+In this form we readily see that the difference field~$d$ tends to decay exponentially quickly, but that interaction between gradients of the mean and difference fields generates other effects.
+
+The approach is to expand the fields in their local spatial structure based around a station $x=X$.
+Expand advection-exchange in a heat exchanger in powers of $(x-X)^n/n!$.
+\begin{align*}
+c(x,t)&=c_0(X,t)+c_1(X,t)(x-X) +c_2(X,t)\rat12(x-X)^2
+\nonumber\\&\quad{}
++c_3(X,t)\rat16(x-X)^3
+ +c_4(X,x,t)\rat1{24}(x-X)^4,
+%\label{eq:ctrt}
+\\
+d(x,t)&=d_0(X,t)+d_1(X,t)(x-X) +d_2(X,t)\rat12(x-X)^2
+\nonumber\\&\quad{}
++d_3(X,t)\rat16(x-X)^3 
++d_4(X,x,t)\rat1{24}(x-X)^4,
+%\label{eq:dtrt}
+\end{align*}
+With Taylor Remainder Theorem closing the problem in terms of unknown functions which here are represented by the non-autonomous forcing~$w_i$.
+Variables \(\verb|y(j)|=d_{j-1}\) and \(\verb|x(j)|=c_{j-1}\).  
+Also \(\verb|w(1)|=d_{4X}\eta_x\) and \(\verb|w(2)|=c_{4X}\xi_x\) and evaluate at intensity $\sigma=5$\,.
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+Execute the construction of a normal form for the system.
+\begin{reduce}
+stonormalform(
+    {y(2),y(3),y(4),y(5),w(1)},
+    {-y(1)+x(2)
+    ,-y(2)+x(3)
+    ,-y(3)+x(4)
+    ,-y(4)+x(5)
+    ,-y(5)+w(2)},
+    { },
+    99 );
+%end; % optional finish here
+\end{reduce}
+Here, since the results are exact, we can notionally carry out analysis to high-order, here coded~\(99\)th order.  Alternatively, as in the next section, one could divide by~\verb|small| all the~\verb|y(j)| terms in the \verb|x(i)| equations, and all the~\verb|x(i)| terms in the~\verb|y(j)| equations to analyse the original system without the algorithm's artifice of~\verb|small|/\eps.
+
+\paragraph{Specified dynamical system}
+The above embeds the \ode{}s as the following. 
+\begin{align*}&
+\dot x_{1}=\varepsilon  y_{2}
+\\& 
+\dot x_{2}=\varepsilon  y_{3}
+\\& 
+\dot x_{3}=\varepsilon  y_{4}
+\\& 
+\dot x_{4}=\varepsilon  y_{5}
+\\& 
+\dot x_{5}=\sigma  w_{1}
+\\& 
+\dot y_{1}=\varepsilon  x_{2}-y_{1}
+\\& 
+\dot y_{2}=\varepsilon  x_{3}-y_{2}
+\\& 
+\dot y_{3}=\varepsilon  x_{4}-y_{3}
+\\& 
+\dot y_{4}=\varepsilon  x_{5}-y_{4}
+\\& 
+\dot y_{5}=\sigma  w_{2}-y_{5}
+\end{align*}
+
+\paragraph{Time dependent coordinate transform}
+\begin{align*}&
+y_{1}=\ParMath{ \sigma  \eps^{4} \big(\ou\big(\ou\big(\ou\big(w_{2},tt,-1\big),tt,
+-1\big),tt,-1\big)+2 \ou\big(\ou\big(w_{2},tt,-1\big),tt,-1\big)+3 \ou
+\big(w_{2},tt,-1\big)\big)-\eps^{3} X_{4}+\eps X_{2}+Y_{1}
+}\\& 
+y_{2}=\sigma  \eps^{3} \big(\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big)+
+2 \ou\big(w_{1},tt,-1\big)\big)-\eps^{3} X_{5}+\eps X_{3}+Y_{2}
+\\& 
+y_{3}=\sigma  \eps^{2} \big(-\ou\big(\ou\big(w_{2},tt,-1\big),tt,-1\big)
+-\ou\big(w_{2},tt,-1\big)\big)+\eps X_{4}+Y_{3}
+\\& 
+y_{4}=-\sigma  \eps \ou\big(w_{1},tt,-1\big)+\eps X_{5}+Y_{4}
+\\& 
+y_{5}=\sigma  \ou\big(w_{2},tt,-1\big)+Y_{5}
+\\& 
+x_{1}=\sigma  \eps^{4} \big(-\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big)
+-3 \ou\big(w_{1},tt,-1\big)\big)+\eps^{3} Y_{4}-\eps Y_{2}+X_{1}
+\\& 
+x_{2}=\sigma  \eps^{3} \big(\ou\big(\ou\big(w_{2},tt,-1\big),tt,-1\big)+
+2 \ou\big(w_{2},tt,-1\big)\big)+\eps^{3} Y_{5}-\eps Y_{3}+X_{2}
+\\& 
+x_{3}=\sigma  \eps^{2} \ou\big(w_{1},tt,-1\big)-\eps Y_{4}+X_{3}
+\\& 
+x_{4}=-\sigma  \eps \ou\big(w_{2},tt,-1\big)-\eps Y_{5}+X_{4}
+\\& 
+x_{5}=X_{5}
+\end{align*}
+
+
+\paragraph{Result normal form DEs}
+\begin{align*}&
+\dot Y_{1}=\eps^{4} Y_{5}-\eps^{2} Y_{3}-Y_{1}
+\\& 
+\dot Y_{2}=-\eps^{2} Y_{4}-Y_{2}
+\\& 
+\dot Y_{3}=-\eps^{2} Y_{5}-Y_{3}
+\\& 
+\dot Y_{4}=-Y_{4}
+\\& 
+\dot Y_{5}=-Y_{5}
+\\& 
+\dot X_{1}=3 \sigma  \eps^{4} w_{1}-\eps^{4} X_{5}+\eps^{2} X_{3}
+\\& 
+\dot X_{2}=-2 \sigma  \eps^{3} w_{2}+\eps^{2} X_{4}
+\\& 
+\dot X_{3}=-\sigma  \eps^{2} w_{1}+\eps^{2} X_{5}
+\\& 
+\dot X_{4}=\sigma  \eps w_{2}
+\\& 
+\dot X_{5}=\sigma  w_{1}
+\end{align*}
+Clearly, the emergent slow manifold is \(\Yv=0\).
+Then the slow evolution of~\Xv\ leads to the emergent dynamics being described by 
+\begin{equation*}
+\D tc\approx\DD xc-\Dn x4c+3\sigma w_1\,.
+\end{equation*}
+
+
+
+\subsubsection{Near the boundary}
+This is for the case of boundary conditions $c+pd=\text{cd}_0(t)$ at $x=0$ for some parameter~$p$.  
+Computer algebra finds boundary conditions on the fields that reduce the dynamics near the boundary to the following with \(\verb|x(1)|=c_1\), \(\verb|x(2)|=c_3\), \(\verb|y(1)|=d_0\), \(\verb|y(2)|=d_2\) and \(\verb|w(1)|=d_{3X}\eta_x\) with \(\sigma=4\).
+Curiously, there is no dependence upon parameter~$p$ in these dynamics.
+
+The procedure \verb|stonormalform| is already loaded.
+Write a message saying we are now analysing the next system.
+\begin{reduce}
+write "**** Near the boundary ****";
+\end{reduce}
+Execute the construction of a normal form for this system
+\begin{reduce}
+stonormalform(
+    {y(2)/small,w(1)},
+    {-y(1)+x(1)/small,-y(2)+x(2)/small},
+    { },
+    99 );
+%end; % optional finish here
+\end{reduce}
+Again, the following results are exact.
+
+\paragraph{Specified dynamical system}
+\begin{align*}&
+\dot x_{1}=y_{2}
+\\&
+\dot x_{2}=\sigma  w_{1}
+\\&
+\dot y_{1}=x_{1}-y_{1}
+\\&
+\dot y_{2}=x_{2}-y_{2}
+\end{align*}
+
+\paragraph{Time dependent coordinate transform}
+\begin{align*}&
+y_{1}=\sigma  \big(\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big)+2 \ou
+\big(w_{1},tt,-1\big)\big)-X_{2}+X_{1}+Y_{1}
+\\&
+y_{2}=-\sigma  \ou\big(w_{1},tt,-1\big)+X_{2}+Y_{2}
+\\&
+x_{1}=\sigma  \ou\big(w_{1},tt,-1\big)+X_{1}-Y_{2}
+\\&
+x_{2}=X_{2}
+\end{align*}
+
+
+\paragraph{Result normal form DEs}
+\begin{align*}&
+\dot Y_{1}=-Y_{2}-Y_{1}
+\\&
+\dot Y_{2}=-Y_{2}
+\\&
+\dot X_{1}=-\sigma  w_{1}+X_{2}
+\\&
+\dot X_{2}=\sigma  w_{1}
+\end{align*}
+
+
+
+
+\subsubsection{Heat exchanger with quadratic reaction}
+\label{sec:heqr}
+
+Expand advection-reaction-exchange in a heat exchanger in powers of $(x-X)^n/n!$.  
+The reaction is some quadratic that should generate Burgers' equation model.
+With Taylor Remainder Theorem closing the problem in terms of unknown functions which here are represented by the non-autonomous forcing~$w_i$.
+Note that \(\verb|y(j)|=d_{j-1}\) and \(\verb|x(j)|=c_{j-1}\).  
+Also \(\verb|w(1)|=3d_{2x}\) and \(\verb|w(2)|=3c_{2x}\) and evaluate at intensity $\sigma=1$\,.
+
+The procedure \verb|stonormalform| is already loaded.
+Write a message saying we are now analysing the next system.
+\begin{reduce}
+write "**** with quadratic reaction ****";
+\end{reduce}
+Execute the construction of a normal form for this system
+\begin{reduce}
+stonormalform(
+    { y(2)-x(1)*y(1),
+      y(3)-x(1)*y(2)-x(2)*y(1),
+      small*w(1)-x(1)*y(3)-2*x(2)*y(2)-x(3)*y(1) },
+    { -y(1)+x(2)-(x(1)^2+y(1)^2)/2,
+      -y(2)+x(3)-x(1)*x(2)-y(1)*y(2),
+      -y(3)+small*w(2)-x(2)^2-x(1)*x(3)-y(2)^2-y(1)*y(3) },
+    { },
+    3 );
+end;
+\end{reduce}
+
+We could divide the off-diagonal linear terms by~\verb|small| (and remove the multiplication of forcing~\verb|w|), and the algorithm still converges, albeit in more iterations.  
+The resulting asymptotic expressions then do not assume that \(x\)~derivatives are `successively smaller'.  
+%See result in file \url{sdeheqr.pdf}
+The following uses the default scaling which corresponds to successively smaller \(x\)-derivatives provided I also multiply the forcing by~\verb|small|.
+
+\paragraph{Specified dynamical system}
+\begin{align*}&
+\dot x_{1}=\eps \big(-x_{1} y_{1}+y_{2}\big)
+\\&
+\dot x_{2}=\eps \big(-x_{2} y_{1}-x_{1} y_{2}+y_{3}\big)
+\\&
+\dot x_{3}=\sigma  \eps w_{1}+\eps \big(-x_{3} y_{1}-2 x_{2} y_{2}-x_{1}
+ y_{3}\big)
+\\&
+\dot y_{1}=\eps \big(x_{2}-1/2 x_{1}^{2}-1/2 y_{1}^{2}\big)-y_{1}
+\\&
+\dot y_{2}=\eps \big(x_{3}-x_{2} x_{1}-y_{2} y_{1}\big)-y_{2}
+\\&
+\dot y_{3}=\sigma  \eps w_{2}+\eps \big(-x_{3} x_{1}-x_{2}^{2}-y_{3} y_{
+1}-y_{2}^{2}\big)-y_{3}
+\end{align*}
+
+
+\paragraph{Time dependent coordinate transform}
+\begin{align*}&
+y_{1}=\eps \big(X_{2}-1/2 X_{1}^{2}+1/2 Y_{1}^{2}\big)+Y_{1}
+\\&
+y_{2}=\eps \big(X_{3}-X_{2} X_{1}+Y_{2} Y_{1}\big)+Y_{2}
+\\&
+y_{3}=\sigma  \eps \ou\big(w_{2},tt,-1\big)+\eps \big(-X_{3} X_{1}-X_{2}
+^{2}+Y_{3} Y_{1}+Y_{2}^{2}\big)+Y_{3}
+\\&
+x_{1}=\eps \big(X_{1} Y_{1}-Y_{2}\big)+X_{1}
+\\&
+x_{2}=\eps \big(X_{2} Y_{1}+X_{1} Y_{2}-Y_{3}\big)+X_{2}
+\\&
+x_{3}=\eps \big(X_{3} Y_{1}+2 X_{2} Y_{2}+X_{1} Y_{3}\big)+X_{3}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+\begin{align*}&
+\dot Y_{1}=\eps^{2} \big(-1/2 X_{1}^{2} Y_{1}+2 X_{1} Y_{2}-Y_{3}\big)-Y
+_{1}
+\\&
+\dot Y_{2}=\eps^{2} \big(-X_{2} X_{1} Y_{1}+2 X_{2} Y_{2}-1/2 X_{1}^{2} 
+Y_{2}+2 X_{1} Y_{3}\big)-Y_{2}
+\\&
+\dot Y_{3}=\ParMath{ -\sigma  \eps^{2} w_{2} Y_{1}+\eps^{2} \big(-X_{3} X_{1} Y_{1
+}-X_{3} Y_{2}-X_{2}^{2} Y_{1}-2 X_{2} X_{1} Y_{2}+X_{2} Y_{3}-1/2 X_{1}
+^{2} Y_{3}\big)-Y_{3}
+}\\&
+\dot X_{1}=\eps^{2} \big(X_{3}-2 X_{2} X_{1}+1/2 X_{1}^{3}\big)
+\\&
+\dot X_{2}=\sigma  \eps^{2} w_{2}+\eps^{2} \big(-2 X_{3} X_{1}-2 X_{2}^{
+2}+3/2 X_{2} X_{1}^{2}\big)
+\\&
+\dot X_{3}=-\sigma  \eps^{2} w_{2} X_{1}+\sigma  \eps w_{1}+\eps^{2} 
+\big(-3 X_{3} X_{2}+3/2 X_{3} X_{1}^{2}+3 X_{2}^{2} X_{1}\big)
+\end{align*}
+Hmmm, looks like this generates the slowly varying model that
+\begin{equation*}
+\D tC\approx \DD xC-2C\D xC+\rat12C^3.
+\end{equation*}
+Interestingly there is an extra factor of two in the nonlinear advection, and a net cubic reaction.
+
+

@@ -1,4 +1,7 @@
 
+off echo;
+
+
 \begin{math}
 \end{math}
 \paragraph{Specified dynamical system}
@@ -6,13 +9,27 @@
 \end{math}\par
 
 \begin{math}
-\dot x_{1}=\eps b_{1} y_{2} y_{1}
+\dot x_{1}=\eps \big(-x_{1} y_{1}+y_{2}\big)
 \end{math}\par
 
 \begin{math}
-\dot y_{1}=\sigma  b_{21} w_{2}+\eps b_{2} x_{1} y_{2}-y_{1}
+\dot x_{2}=\eps \big(-x_{2} y_{1}-x_{1} y_{2}+y_{3}\big)
 \end{math}\par
 
 \begin{math}
-\dot y_{2}=\sigma  b_{31} w_{3}+\eps b_{3} x_{1} y_{1}-y_{2}
+\dot x_{3}=\sigma  \eps w_{1}+\eps \big(-x_{3} y_{1}-2 x_{2} y_{2}-x_{1}
+ y_{3}\big)
+\end{math}\par
+
+\begin{math}
+\dot y_{1}=\eps \big(x_{2}-1/2 x_{1}^{2}-1/2 y_{1}^{2}\big)-y_{1}
+\end{math}\par
+
+\begin{math}
+\dot y_{2}=\eps \big(x_{3}-x_{2} x_{1}-y_{2} y_{1}\big)-y_{2}
+\end{math}\par
+
+\begin{math}
+\dot y_{3}=\sigma  \eps w_{2}+\eps \big(-x_{3} x_{1}-x_{2}^{2}-y_{3} y_{
+1}-y_{2}^{2}\big)-y_{3}
 \end{math}\par

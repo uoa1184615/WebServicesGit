@@ -361,7 +361,7 @@ res0, res1, lengthresx, lengthresy, lengthresz;
 
 Write an intro message.
 \begin{reduce}
-write "Construct a stochastic normal form (version 22 Apr 2021)"$
+write "Construct a stochastic normal form (version 23 Apr 2021)"$
 \end{reduce}
 
 Parameter \verb|maxiter|~is the maximum number of allowed
@@ -1209,12 +1209,15 @@ keep output relatively small.
 \begin{reduce}
 write "The stochastic/non-autonomous coordinate transform,
 (to one order lower in both small and sigma)";
-for i:=1:nz do begin z_(i):=sigma*small*z_(i); 
-               write z_(i):=z_(i)/small/sigma; end;
-for i:=1:ny do begin y_(i):=sigma*small*y_(i); 
-               write y_(i):=y_(i)/small/sigma; end;
-for i:=1:nx  do begin x_(i):=sigma*small*x_(i); 
-               write x_(i):=x_(i)/small/sigma; end;
+for i:=1:nz do if trace then write z_(i):=z_(i)
+    else begin z_(i):=sigma*small*z_(i); 
+         write z_(i):=z_(i)/small/sigma; end;
+for i:=1:ny do if trace then write y_(i):=y_(i) 
+    else begin y_(i):=sigma*small*y_(i); 
+         write y_(i):=y_(i)/small/sigma; end;
+for i:=1:nx do if trace then write x_(i):=x_(i) 
+    else begin x_(i):=sigma*small*x_(i); 
+         write x_(i):=x_(i)/small/sigma; end;
 \end{reduce}
 
 Lastly print the normal form \sde{}s: first the fast, second

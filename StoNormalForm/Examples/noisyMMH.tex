@@ -1,0 +1,263 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{noisyMMH}: noisy Michaelis--Menten--Henri chemical kinetics} 
+\label{nonautoTwo}
+\def\b#1{\color{blue}{}#1\color{black}{}}
+\def\dash#1{#1'}% change to dash time derivatives
+
+
+The Michaelis--Menten--Henri system, in non-dimensional form, is
+\begin{align*}
+&\dot x=\epsilon[-x+(x+\kappa-\lambda)y],
+&&\dot y=x-(x+\kappa)y\,.
+\end{align*}
+The usual approach is singular perturbation theory, but let's not obfuscate with singular limits, and instead use the clarity of being regular.
+A manifold of equilibria occur at \(y=x/(x+\kappa)\) and \(\epsilon=0\)  (also if \(\epsilon\neq 0\) and \(\lambda=0\) but we do not consider this case).
+Let's explore dynamics based at arbitrary point on this equilibrium manifold:
+substitute \(x(t)=x_0+x_1(t)\) and \(y(t)=x_0/(x_0+\kappa)+y_1(t)\).
+Also, to get the decay rate of~\(y_1\) to be a simple number, stretch time by the factor~\(x_0+\kappa\): that is, \((x_0+\kappa)dt=d\tau\) where \(\tau\)~is the time of the analysis so that
+\begin{equation*}
+\frac1{x_0+\kappa}\dot x_1(t)=x'_1(\tau),\quad
+\frac1{x_0+\kappa}\dot y_1(t)=y'_1(\tau).
+\end{equation*}
+This does mean that we have to be careful interpreting the results.  Hence derive
+\begin{align*}&
+x_1'=\frac\epsilon{x_0+\kappa}\left[
+-x_0-x_1+(x_0+x_1+\kappa-\lambda)(x_0/(x_0+\kappa)+y_1)
+\right],
+\\&
+y_1'=-y_1+\frac1{x_0+\kappa}\left[
+-x_1y_1+x_0+x_1-\frac{(x_0+x_1+\kappa)x_0}{x_0+\kappa}\right].
+\end{align*}
+As a prototypical example, let's investigate the simplest
+stochastic effects on this MM system of additive noises~\(w_1(\tau\) and \(w_2(\tau)\). The
+additive noise transforms to a multiplicative noise on
+the slow manifold, so it is important to remember that
+\emph{all} analysis and results are in the
+\emph{Stratonovich} interpretation.
+
+The analysis here is \emph{strong, pathwise}.
+The transformations here only rely on the `noise' being
+measurable, so the results also apply to deterministic
+non-autonomous forcing. The analysis may also apply to to
+non-Brownian noise provided the appropriate interpretation
+is used (e.g., the Marcus interpretation).  That is, as long
+as standard rules of integral calculus are valid.
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+Set some variables for simplicity.
+\begin{reduce}
+let rho*x0=>1-rho*kappa; % define rho=1/(x0+kappa)
+kappa:=1; lam:=1/2;      % set for simplicity
+\end{reduce}
+Execute the construction of a normal form for the system.
+\begin{reduce}
+factor epsilon;
+stonormalform(
+    { epsilon*rho*( -x0-x(1)
+      +(x0+x(1)+kappa-lam)*(x0*rho+y(1)) )
+      +w(1) },
+    { -y(1)+rho*( -x(1)*y(1)+x0+x(1)
+      -(x0+x(1)+kappa)*x0*rho )
+      +w(2) },
+    {},
+    3 )$
+end; 
+\end{reduce}
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}=\epsilon  \eps \big(x_{1} y_{1} \rho -x_{1} \rho ^{2}-1/2 y_{
+1} \rho +y_{1}+1/2 \rho ^{2}-1/2 \rho \big)+\sigma  w_{1}
+\\&
+\dot y_{1}=\sigma  w_{2}+\eps \big(-x_{1} y_{1} \rho +x_{1} \rho ^{2}
+\big)-y_{1}
+\end{align*}
+
+
+
+\paragraph{Time dependent coordinate transform}  The algorithm constructs a coordinate transform to
+variables~\((X_1,Y_1)\), including terms quadratic
+in~\(\sigma\), that to errors~\Ord{\sigma^2,\varepsilon^2},
+is the following.  
+The coordinate transform depends upon
+both the past and the future via convolutions
+\(\ou\big({},tt,-1\big)\) and \(\ou\big({},tt,1\big)\),
+respectively.
+The following expressions are complicated because stochastic
+effects interact through nonlinearity in a combinatorial
+explosion of ways.  We almost certainly do not need all
+these terms.  I subsequently explain why the \b{blue terms}
+are the ones describing the emergent stochastic slow
+manifold and the evolution thereon. Further, remember that
+the dominant terms are towards the end of each expression.
+\begin{align*}&
+y_{1}=\ParMath{\sigma  \eps \big(-\ou\big(\ou\big(w_{2},tt,-1\big),tt,-1\big) X_{
+1} \rho 
+\b{-\ou\big(w_{1},tt,-1\big) \rho ^{2}\big)+\sigma  \ou\big(w_{2},
+tt,-1\big)}
++\eps X_{1} \rho ^{2}+Y_{1}
+}\\&
+x_{1}=\ParMath{\epsilon  \sigma  \eps \big(-\ou\big(w_{2},tt,-1\big) X_{1} \rho 
+\b{+1/2 \ou\big(w_{2},tt,-1\big) \rho -\ou\big(w_{2},tt,-1\big)
+}
+-\ou\big(w_{1},tt,1\big) Y_{1} \rho \big)+\epsilon  \eps \big(-X_{1} Y_{1} \rho +1/2 
+Y_{1} \rho -Y_{1}\big)+X_{1}
+ }
+\end{align*}
+These new coordinates~\((X_1,Y_1)\) are non-Markovian in
+relation to~\((x_1,y_1)\), in some sense, but the
+non-Markovian nature is exponentially decaying away from the
+current time. The construction of a non-autonomous
+stochastic slow manifold has to look to the future and the
+past in order to find out what variations are going to stay
+bounded for all time.
+
+
+\paragraph{Result normal form DEs}
+In the \((X_1,Y_1)\) coordinates, the stochastic system
+satisfies the following Stratonovich system, to
+errors~\Ord{\sigma^3,\varepsilon^3}.
+\begin{align*}&
+\dash Y_{1}=\ParMath{ \epsilon  \sigma ^{2} \eps^{2} \big(\ou\big(\ou\big(w_{2},tt,
+-1\big),tt,-1\big) w_{1} Y_{1} \rho ^{2}+2 \ou\big(w_{2},tt,-1\big) w_{1
+} Y_{1} \rho ^{2}\big)+\epsilon  \sigma  \eps^{2} \big(2 w_{2} X_{1} Y_{
+1} \rho ^{2}-w_{2} Y_{1} \rho ^{2}+2 w_{2} Y_{1} \rho -w_{1} Y_{1} \rho 
+^{3}\big)+\epsilon  \eps^{2} \big(-X_{1} Y_{1} \rho ^{3}+1/2 Y_{1} \rho 
+^{3}-Y_{1} \rho ^{2}\big)-\eps X_{1} Y_{1} \rho -Y_{1}
+}\\&
+\dash X_{1}=\ParMath{ \b{1/2 \epsilon ^{2} \sigma  \eps^{2} w_{2} \rho ^{2}}
++\epsilon \sigma ^{2} \eps^{2} \big(-\ou\big(\ou\big(w_{2},tt,-1\big),tt,-1\big) w
+_{1} X_{1} \rho ^{2}-2 \ou\big(w_{2},tt,-1\big) w_{1} X_{1} \rho ^{2}
+\b{+1/2 \ou\big(w_{2},tt,-1\big) w_{1} \rho ^{2}-\ou\big(w_{2},tt,-1\big) w_{1} \rho -\ou\big(w_{1},tt,-1\big) w_{1} \rho ^{3}\big)+\epsilon  \sigma ^{2} \eps \ou\big(w_{2},tt,-1\big) w_{1} \rho}
++\epsilon  \sigma  \eps^{2} \big(-w_{2} X_{1}^{2} \rho ^{2}+1/2 w_{2} X_{1} \rho ^{2}-w_{2} X_{1} 
+\rho -w_{1} X_{1} \rho ^{3}
+\b{+1/2 w_{1} \rho ^{3}-w_{1} \rho ^{2}}\big)+
+\epsilon  \sigma  \eps \big(w_{2} X_{1} \rho 
+\b{-1/2 w_{2} \rho +w_{2}}\big)
++\epsilon  \eps^{2} \big(X_{1}^{2} \rho ^{3}-1/2 X_{1} \rho ^{3}+X_{1} 
+\rho ^{2}\big)+\epsilon  \eps \big(-X_{1} \rho ^{2}
+\b{+1/2 \rho ^{2}-1/2 
+\rho \big)+\sigma  w_{1}}
+}
+\end{align*}
+
+\paragraph{Discussion}
+\begin{itemize}
+\item In the \(Y_1'\) \sde, by construction, every term
+is\({}\propto Y_1\), and, further, the leading term gives
+\(Y_1' \approx -Y_1\). Hence,
+\(Y_1 \approx \Ord{e^{-\tau}} =\Ord{e^{-\int(x_0+\kappa)dt}}\)
+as time increases. Consequently, by continuity, \emph{in
+some finite domain} about~\((x_0,y_0)\), \(Y_1\to 0\) to
+form the emergent stochastic slow manifold \(Y_1=0\).
+
+\item The local shape of the slow manifold is thus given by
+substituting \(Y_1=0\) into the expressions
+for~\((x_1,y_1)\). Thus the slow manifold is locally
+parametrised by~\(X_1,\epsilon,\sigma\). Now the variation
+in~\(X_1\) is the Taylor series for the variation in~\(x_0\)
+(as they are both describing the same slow manifold). So all
+we need is to set \(X_1=0\) and look at the shape of the
+slow manifold in terms of~\(x_0,\epsilon,\sigma\), that is,
+the \b{blue terms}.
+\begin{itemize}
+
+\item Setting \(X_1=Y_1=0\) gives \(y_1\approx
+%\epsilon\sfrac12(\rho^3-\rho^4)
+-\sigma \ou\big(w_{1},tt,-1\big) \rho ^{2} +\sigma 
+\ou\big(w_{2},tt,-1\big)\), that is, since
+$\rho=1/(x+\kappa)=1/(x+1)$,
+\begin{equation*}
+y=y_0+y_1\approx \frac{x_0}{x_0+1}
+%+\epsilon\frac{x_0}{2(x_0+1)^4}
+-\frac{\sigma\ou\big(w_{1},tt,-1\big)}{ (x+1) ^{2}} 
++\sigma  \ou\big(w_{2},tt,-1\big)\,.
+\end{equation*}
+Dominantly, the slow manifold jitters up/down in~\(y\) due
+to the recent history of noise~\(w_2\), but also is affected
+from the recent history of the noise~\(w_1\) in~\(x\). 
+
+\item Setting \(X_1=Y_1=0\) gives \(x_1\approx\epsilon 
+\sigma  \varepsilon  \big( 1/2 \ou\big(w_{2},tt,-1\big) \rho
+-\ou\big(w_{2},tt,-1\big) \big)\), that is, 
+\begin{equation*}
+x=x_0+x_1 \approx x_0-\epsilon  \sigma   \frac{2x_0+1}{2(x_0+1)}\ou\big(w_{2},tt,-1\big)\,.
+\end{equation*}
+The noise~\(w_2\) in~\(y\) generates a history dependent
+slip between~\(x\) and the relevant~\(x_0\)!  
+
+This slip may be seen to be due to the slope of isochrons
+transversal to the slow manifold---a slope not detected in
+Singular Perturbation Analysis.
+
+\end{itemize}
+This stochastic-MM example also shows the general property
+that although the \emph{existence} of a slow manifold has
+future dependence, here via~\(\ou\big({},tt,1\big)\)
+convolutions, the slow manifold itself and the evolution
+thereon depends only upon the history, here
+via~\(\ou\big({},tt,-1\big)\) convolutions.
+
+\item Now for the \(x\)-evolution on the stochastic slow
+manifold. Consider \(X(t)=x_0+x_1(t)\), so that \(X'=x_1'\).
+Recall that on the slow manifold, \(Y_1=0\) and~\(x\approx
+x_0-\epsilon  \sigma \frac {2x+1} {2(x+1)}
+\ou\big(w_{2},tt,-1\big)\), \(X_1=0\), so also putting
+\(X_1=0\) and \(x_0=X\) give the evolution for the slow
+variable~\(X\), namely the \emph{global} slow evolution is
+\begin{equation*}
+X'\approx -\epsilon \frac{X}{2(X+1)^2} +\epsilon^2
+\frac{X(2X+1)}{4(X+1)^ 5} +\sigma w_1 +\epsilon \sigma
+\frac{2X+1}{2(X+1)}w_2\,.
+\end{equation*}
+The stochastic slow variable~\(X\) is not quite the same as
+the physical~\(x\). This coordinate transform lacks any
+convolutions in time. That lack is part of the art of the
+construction.
+
+If, instead, one wants the slow variable to be
+precisely~\(x\), as many implicitly assume they can, then
+convolutions must occur in~\(x')\). We may see this by
+constructing a nonlinear coordinate transform that
+maintains, when \(Y_1=0\), that \(x=x_0\), precisely.  It is
+straightforward to modify the algorithm to do so.  The
+generic consequence is that terms \emph{linear} in the noise
+appear in the evolution~\(x'\) that have fast-time history
+convolutions. That is, the consequence is that undesirable
+fast-time history integrals occur in the evolution of the
+supposedly slow variable~\(x\).
+
+
+
+\paragraph{Noise-noise interactions}
+However, effects which are quadratic in the noise, due to
+noise-noise interactions, generally involve convolutions
+that \emph{cannot} be removed from the evolution of the slow
+variable, as seen in expressions for~\(X_1'\). Here, the
+lowest order example is the term
+\begin{equation*}
++\epsilon  \sigma ^{2} \ou\big(w_{2},tt,-1\big) w_{1} /(x+1)
+\end{equation*}
+which could be included in the retained terms of~\(X'_1\).
+We argued \cite[\S4]{Chao95} that such terms `bring up'
+\emph{new information} from the fluctuations on the
+fast-time microscale, and hence cause noise effects in the
+slow model that are independent of slow-scale sampling
+of~\(w_1\) and~\(w_2\). We argued that such terms, when one
+only samples them on the long-times of the slow manifold,
+should thus be replaced by a new noise, namely
+\(\ou\big(w_{2},tt,-\beta\big)
+w_{1}\sim\frac1{2\sqrt\beta}w_3\) when all~\(w_j\) are
+formally `the derivatives' of independent Wiener processes.
+
+\end{itemize}
+
+The above results are for one example of a stochastic MM
+system.  Almost all other stochastic MM systems would have
+the same issues.
+
+
+

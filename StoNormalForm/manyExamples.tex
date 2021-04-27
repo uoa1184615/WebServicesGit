@@ -32,18 +32,30 @@
 \paragraph{Instructions}
 \begin{itemize}
 \item Download and install the computer algebra package
-\emph{Reduce}\footnote{Use the computer algebra package \emph{Reduce} 
+\emph{Reduce}\footnote{We use the computer algebra package \emph{Reduce} 
 because it is both free 
 and perhaps the fastest general purpose computer algebra 
 system~\cite[e.g.]{Fateman2002}.} via \url{http://www.reduce-algebra.com}
 
-
-
 \item Navigate to folder \verb|Examples| within folder \verb|StoNormForm|.
 
-\item For each example of interest, start-up \emph{Reduce} and enter the command \verb|in_tex "filename.tex"$|  where filename is the root name of the example (as listed in the following table of contents).
-
+\item For each example of interest, start-up \emph{Reduce} and enter the command \verb|in_tex "filename.tex"$| where filename is the root name of the example (as listed in the following table of contents).
 \end{itemize}
+The results involve convolutions over the non-autonomous\slash stochastic factors \cite[(12) and~\S19.2, respectively]{Roberts06k, Roberts2014a}:
+\begin{equation*}
+\ou\big(v,t,\mu\big):= \begin{cases}
+\int_{-\infty}^t \e^{\mu(t-\tau)}v(\tau)\,d\tau &\Re\mu<0\,,\\
+\int^{\infty}_t  \e^{\mu(t-\tau)}v(\tau)\,d\tau &\Re\mu>0\,,\\
+\end{cases}
+\end{equation*}
+which has the crucial differential property that
+\begin{equation*}
+\de t{}\ou\big(v,t,\mu\big)= \mu(\ou\big(v,t,\mu\big))
+-(\operatorname{sgn}\Re\mu)v \,.
+\end{equation*}
+
+
+
 
 
 \tableofcontents
@@ -65,42 +77,12 @@ system~\cite[e.g.]{Fateman2002}.} via \url{http://www.reduce-algebra.com}
 \input{Examples/foliateHyper}
 \input{Examples/monahanFive}
 \input{Examples/majdaTriad}
+\input{Examples/nonautoTwo}
+\input{Examples/noisyMMH}
+\input{Examples/heatXchanger}
 
 
 
-
-
-%\section{Slow invariant manifolds}
-%
-%Also see \cref{simple3d,metastable4}.
-%\input{Examples/simple2d}
-%\input{Examples/lorenz86sm}
-%
-%
-%
-%
-%\section{Oscillation in a centre manifold}
-%
-%Also see \cref{nonlinNormModes}.
-%\input{Examples/simpleosc}
-%\input{Examples/quasidde}
-%\input{Examples/lorenz86nf}
-%\input{Examples/stoleriu2}
-%
-%
-%
-%\section{Stable invariant manifolds}
-%
-%Also see \cref{stable3d}.
-%\input{Examples/stable2d}
-%
-%
-%
-%\section{Invariant manifolds in delay DEs}
-%
-%Also see \cref{doubleHopfDDE}
-%\input{Examples/simple1dde}
-%\input{Examples/logistic1dde}
 
 
 \bibliographystyle{agsm}

@@ -1,5 +1,10 @@
 \begin{thebibliography}{xx}
 
+\harvarditem{Chao \harvardand\ Roberts}{1996}{Chao95}
+Chao, X. \harvardand\ Roberts, A.~J.  \harvardyearleft 1996\harvardyearright ,
+  `On the low-dimensional modelling of {Stratonovich} stochastic differential
+  equations', {\em Physica~A} {\bf 225},~62--80.
+
 \harvarditem{Fateman}{2003}{Fateman2002}
 Fateman, R.  \harvardyearleft 2003\harvardyearright , `Comparing the speed of
   programs for sparse polynomial multiplication', {\em ACM SIGSAM Bulletin}
@@ -21,6 +26,26 @@ Monahan, A.~H. \harvardand\ Culina, J.  \harvardyearleft 2011\harvardyearright
 Pavliotis, G.~A. \harvardand\ Stuart, A.~M.  \harvardyearleft
   2008\harvardyearright , {\em Multiscale methods: averaging and
   homogenization}, Vol.~53 of {\em Texts in Applied Mathematics}, Springer.
+
+\harvarditem{Potzsche \harvardand\ Rasmussen}{2006}{Potzsche2006}
+Potzsche, C. \harvardand\ Rasmussen, M.  \harvardyearleft 2006\harvardyearright
+  , `Taylor approximation of integral manifolds', {\em Journal of Dynamics and
+  Differential Equations} {\bf 18},~427--460.
+
+\harvarditem{Roberts}{2008}{Roberts06k}
+Roberts, A.~J.  \harvardyearleft 2008\harvardyearright , `Normal form
+  transforms separate slow and fast modes in stochastic dynamical systems',
+  {\em Physica~A} {\bf 387},~12--38.
+
+\harvarditem{Roberts}{2015{\em a}}{Roberts2013a}
+Roberts, A.~J.  \harvardyearleft 2015{\em a}\harvardyearright , `Macroscale,
+  slowly varying, models emerge from the microscale dynamics in long thin
+  domains', {\em IMA Journal of Applied Mathematics} {\bf 80}(5),~1492--1518.
+
+\harvarditem{Roberts}{2015{\em b}}{Roberts2014a}
+Roberts, A.~J.  \harvardyearleft 2015{\em b}\harvardyearright , {\em Model
+  emergent dynamics in complex systems}, SIAM, Philadelphia.
+\newline\harvardurl{http://bookstore.siam.org/mm20/}
 
 \harvarditem[Sun et~al.]{Sun, Kan \harvardand\ Duan}{2011}{Sun2011}
 Sun, X., Kan, X. \harvardand\ Duan, J.  \harvardyearleft 2011\harvardyearright

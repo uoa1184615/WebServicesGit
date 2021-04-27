@@ -1,0 +1,288 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{nonautoTwo}: Potzsche and Rasmussen non-autonomous examples} 
+\label{nonautoTwo}
+
+
+\cite{Potzsche2006} establish Taylor approximations of various integral manifolds of non-autonomous systems.
+They give two examples.
+
+\subsubsection{Lorenz near the pitchfork bifurcation}
+
+Example~5.1 of \cite{Potzsche2006} is
+\begin{align*}
+&\dot x_1=\sigma_\epsilon(x_2-x_1),\\
+&\dot x_2=\rho_\epsilon x_1-x_2-x_1x_3\,,\\
+&\dot x_3=-\beta_\epsilon x_3+x_1x_2\,.
+\end{align*}
+where parameters are $\sigma_\epsilon=\sigma_0+\epsilon\sigma(t)$, $\rho_\epsilon=1+\rho_0+\epsilon\rho(t)$ and $\beta_\epsilon=\beta_0+\epsilon\beta(t)$.
+When there is no parametric fluctuations, $\epsilon=0$\,, there is a pitchfork bifurcation as~$\rho_0$ crosses zero so they set $\rho_0=0$\,.
+For the general procedure we must set $\sigma_0$~and~$\beta_0$ to some definite values, here $\sigma_0=\beta_0=1$\,.
+\begin{reduce}
+s0:=beta0:=1; 
+s1:=s0/(s0+1);
+\end{reduce}
+
+To analyses dynamics at this pitchfork bifurcation in the presence of fluctuations, \cite{Potzsche2006} [p.449] take a linear transform of the system to variables
+\begin{equation*}
+\yv=\begin{bmatrix}
+-\sigma_0&0&1 \\ 1&0&1 \\ 0&1&0
+\end{bmatrix}\xv\,.
+\end{equation*} 
+In the following coding I use $\verb|x(1)|=y_3$, $\verb|y(1)|=y_1$ and $\verb|y(2)|=y_2$\,; there are no unstable modes.
+
+There is a notational glitch in that the procedure uses~\(\sigma\) for the size of the non-autonomous effects, whereas they use~\(\sigma\) as a parameter to the Lorenz system.  Herein let~\(s\) denote their~\(\sigma\), and let~\(\sigma\) denote their~\(\epsilon\).
+Then their fluctuations $\epsilon\rho(t)$ are represented in the coded input by \verb|w(rho)| whereas in the output it is represented by $\sigma w_\rho$, and similarly for the other non-autonomous quantities.
+
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+Execute the construction of a normal form for the system.
+\begin{reduce}
+factor yy,y,xx,x;
+stonormalform(
+    { s0*s1*y(1)*y(2) -s1*x(1)*y(2) +s1*x(1)*w(rho)
+        +(w(s)-w(rho)/(s0+1))*y(1) },
+    { -(s0+1)*y(1)+s1*y(1)*y(2)-x(1)*y(2)/(s0+1)
+        +w(rho)/(s0+1)*x(1) 
+        -(w(s)+w(rho)/(s0+1))*y(1),
+      -beta0*y(2)-s0*y(1)^2+(1-s0)*x(1)*y(1)+x(1)^2
+        -w(beta)*y(2) },
+    {},
+    3 )$
+%end; % optionally end examples here
+\end{reduce}
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}=-1/2 x_{1} y_{2} \eps+1/2 x_{1} \sigma  w_{\rho }+1/2 y_{2} y
+_{1} \eps+y_{1} \sigma  \big(-1/2 w_{\rho }+w_{s}\big)
+\\&
+\dot y_{1}=\ParMath{ -1/2 x_{1} y_{2} \eps+1/2 x_{1} \sigma  w_{\rho }+1/2 y_{2} y
+_{1} \eps+y_{1} \sigma  \big(-1/2 w_{\rho }-w_{s}\big)-2 y_{1}
+}
+\\&
+\dot y_{2}=x_{1}^{2} \eps-y_{2} \sigma  w_{\beta }-y_{2}-y_{1}^{2} \eps
+\end{align*}
+%Here, \eps\ counts the order of nonlinearity so that errors~\Ord{\eps^4} are errors~\Ord{|\vv|^5+\sigma^5} (due to the noise driving fluctuations of size~\(\sigma\)).
+
+
+
+\paragraph{Time dependent coordinate transform}  Straightforwardly,
+\begin{align*}&
+y_{1}=\ParMath{X_{1} Y_{2} \sigma  \eps \big(-1/2 \ou\big(w_{\beta },tt,-1\big)+
+\ou\big(w_{\rho },tt,-1\big)-1/4 \ou\big(w_{\rho },tt,-2\big)+1/2 \ou
+\big(w_{s},tt,-1\big)\big)-1/2 X_{1} Y_{2} \eps+1/2 X_{1} \sigma  \ou
+\big(w_{\rho },tt,-2\big)+Y_{2} Y_{1} \sigma  \eps \big(1/2 \ou\big(w_{
+\beta },tt,1\big)-1/4 \ou\big(w_{\rho },tt,2\big)+1/3 \ou\big(w_{\rho },
+tt,1\big)+1/2 \ou\big(w_{s},tt,2\big)-1/2 \ou\big(w_{s},tt,1\big)\big)-1
+/2 Y_{2} Y_{1} \eps+Y_{1}
+}\\&
+y_{2}=\ParMath{X_{1}^{2} \sigma  \eps \big(-\ou\big(w_{\beta },tt,-1\big)-\ou
+\big(w_{\rho },tt,-1\big)\big)+X_{1}^{2} \eps+X_{1} Y_{1} \sigma  \eps 
+\big(\ou\big(w_{\rho },tt,2\big)-2/3 \ou\big(w_{\rho },tt,1\big)+1/3 \ou
+\big(w_{\rho },tt,-2\big)-2 \ou\big(w_{s},tt,2\big)+2 \ou\big(w_{s},tt,1
+\big)\big)+Y_{2}+Y_{1}^{2} \sigma  \eps \big(1/3 \ou\big(w_{\beta },tt,3
+\big)-1/3 \ou\big(w_{\rho },tt,3\big)-2/3 \ou\big(w_{s},tt,3\big)\big)+1
+/3 Y_{1}^{2} \eps
+}\\&
+x_{1}=\ParMath{X_{1} Y_{2} \sigma  \eps \big(-1/2 \ou\big(w_{\beta },tt,1\big)-1/
+3 \ou\big(w_{\rho },tt,1\big)-1/12 \ou\big(w_{\rho },tt,-2\big)+1/2 \ou
+\big(w_{s},tt,1\big)\big)+1/2 X_{1} Y_{2} \eps+X_{1}+Y_{2} Y_{1} \sigma 
+ \eps \big(1/6 \ou\big(w_{\beta },tt,3\big)-1/3 \ou\big(w_{\rho },tt,3
+\big)+1/4 \ou\big(w_{\rho },tt,2\big)+7/6 \ou\big(w_{s},tt,3\big)-1/2 
+\ou\big(w_{s},tt,2\big)\big)-1/6 Y_{2} Y_{1} \eps+Y_{1} \sigma  \big(1/2
+ \ou\big(w_{\rho },tt,2\big)-\ou\big(w_{s},tt,2\big)\big)
+ }
+\end{align*}
+
+\paragraph{Result normal form DEs}
+As expected, \(Y_1=Y_2=0\) is the emergent slow manifold, albeit hideously complicated \sde{}s due to the nonlinear interaction of the three non-autonomous effects.
+\begin{align*}&
+\dot Y_{1}=\ParMath{ X_{1}^{2} Y_{1} \sigma ^{2} \eps^{2} \big(1/2 \ou\big(\ou
+\big(w_{\rho },tt,2\big),tt,2\big) w_{\rho }+1/4 \ou\big(\ou\big(w_{
+\rho },tt,-2\big),tt,-2\big) w_{\rho }-1/2 \ou\big(\ou\big(w_{\rho },tt,
+-2\big),tt,-2\big) w_{s}-\ou\big(\ou\big(w_{s},tt,2\big),tt,2\big) w_{
+\rho }+1/12 \ou\big(w_{\beta },tt,2\big) w_{\rho }+1/2 \ou\big(w_{\beta 
+},tt,-1\big) w_{\beta }+1/3 \ou\big(w_{\beta },tt,-1\big) w_{\rho }-1/2 
+\ou\big(w_{\beta },tt,-1\big) w_{s}-3/4 \ou\big(w_{\rho },tt,2\big) w_{
+\beta }+13/48 \ou\big(w_{\rho },tt,2\big) w_{\rho }+3/8 \ou\big(w_{\rho 
+},tt,2\big) w_{s}+1/3 \ou\big(w_{\rho },tt,1\big) w_{\beta }-2/3 \ou
+\big(w_{\rho },tt,1\big) w_{\rho }-1/3 \ou\big(w_{\rho },tt,1\big) w_{s}
++1/2 \ou\big(w_{\rho },tt,-1\big) w_{\beta }+1/3 \ou\big(w_{\rho },tt,-1
+\big) w_{\rho }-1/2 \ou\big(w_{\rho },tt,-1\big) w_{s}-1/6 \ou\big(w_{
+\rho },tt,-2\big) w_{\beta }+7/12 \ou\big(w_{\rho },tt,-2\big) w_{\rho }
+-7/12 \ou\big(w_{\rho },tt,-2\big) w_{s}+3/2 \ou\big(w_{s},tt,2\big) w_{
+\beta }-3/8 \ou\big(w_{s},tt,2\big) w_{\rho }-3/4 \ou\big(w_{s},tt,2
+\big) w_{s}-\ou\big(w_{s},tt,1\big) w_{\beta }+2 \ou\big(w_{s},tt,1\big)
+ w_{\rho }+\ou\big(w_{s},tt,1\big) w_{s}\big)+X_{1}^{2} Y_{1} \sigma  
+\eps^{2} \big(-1/2 w_{\beta }-3/4 w_{\rho }-1/4 w_{s}\big)+1/2 X_{1}^{2}
+ Y_{1} \eps^{2}+X_{1} Y_{2}^{2} \sigma ^{2} \eps^{2} \big(-1/8 \ou\big(
+\ou\big(w_{\rho },tt,2\big),tt,2\big) w_{\rho }+1/4 \ou\big(\ou\big(w_{s
+},tt,2\big),tt,2\big) w_{\rho }-1/12 \ou\big(w_{\beta },tt,2\big) w_{
+\rho }+1/4 \ou\big(w_{\beta },tt,1\big) w_{\beta }-1/2 \ou\big(w_{\beta 
+},tt,1\big) w_{\rho }-1/4 \ou\big(w_{\beta },tt,1\big) w_{s}+1/4 \ou
+\big(w_{\beta },tt,-1\big) w_{\beta }+1/6 \ou\big(w_{\beta },tt,-1\big) 
+w_{\rho }-1/4 \ou\big(w_{\beta },tt,-1\big) w_{s}+1/96 \ou\big(w_{\rho }
+,tt,2\big) w_{\rho }+1/6 \ou\big(w_{\rho },tt,1\big) w_{\beta }-1/3 \ou
+\big(w_{\rho },tt,1\big) w_{\rho }-1/6 \ou\big(w_{\rho },tt,1\big) w_{s}
+-1/2 \ou\big(w_{\rho },tt,-1\big) w_{\beta }-1/3 \ou\big(w_{\rho },tt,-1
+\big) w_{\rho }+1/2 \ou\big(w_{\rho },tt,-1\big) w_{s}-1/12 \ou\big(w_{
+\rho },tt,-2\big) w_{\beta }+1/96 \ou\big(w_{\rho },tt,-2\big) w_{\rho }
+-1/6 \ou\big(w_{\rho },tt,-2\big) w_{s}-1/6 \ou\big(w_{s},tt,2\big) w_{
+\rho }-1/4 \ou\big(w_{s},tt,1\big) w_{\beta }+1/2 \ou\big(w_{s},tt,1
+\big) w_{\rho }+1/4 \ou\big(w_{s},tt,1\big) w_{s}-1/4 \ou\big(w_{s},tt,
+-1\big) w_{\beta }-1/6 \ou\big(w_{s},tt,-1\big) w_{\rho }+1/4 \ou\big(w_
+{s},tt,-1\big) w_{s}\big)+3/4 X_{1} Y_{2}^{2} \sigma  \eps^{2} w_{\rho }
+-1/2 X_{1} Y_{2}^{2} \eps^{2}+Y_{1} \sigma ^{2} \big(1/4 \ou\big(w_{
+\rho },tt,2\big) w_{\rho }-1/2 \ou\big(w_{s},tt,2\big) w_{\rho }\big)+Y_
+{1} \sigma  \big(-1/2 w_{\rho }-w_{s}\big)-2 Y_{1}
+}\\&
+\dot Y_{2}=\ParMath{ X_{1}^{2} Y_{2} \sigma ^{2} \eps^{2} \big(\ou\big(w_{\beta },
+tt,1\big) w_{\beta }+\ou\big(w_{\beta },tt,1\big) w_{\rho }-1/3 \ou\big(
+w_{\beta },tt,-1\big) w_{\rho }+\ou\big(w_{\beta },tt,-1\big) w_{s}+2/3 
+\ou\big(w_{\rho },tt,1\big) w_{\beta }+2/3 \ou\big(w_{\rho },tt,1\big) w
+_{\rho }+2/3 \ou\big(w_{\rho },tt,-1\big) w_{\rho }-2 \ou\big(w_{\rho },
+tt,-1\big) w_{s}+1/3 \ou\big(w_{\rho },tt,-2\big) w_{\beta }-13/24 \ou
+\big(w_{\rho },tt,-2\big) w_{\rho }+5/6 \ou\big(w_{\rho },tt,-2\big) w_{
+s}-\ou\big(w_{s},tt,1\big) w_{\beta }-\ou\big(w_{s},tt,1\big) w_{\rho }+
+1/3 \ou\big(w_{s},tt,-1\big) w_{\rho }-\ou\big(w_{s},tt,-1\big) w_{s}
+\big)+X_{1}^{2} Y_{2} \sigma  \eps^{2} \big(-w_{\beta }-1/2 w_{\rho }+w_
+{s}\big)+X_{1}^{2} Y_{2} \eps^{2}-Y_{2} \sigma  w_{\beta }-Y_{2}
+}\\&
+\dot X_{1}=\ParMath{ X_{1}^{3} \sigma ^{2} \eps^{2} \big(-1/4 \ou\big(\ou\big(w_{
+\rho },tt,-2\big),tt,-2\big) w_{\rho }+1/2 \ou\big(\ou\big(w_{\rho },tt,
+-2\big),tt,-2\big) w_{s}-1/2 \ou\big(w_{\beta },tt,-1\big) w_{\beta }-1/
+3 \ou\big(w_{\beta },tt,-1\big) w_{\rho }+1/2 \ou\big(w_{\beta },tt,-1
+\big) w_{s}+1/4 \ou\big(w_{\beta },tt,-2\big) w_{\rho }-1/2 \ou\big(w_{
+\beta },tt,-2\big) w_{s}-1/2 \ou\big(w_{\rho },tt,-1\big) w_{\beta }-1/3
+ \ou\big(w_{\rho },tt,-1\big) w_{\rho }+1/2 \ou\big(w_{\rho },tt,-1\big)
+ w_{s}-1/12 \ou\big(w_{\rho },tt,-2\big) w_{\beta }-13/48 \ou\big(w_{
+\rho },tt,-2\big) w_{\rho }+3/8 \ou\big(w_{\rho },tt,-2\big) w_{s}-1/8 
+\ou\big(w_{s},tt,-2\big) w_{\rho }+1/4 \ou\big(w_{s},tt,-2\big) w_{s}
+\big)+X_{1}^{3} \sigma  \eps^{2} \big(1/2 w_{\beta }+3/4 w_{\rho }-1/4 w
+_{s}\big)-1/2 X_{1}^{3} \eps^{2}+X_{1} \sigma ^{2} \big(-1/4 \ou\big(w_{
+\rho },tt,-2\big) w_{\rho }+1/2 \ou\big(w_{\rho },tt,-2\big) w_{s}\big)+
+1/2 X_{1} \sigma  w_{\rho }
+}
+\end{align*}
+In their analysis \cite{Potzsche2006} explicitly report the last and third-to-last terms above, for these choices of $\sigma_0$~and~$\beta_0$, to deduce their model~(5.3) which here is
+\begin{equation*}
+\dot X\approx\rat12\sigma w_\rho X-\rat12 X^3.
+\end{equation*}
+Nice agreement.
+
+
+
+
+\subsubsection{Fluctuating kdV example}
+
+\cite{Potzsche2006} [Example~5.4] seek travelling wave solutions, $u(x-ct)$ with wave speed~$c$, of a modified KdV equation.  
+This leads to the following system 
+\begin{equation*}
+\dot x_1=x_2\,,\quad
+\dot x_2=x_3\,,\quad
+\dot x_3=c^2x_2-a(t)x_1^2x_2\,.
+\end{equation*}
+This analysis is for wave speed $c^2=1$\,.
+A transform to diagonalise the linear part into slow variable~$x$, stable~$y$ and unstable~$z$ is then that $x_1=x+y+z$\,, $x_2=z-y$ and $x_3=z+y$\,.
+Using \verb|w(a)| to denote the variable coefficient~$a(t)$, it is represented in this output by~$\sigma w_a$.
+
+The procedure \verb|stonormalform| is already loaded.
+Write a message saying we are now analysing the next system.
+\begin{reduce}
+write "**** Fluctuating kdV example of P&R (2006) ****";
+factor zz,z;
+\end{reduce}
+Execute the construction of a normal form for this system.
+\begin{reduce}
+rhs:=w(a)*(x(1)+y(1)+z(1))^2*(z(1)-y(1))$
+stonormalform(
+    { rhs },
+    { -y(1)-rhs/2 },
+    { +z(1)-rhs/2 },
+    3 )$
+end; % finish here if not before
+\end{reduce}
+
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}=\ParMath{ -x_{1}^{2} y_{1} \sigma  w_{a}+x_{1}^{2} z_{1} \sigma  w_{a}-
+2 x_{1} y_{1}^{2} \sigma  w_{a}+2 x_{1} z_{1}^{2} \sigma  w_{a}-y_{1}^{3
+} \sigma  w_{a}-y_{1}^{2} z_{1} \sigma  w_{a}+y_{1} z_{1}^{2} \sigma  w_
+{a}+z_{1}^{3} \sigma  w_{a}
+}\\&
+\dot y_{1}=\ParMath{ 1/2 x_{1}^{2} y_{1} \sigma  w_{a}-1/2 x_{1}^{2} z_{1} \sigma 
+ w_{a}+x_{1} y_{1}^{2} \sigma  w_{a}-x_{1} z_{1}^{2} \sigma  w_{a}+1/2 y
+_{1}^{3} \sigma  w_{a}+1/2 y_{1}^{2} z_{1} \sigma  w_{a}-1/2 y_{1} z_{1}
+^{2} \sigma  w_{a}-y_{1}-1/2 z_{1}^{3} \sigma  w_{a}
+}\\&
+\dot z_{1}=\ParMath{ 1/2 x_{1}^{2} y_{1} \sigma  w_{a}-1/2 x_{1}^{2} z_{1} \sigma 
+ w_{a}+x_{1} y_{1}^{2} \sigma  w_{a}-x_{1} z_{1}^{2} \sigma  w_{a}+1/2 y
+_{1}^{3} \sigma  w_{a}+1/2 y_{1}^{2} z_{1} \sigma  w_{a}-1/2 y_{1} z_{1}
+^{2} \sigma  w_{a}-1/2 z_{1}^{3} \sigma  w_{a}+z_{1}
+}
+\end{align*}
+%Here, \eps\ counts the order of nonlinearity so that the errors~\Ord{\eps^3} are errors~\Ord{|\vv|^4+\sigma^4} (due to the noise driving fluctuations of size~\(\sigma\)).
+
+
+
+\paragraph{Time dependent coordinate transform}  Straightforwardly,
+\begin{align*}&
+z_{1}=\ParMath{ -1/2 X_{1}^{2} Y_{1} \sigma  \ou\big(w_{a},tt,2\big)-X_{1} Y_{1}^{
+2} \sigma  \ou\big(w_{a},tt,3\big)-X_{1} Z_{1}^{2} \sigma  \ou\big(w_{a}
+,tt,-1\big)-1/2 Y_{1}^{3} \sigma  \ou\big(w_{a},tt,4\big)-1/2 Y_{1}^{2} 
+Z_{1} \sigma  \ou\big(w_{a},tt,2\big)-1/2 Z_{1}^{3} \sigma  \ou\big(w_{a
+},tt,-2\big)+Z_{1}
+}\\&
+y_{1}=\ParMath{ -1/2 X_{1}^{2} Z_{1} \sigma  \ou\big(w_{a},tt,-2\big)-X_{1} Y_{1}
+^{2} \sigma  \ou\big(w_{a},tt,1\big)-X_{1} Z_{1}^{2} \sigma  \ou\big(w_{
+a},tt,-3\big)-1/2 Y_{1}^{3} \sigma  \ou\big(w_{a},tt,2\big)-1/2 Y_{1} Z_
+{1}^{2} \sigma  \ou\big(w_{a},tt,-2\big)+Y_{1}-1/2 Z_{1}^{3} \sigma  \ou
+\big(w_{a},tt,-4\big)
+}\\&
+x_{1}=\ParMath{ X_{1}^{2} Y_{1} \sigma  \ou\big(w_{a},tt,1\big)+X_{1}^{2} Z_{1} 
+\sigma  \ou\big(w_{a},tt,-1\big)+2 X_{1} Y_{1}^{2} \sigma  \ou\big(w_{a}
+,tt,2\big)+2 X_{1} Z_{1}^{2} \sigma  \ou\big(w_{a},tt,-2\big)+X_{1}+Y_{1
+}^{3} \sigma  \ou\big(w_{a},tt,3\big)+Y_{1}^{2} Z_{1} \sigma  \ou\big(w_
+{a},tt,1\big)+Y_{1} Z_{1}^{2} \sigma  \ou\big(w_{a},tt,-1\big)+Z_{1}^{3}
+ \sigma  \ou\big(w_{a},tt,-3\big)
+}
+\end{align*}
+
+\paragraph{Result normal form DEs}
+\begin{align*}&
+\dot Z_{1}=\ParMath{ -1/4 X_{1}^{4} Z_{1} \sigma ^{2} \ou\big(w_{a},tt,-2\big) w_{
+a}+X_{1}^{2} Y_{1} Z_{1}^{2} \sigma ^{2} \big(3/4 \ou\big(w_{a},tt,2
+\big) w_{a}-\ou\big(w_{a},tt,1\big) w_{a}+5/4 \ou\big(w_{a},tt,-2\big) w
+_{a}-2 \ou\big(w_{a},tt,-3\big) w_{a}\big)-1/2 X_{1}^{2} Z_{1} \sigma  w
+_{a}+Y_{1}^{2} Z_{1}^{3} \sigma ^{2} \big(3/4 \ou\big(w_{a},tt,2\big) w_
+{a}-\ou\big(w_{a},tt,1\big) w_{a}-3/4 \ou\big(w_{a},tt,-2\big) w_{a}+\ou
+\big(w_{a},tt,-3\big) w_{a}-3/4 \ou\big(w_{a},tt,-4\big) w_{a}\big)-1/2 
+Y_{1} Z_{1}^{2} \sigma  w_{a}+Z_{1}
+}\\&
+\dot Y_{1}=\ParMath{ 1/4 X_{1}^{4} Y_{1} \sigma ^{2} \ou\big(w_{a},tt,2\big) w_{a}
++X_{1}^{2} Y_{1}^{2} Z_{1} \sigma ^{2} \big(2 \ou\big(w_{a},tt,3\big) w_
+{a}-5/4 \ou\big(w_{a},tt,2\big) w_{a}+\ou\big(w_{a},tt,-1\big) w_{a}-3/4
+ \ou\big(w_{a},tt,-2\big) w_{a}\big)+1/2 X_{1}^{2} Y_{1} \sigma  w_{a}+Y
+_{1}^{3} Z_{1}^{2} \sigma ^{2} \big(3/4 \ou\big(w_{a},tt,4\big) w_{a}-
+\ou\big(w_{a},tt,3\big) w_{a}+3/4 \ou\big(w_{a},tt,2\big) w_{a}+\ou\big(
+w_{a},tt,-1\big) w_{a}-3/4 \ou\big(w_{a},tt,-2\big) w_{a}\big)+1/2 Y_{1}
+^{2} Z_{1} \sigma  w_{a}-Y_{1}
+}\\&
+\dot X_{1}=\ParMath{ X_{1}^{3} Y_{1} Z_{1} \sigma ^{2} \big(-2 \ou\big(w_{a},tt,2
+\big) w_{a}+2 \ou\big(w_{a},tt,1\big) w_{a}-2 \ou\big(w_{a},tt,-1\big) w
+_{a}+2 \ou\big(w_{a},tt,-2\big) w_{a}\big)+X_{1} Y_{1}^{2} Z_{1}^{2} 
+\sigma ^{2} \big(-3 \ou\big(w_{a},tt,3\big) w_{a}+2 \ou\big(w_{a},tt,2
+\big) w_{a}+\ou\big(w_{a},tt,1\big) w_{a}-\ou\big(w_{a},tt,-1\big) w_{a}
+-2 \ou\big(w_{a},tt,-2\big) w_{a}+3 \ou\big(w_{a},tt,-3\big) w_{a}\big)
+}
+\end{align*}
+Since \(Z_1=0\) is invariant, putting $Z_1=0$ into the coordinate transform gives the centre-stable manifold.
+Then the expression for~$z_1$ in the above coordinate transform leads to the same convolutions as those of \cite{Potzsche2006} [pp.453--4].
+Conversely, since \(Y_1=0\) is invariant, putting $Y_1=0$ gives the centre-unstable manifold and the expression for~$y_1$ above leads to the same convolutions as those of \cite{Potzsche2006}.
+Presumably the distortions of the other variables have a higher order influence on this nice agreement.
+
+The \(X_1\)-evolution is zero on either of these invariant manifolds.

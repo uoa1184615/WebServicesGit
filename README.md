@@ -13,7 +13,7 @@ sub-centre manifold, a nonlinear normal form, any spectral
 submanifold, or indeed a normal form coordinate transform of
 the entire state space.
 
-StochasticNormalForm: derive a stochastic/non-autonomous
+StoNormalForm: derive a stochastic/non-autonomous
 coordinate transformation that separates slow, stable and
 unstable modes in a system of SDEs or non-autonomous ODEs
 (or autonomous ODEs).  This coordinate transform immediately
