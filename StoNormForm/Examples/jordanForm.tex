@@ -27,7 +27,7 @@ stonormalform(
       -x(1)*y(1) },
     { -2*y(1)+x(1)^2+x(2)^2+w(y) },
     {},
-    3 )$
+    3 ,sman)$
 end;
 \end{reduce}
 Why divide~\verb|x(2)| by~\verb|small|?  A possible coding is to specify the system as given, but recall that the slow \sde{}s are always multiplied by~\verb|small| thus changing the first \sde\ to \(\dot x_1=\eps x_2\) and hence changing the relation between position and velocity---this would be OK if~\(x_2\) was viewed as momentum \emph{and} the particle had large mass.  But what if really do we want \(x_2\) to be velocity.  Fortunately, the coded iteration scheme works for systems with linear part in Jordan form, but one has to code the system as follows. Namely, divide the off-diagonal term of the Jordan form by~\verb|small| to cancel out the procedure's brutal multiplication by~\verb|small|. 
@@ -81,9 +81,11 @@ _{1}^{2} Y_{1}\big)-2 Y_{1}
 }
 \end{align*}
 \begin{itemize}
-\item As expected, \(Y_1=0\) is the stochastic slow manifold, and is exponentially attractive (almost always) in some domain about the origin.
+\item As expected,  \(\dot Y_1=0\) when \(Y_1=0\)\,, and so \(Y_1=0\) is the stochastic slow manifold, and is exponentially attractive (almost always) in some domain about the origin.
 \item As expected, the slow~\Xv\ evolution is independent of~\(Y_1\): \(X_2\)~is approximately a `velocity' variable for `position'~\(X_1\), and shows some nonlinear noise affected dynamics.
 \item The time-dependent coordinate transform maps these predictions back into the \(\xv,y\)-space.  Observe that~\Xv\ are not precisely the physical position-veloxity~\xv, but instead are affected by nonlinearity, and the noise, and their interaction.
+\item The stochastic slow invariant manifold could be more efficiently constructed by specifying the optional fifth parameter~\verb|cman| to the \verb|stonormalform()| invocation.
+\item For this system we can see from the above that also \(\Xv=0\) is invariant.  Hence a stochastic stable manifold exists.  We may construct it directly by specifying the optional fifth parameter~\verb|sman| to \verb|stonormalform()|.
 \end{itemize}
 
 

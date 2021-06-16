@@ -1,0 +1,88 @@
+\documentclass[11pt,a5paper]{article}
+\usepackage[a5paper,margin=13mm]{geometry}
+\usepackage{parskip,time} \raggedright
+\begin{document}
+
+\title{A normal form of your dynamical system}
+
+
+\author{A. J. Roberts, University of Adelaide\\
+\texttt{http://orcid.org/0000-0001-8930-1552}}
+\date{\now, \today}
+\def\ou\big(#1,#2,#3\big)
+    {{{\rm e}^{\if#31\else#3\fi t}\star}#1\,}
+\def\eps{\varepsilon}
+\maketitle
+Generally, the lowest order, most important,
+terms are near the end of each expression.
+\input{stoNFreportSys}
+
+off echo;
+
+
+\(\)
+\paragraph{Time dependent normal form coordinates}
+\(
+\)\par
+
+\(y_{1}=-a^{2} \sigma  \eps^{2} \ou\big(\ou\big(\ou\big(w_{1},tt,-1\big),
+tt,-1\big),tt,-1\big)-a \sigma  \eps \ou\big(\ou\big(w_{2},tt,-1\big),tt
+,-1\big)+\sigma  \ou\big(w_{1},tt,-1\big)+Y_{1}
+\)\par
+
+\(y_{2}=-a^{2} \sigma  \eps^{2} \ou\big(\ou\big(\ou\big(w_{2},tt,-1\big),
+tt,-1\big),tt,-1\big)+a \sigma  \eps \ou\big(\ou\big(w_{1},tt,-1\big),tt
+,-1\big)+\sigma  \ou\big(w_{2},tt,-1\big)+Y_{2}
+\)\par
+
+\(x_{1}=a \epsilon  \sigma  \eps^{2} \big(\ou\big(\ou\big(w_{2},tt,-1\big)
+,tt,-1\big)+\ou\big(w_{2},tt,-1\big)\big)+a \epsilon  \eps^{2} Y_{2}-
+\epsilon  \sigma  \eps \ou\big(w_{1},tt,-1\big)-\epsilon  \eps Y_{1}+X_{
+1}
+\)\par
+
+\(x_{2}=a \epsilon  \sigma  \eps^{2} \big(-\ou\big(\ou\big(w_{1},tt,-1
+\big),tt,-1\big)-\ou\big(w_{1},tt,-1\big)\big)-a \epsilon  \eps^{2} Y_{1
+}-\epsilon  \sigma  \eps \ou\big(w_{2},tt,-1\big)-\epsilon  \eps Y_{2}+X
+_{2}
+\)\par
+
+\(x_{3}=a \epsilon  \sigma  \eps^{2} \big(-\ou\big(\ou\big(w_{2},tt,-1
+\big),tt,-1\big) X_{2}-\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) X_{1}
+-\ou\big(w_{2},tt,-1\big) X_{2}-\ou\big(w_{1},tt,-1\big) X_{1}\big)+a 
+\epsilon  \eps^{2} \big(-X_{2} Y_{2}-X_{1} Y_{1}\big)+\epsilon ^{2} 
+\sigma  \eps^{2} \big(\ou\big(w_{2},tt,1\big) Y_{1}-\ou\big(w_{1},tt,1
+\big) Y_{2}\big)+\epsilon  \sigma  \eps \big(-\ou\big(w_{2},tt,-1\big) X
+_{1}+\ou\big(w_{1},tt,-1\big) X_{2}\big)+\epsilon  \eps \big(X_{2} Y_{1}
+-X_{1} Y_{2}\big)+X_{3}
+\)\par
+
+\(\)
+\paragraph{Result normal form DEs}
+\(
+\)\par
+
+\(\dot Y_{1}=-a \eps Y_{2}-Y_{1}
+\)\par
+
+\(\dot Y_{2}=a \eps Y_{1}-Y_{2}
+\)\par
+
+\(\dot X_{1}=-a^{2} \epsilon  \sigma  \eps^{3} w_{1}-a \epsilon  \sigma  
+\eps^{2} w_{2}+\epsilon  \sigma  \eps w_{1}
+\)\par
+
+\(\dot X_{2}=-a^{2} \epsilon  \sigma  \eps^{3} w_{2}+a \epsilon  \sigma  
+\eps^{2} w_{1}+\epsilon  \sigma  \eps w_{2}
+\)\par
+
+\(\dot X_{3}=a^{2} \epsilon  \sigma  \eps^{3} \big(-w_{2} X_{1}+w_{1} X_{2
+}\big)+a \epsilon ^{2} \sigma ^{2} \eps^{3} \big(\ou\big(\ou\big(w_{2},
+tt,-1\big),tt,-1\big) w_{2}+\ou\big(\ou\big(w_{1},tt,-1\big),tt,-1\big) 
+w_{1}+\ou\big(w_{2},tt,-1\big) w_{2}+\ou\big(w_{1},tt,-1\big) w_{1}\big)
++a \epsilon  \sigma  \eps^{2} \big(w_{2} X_{2}+w_{1} X_{1}\big)+
+\epsilon ^{2} \sigma ^{2} \eps^{2} \big(\ou\big(w_{2},tt,-1\big) w_{1}-
+\ou\big(w_{1},tt,-1\big) w_{2}\big)+\epsilon  \sigma  \eps \big(w_{2} X_
+{1}-w_{1} X_{2}\big)
+\)\par
+\end{document}

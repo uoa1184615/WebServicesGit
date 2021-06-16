@@ -34,7 +34,7 @@ stonormalform(
     {-y(1)-a*y(2)+w(1),
      -y(2)+a*y(1)+w(2)},
     {},
-    4)$
+    4 )$
 end;
 \end{reduce}
 
@@ -127,4 +127,24 @@ w_{1}+\ou\big(w_{2},tt,-1\big) w_{2}+\ou\big(w_{1},tt,-1\big) w_{1}\big)
 \item The time-dependent coordinate transform maps these predictions back into the \(\xv,\yv\)-space.
 \end{itemize}
 
+
+
+\paragraph{But fails to construct a stable manifold}
+This procedure can directly construct the (slow) centre manifold of the system, just specify the optional fifth argument as~\verb|cman|.  The result is the same as substituting \(\Yv=0\) into the above, but is significantly more efficient because the combinatorially exploding algebra is much less.  
+
+However, the procedure fails to construct a stable manifold for this system.  Try the following and see several error messages due to a bad ``\emph{x-residual component}''.
+\begin{reduce}
+stonormalform(
+    {epsilon*y(1), epsilon*y(2),
+     epsilon*(x(1)*y(2)-x(2)*y(1))},
+    {-y(1)-a*y(2)+w(1),
+     -y(2)+a*y(1)+w(2)},
+    {}, 4 , sman)$
+\end{reduce}
+The reason is that in the above system the manifold \(\Xv=0\) is \emph{not} invariant.  Instead, here~\(\dot\Xv\) has `irremovable' forcing due to the noise terms, such as \( \epsilon \sigma \eps \ou\big(w_1,tt,-1\big)\).
+
+The procedure does not abandon iteration straight away.  Instead, it attempts more iterations just in case the failure disappears with further iterations (the procedure halves the maximum number of iterations allowed each time such a failure is detected, and stops when the maximum is less than the total number of iterations done so far).  But here, \emph{for general~\(w_j(t)\)}, there is no invariant stable manifold, so the attempt is abandoned.
+
+In some scenarios you might only be interested in a specific form of~\(w_j(t)\), such as zero mean periodic~\(w_j(t)\), when a stable manifold exists but this procedure does not construct it (although the algorithm could be modified to cope).
+The coded procedure here is for quite general~\(w_j(t)\), such as white noise. 
 

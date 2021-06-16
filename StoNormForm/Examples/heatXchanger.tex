@@ -223,7 +223,7 @@ Write a message saying we are now analysing the next system.
 \begin{reduce}
 write "**** with quadratic reaction ****";
 \end{reduce}
-Execute the construction of a normal form for this system
+Execute the construction of a normal form for this system, but this time just choose the slow centre manifold.
 \begin{reduce}
 stonormalform(
     { y(2)-x(1)*y(1),
@@ -233,13 +233,13 @@ stonormalform(
       -y(2)+x(3)-x(1)*x(2)-y(1)*y(2),
       -y(3)+small*w(2)-x(2)^2-x(1)*x(3)-y(2)^2-y(1)*y(3) },
     { },
-    3 );
+    3 , cman);
 end;
 \end{reduce}
 
 We could divide the off-diagonal linear terms by~\verb|small| (and remove the multiplication of forcing~\verb|w|), and the algorithm still converges, albeit in more iterations.  
 The resulting asymptotic expressions then do not assume that \(x\)~derivatives are `successively smaller'.  
-%See result in file \url{sdeheqr.pdf}
+\footnote{See result in file \texttt{sdeheqr.pdf}}
 The following uses the default scaling which corresponds to successively smaller \(x\)-derivatives provided I also multiply the forcing by~\verb|small|.
 
 \paragraph{Specified dynamical system}
@@ -262,32 +262,41 @@ The following uses the default scaling which corresponds to successively smaller
 
 \paragraph{Time dependent coordinate transform}
 \begin{align*}&
-y_{1}=\eps \big(X_{2}-1/2 X_{1}^{2}+1/2 Y_{1}^{2}\big)+Y_{1}
+y_{1}=\eps \big(X_{2}-1/2 X_{1}^{2}
+%+1/2 Y_{1}^{2}
+\big)%+Y_{1}
 \\&
-y_{2}=\eps \big(X_{3}-X_{2} X_{1}+Y_{2} Y_{1}\big)+Y_{2}
+y_{2}=\eps \big(X_{3}-X_{2} X_{1}
+%+Y_{2} Y_{1}
+\big)%+Y_{2}
 \\&
 y_{3}=\sigma  \eps \ou\big(w_{2},tt,-1\big)+\eps \big(-X_{3} X_{1}-X_{2}
-^{2}+Y_{3} Y_{1}+Y_{2}^{2}\big)+Y_{3}
+^{2}
+%+Y_{3} Y_{1}+Y_{2}^{2}
+\big)%+Y_{3}
 \\&
-x_{1}=\eps \big(X_{1} Y_{1}-Y_{2}\big)+X_{1}
+x_{1}=%\eps \big(X_{1} Y_{1}-Y_{2}\big)+
+X_{1}
 \\&
-x_{2}=\eps \big(X_{2} Y_{1}+X_{1} Y_{2}-Y_{3}\big)+X_{2}
+x_{2}=%\eps \big(X_{2} Y_{1}+X_{1} Y_{2}-Y_{3}\big)+
+X_{2}
 \\&
-x_{3}=\eps \big(X_{3} Y_{1}+2 X_{2} Y_{2}+X_{1} Y_{3}\big)+X_{3}
+x_{3}=%\eps \big(X_{3} Y_{1}+2 X_{2} Y_{2}+X_{1} Y_{3}\big)+
+X_{3}
 \end{align*}
 
 \paragraph{Result normal form DEs}
 \begin{align*}&
-\dot Y_{1}=\eps^{2} \big(-1/2 X_{1}^{2} Y_{1}+2 X_{1} Y_{2}-Y_{3}\big)-Y
-_{1}
-\\&
-\dot Y_{2}=\eps^{2} \big(-X_{2} X_{1} Y_{1}+2 X_{2} Y_{2}-1/2 X_{1}^{2} 
-Y_{2}+2 X_{1} Y_{3}\big)-Y_{2}
-\\&
-\dot Y_{3}=\ParMath{ -\sigma  \eps^{2} w_{2} Y_{1}+\eps^{2} \big(-X_{3} X_{1} Y_{1
-}-X_{3} Y_{2}-X_{2}^{2} Y_{1}-2 X_{2} X_{1} Y_{2}+X_{2} Y_{3}-1/2 X_{1}
-^{2} Y_{3}\big)-Y_{3}
-}\\&
+%\dot Y_{1}=\eps^{2} \big(-1/2 X_{1}^{2} Y_{1}+2 X_{1} Y_{2}-Y_{3}\big)-Y
+%_{1}
+%\\&
+%\dot Y_{2}=\eps^{2} \big(-X_{2} X_{1} Y_{1}+2 X_{2} Y_{2}-1/2 X_{1}^{2} 
+%Y_{2}+2 X_{1} Y_{3}\big)-Y_{2}
+%\\&
+%\dot Y_{3}=\ParMath{ -\sigma  \eps^{2} w_{2} Y_{1}+\eps^{2} \big(-X_{3} X_{1} Y_{1
+%}-X_{3} Y_{2}-X_{2}^{2} Y_{1}-2 X_{2} X_{1} Y_{2}+X_{2} Y_{3}-1/2 X_{1}
+%^{2} Y_{3}\big)-Y_{3}
+%}\\&
 \dot X_{1}=\eps^{2} \big(X_{3}-2 X_{2} X_{1}+1/2 X_{1}^{3}\big)
 \\&
 \dot X_{2}=\sigma  \eps^{2} w_{2}+\eps^{2} \big(-2 X_{3} X_{1}-2 X_{2}^{
