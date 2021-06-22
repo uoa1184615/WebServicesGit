@@ -293,7 +293,7 @@ pp, est, eyem, m;
 
 Write an intro message.
 \begin{reduce}
-write "Construct an invariant manifold (version 10 May 2021)"$
+write "Construct an invariant manifold (version 21 Jun 2021)"$
 \end{reduce}
 
 
@@ -684,8 +684,8 @@ clear l_invs,g_invs,l1_invs,g1_invs,l2_invs,g2_invs;
 array l_invs(neval), g_invs(neval), l1_invs(neval), 
      g1_invs(neval), l2_invs(neval), g2_invs(neval);
 clear sp_; operator sp_; linear sp_;
-for k:=0:neval do begin
-  if trace then write "ITERATION ",k:=k; 
+for k_:=0:neval do begin
+  if trace then write "ITERATION ",k_; 
 \end{reduce}
 
 Code the operator \(\cL\hat v\) where the delay is to only
@@ -693,13 +693,13 @@ act on the oscillation part.
 \begin{reduce}
   for ii:=1:n do for jj:=1:n do llzz_(ii,jj):=(
       -sub(small=0,ll(ii,jj)) where d_(1,t,~dt)
-      => cos(i*eval_s(k)*dt)+i*sin(i*eval_s(k)*dt));
+      => cos(i*eval_s(k_)*dt)+i*sin(i*eval_s(k_)*dt));
 \end{reduce}
 
 Code the operator \(\D t{\hat v}\) where it only acts on the
 oscillation part.
 \begin{reduce}
-  for j:=1:n do llzz_(j,j):=eval_s(k)+llzz_(j,j);
+  for j:=1:n do llzz_(j,j):=eval_s(k_)+llzz_(j,j);
 \end{reduce}
 
 Now code the part leading to the solvability condition which
@@ -707,34 +707,34 @@ arises from allowing the (oscillation) amplitude to evolve.
 Use operator \verb|sp_| to extract the delay parts that
 subtly affect the updates of the evolution.
 \begin{reduce}
-  for j:=1:length(modes_(k)) do 
-    for ii:=1:n do llzz_(ii,n+j):=ee(ii,part(modes_(k),j))
+  for j:=1:length(modes_(k_)) do 
+    for ii:=1:n do llzz_(ii,n+j):=ee(ii,part(modes_(k_),j))
      +(for jj:=1:n sum 
-       sp_(ll(ii,jj)*ee(jj,part(modes_(k),j)),d_)
+       sp_(ll(ii,jj)*ee(jj,part(modes_(k_),j)),d_)
        where { sp_(1,d_)=>0
              , sp_(d_(1,t,~dt),d_)=>dt*(
-               cos(i*eval_s(k)*dt)+i*sin(i*eval_s(k)*dt))
+               cos(i*eval_s(k_)*dt)+i*sin(i*eval_s(k_)*dt))
              });
 \end{reduce}
 
 Force the updates to be orthogonal to the left-eigenvectors
 in the complex conjugate transpose adjoint.
 \begin{reduce}
-  for ii:=1:length(modes_(k)) do for j:=1:n do 
-      llzz_(n+ii,j):=conj_(zz(j,part(modes_(k),ii)));
+  for ii:=1:length(modes_(k_)) do for j:=1:n do 
+      llzz_(n+ii,j):=conj_(zz(j,part(modes_(k_),ii)));
   if trace then write "finished Force the updates to be orthogonal";
 \end{reduce}
 
 Set the bottom-right corner of the matrix to zero.
 \begin{reduce}
-  for i:=1:length(modes_(k)) do 
+  for i:=1:length(modes_(k_)) do 
     for j:=1:m do llzz_(n+i,n+j):=0;
 \end{reduce}
 
 Add some trivial rows and columns to make the matrix up to
 the same size for all eigenvalues.
 \begin{reduce}
-  for i:=length(modes_(k))+1:m do begin 
+  for i:=length(modes_(k_))+1:m do begin 
     for j:=1:n+i-1 do llzz_(n+i,j):=llzz_(j,n+i):=0;
     llzz_(n+i,n+i):=1;
   end;
@@ -747,9 +747,9 @@ the inversion operators.
   if trace then write llzz_:=llzz_; 
   llzz_:=llzz_^(-1);
   if trace then write llzz_:=llzz_;
-  l_invs(k):=for i:=1:n sum for j:=1:n sum e_(i,j)*llzz_(i,j);
-  g_invs(k):=for i:=1:length(modes_(k)) sum 
-    for j:=1:n sum e_(part(modes_(k),i),j)*llzz_(i+n,j);
+  l_invs(k_):=for i:=1:n sum for j:=1:n sum e_(i,j)*llzz_(i,j);
+  g_invs(k_):=for i:=1:length(modes_(k_)) sum 
+    for j:=1:n sum e_(part(modes_(k_),i),j)*llzz_(i+n,j);
 if trace then write "finished Invert the matrix and unpack";
 \end{reduce}
 
@@ -761,17 +761,17 @@ left-eigenvectors), so we need to remember more parts of the
 inverse of the matrix.  
 %  realgeneval:={repart(geneval)=>geneval, impart(geneval)=>0}$
 \begin{reduce}
-  l1_invs(k) := for ii:=1:n sum for j:=1:n sum 
+  l1_invs(k_) := for ii:=1:n sum for j:=1:n sum 
       e_(ii,j)*conj_(llzz_(j,ii));
-  l2_invs(k) := for ii:=1:n sum 
-      for j:=1:length(modes_(k)) sum 
-          e_(ii,part(modes_(k),j))*conj_(llzz_(j+n,ii));
-  g1_invs(k) := for ii:=1:length(modes_(k)) sum 
+  l2_invs(k_) := for ii:=1:n sum 
+      for j:=1:length(modes_(k_)) sum 
+          e_(ii,part(modes_(k_),j))*conj_(llzz_(j+n,ii));
+  g1_invs(k_) := for ii:=1:length(modes_(k_)) sum 
       for j:=1:n sum 
-          e_(part(modes_(k),ii),j)*conj_(llzz_(j,ii+n));
-  g2_invs(k) := for ii:=1:length(modes_(k)) sum 
-      for j:=1:length(modes_(k)) sum 
-          e_(part(modes_(k),ii),part(modes_(k),j))
+          e_(part(modes_(k_),ii),j)*conj_(llzz_(j,ii+n));
+  g2_invs(k_) := for ii:=1:length(modes_(k_)) sum 
+      for j:=1:length(modes_(k_)) sum 
+          e_(part(modes_(k_),ii),part(modes_(k_),j))
           *conj_(llzz_(j+n,ii+n));
   if trace then write "finished Unpack the conjugate transpose";
 end;
@@ -791,9 +791,9 @@ clear l_inv; operator l_inv; linear l_inv;
 let l_inv(e_(~j,~k)*exp(~a),exp)=>l_invproc(a/t)*e_(j,k);
 procedure l_invproc(a);
   if a member eval_set
-  then << k:=0; 
-    repeat k:=k+1 until a=eval_s(k);
-    l_invs(k)*exp(a*t) >>
+  then << k_:=0; 
+    repeat k_:=k_+1 until a=eval_s(k_);
+    l_invs(k_)*exp(a*t) >>
   else sub(geneval=a,l_invs(0))*exp(a*t)$
 \end{reduce}
 
@@ -803,9 +803,9 @@ clear g_inv; operator g_inv; linear g_inv;
 let g_inv(e_(~j,~k)*exp(~a),exp)=>ginv_proc(a/t)*e_(j,k);
 procedure ginv_proc(a); 
   if a member eval_set
-  then << k:=0; 
-    repeat k:=k+1 until a=eval_s(k);
-    g_invs(k) >>
+  then << k_:=0; 
+    repeat k_:=k_+1 until a=eval_s(k_);
+    g_invs(k_) >>
   else sub(geneval=a,g_invs(0))$
 \end{reduce}
 
@@ -814,9 +814,9 @@ define the generic procedure.
 \begin{reduce}
 procedure inv_proc(a,invs);
   if a member eval_set
-  then << k:=0; 
-    repeat k:=k+1 until a=eval_s(k);
-    invs(k)*exp(a*t) >>
+  then << k_:=0; 
+    repeat k_:=k_+1 until a=eval_s(k_);
+    invs(k_)*exp(a*t) >>
   else sub(geneval=a,invs(0))*exp(a*t)$
 \end{reduce}
 
