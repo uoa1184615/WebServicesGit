@@ -8,11 +8,14 @@ These give the location of the invariant manifold in
 terms of parameters~\(s\sb j\).
 \(";
 
-tmp_(1):=coeffn(small*uu,e_(1,1),1)/small +order_(varepsilon^2);
+                                                       2
+tmp_(1):=coeffn(small*uu,e_(1,1),1)/small +order_(small );
 
-tmp_(2):=coeffn(small*uu,e_(2,1),1)/small +order_(varepsilon^2);
+                                                       2
+tmp_(2):=coeffn(small*uu,e_(2,1),1)/small +order_(small );
 
-tmp_(3):=coeffn(small*uu,e_(3,1),1)/small +order_(varepsilon^2);
+                                                       2
+tmp_(3):=coeffn(small*uu,e_(3,1),1)/small +order_(small );
 
 
 write "\)

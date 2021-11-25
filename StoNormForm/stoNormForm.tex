@@ -37,8 +37,8 @@ Sciences, University of Adelaide, South Australia~5005,
 Provides a coded procedure to construct invariant manifolds
 or a normal form of a wide class of systems of
 non-autonomous or stochastic differential equations (herein
-abbreviated by \sde{}s).  The methodology is based upon 
-earlier research~\cite[]{Cox91, Chao95, Roberts06k}. 
+abbreviated by \sde{}s).  The methodology is based upon
+earlier research~\cite[]{Cox91, Chao95, Roberts06k}.
 Interpret all \sde{}s in the Stratonovich sense so the
 analysis applies to deterministic differential equations,
 both non-autonomous and autonomous. Cater for deterministic
@@ -274,10 +274,12 @@ constructed)
 \begin{align*}&
 x_{1}=\sigma  \eps \ou\big(w_{1},tt,-1\big) X_{1}+\eps X_{1}
 Y_{1}+X_{1}
++O\big(\varepsilon ^{2},\sigma^{2}\big)
 \\&
 y_{1}=4 \sigma  \eps \ou\big(w_{1},tt,-1\big) Y_{1}+\sigma
 \ou\big(w_{1},tt,-1\big)+\eps \big(X_{1}^{2}+2
 Y_{1}^{2}\big)+Y_{1}
++O\big(\varepsilon ^{2},\sigma^{2}\big)
 \end{align*}
 
 
@@ -285,10 +287,12 @@ Y_{1}^{2}\big)+Y_{1}
 \begin{align*}&
 \dot X_{1}=2 \sigma ^{2} \eps^{2} \ou\big(w_{1},tt,-1\big)
 w_{1} X_{1}- \sigma  \eps w_{1} X_{1}-\eps^{2} X_{1}^{3}
++O\big(\varepsilon ^{3},\sigma^{3}\big)
 \\&
 \dot Y_{1}=8 \sigma ^{2} \eps^{2} \ou\big(w_{1},tt,-1\big)
 w_{1} Y_{1}-4 \sigma  \eps w_{1} Y_{1}-2 \eps^{2} X_{1}^{2}
 Y_{1}-Y_{1}
++O\big(\varepsilon ^{3},\sigma^{3}\big)
 \end{align*}
 \begin{itemize}
 \item Since this construction is based upon the subspace of
@@ -316,8 +320,9 @@ origin.
 here indicates an algebraic attraction to zero, albeit
 affected by a multiplicative noise, and moderated by some
 irreducible noise-noise interactions.  The independence
-implies that the \(\dot X_1\) \sde\ precisely predicts the
-system dynamics from its initial value over all time.
+of~\(Y_1\) implies that the \(\dot X_1\) \sde\ precisely
+predicts the system dynamics from its initial value over all
+time.
 
 \item These deductions are transformed into the original
 \(xy\)-space by the constructed time-dependent coordinate
@@ -810,7 +815,8 @@ array ff(nx),gg(ny),hh(nz);
 Write expressions to the file \verb|scratchfile.red| for
 later reading. Prepend the expressions with an instruction
 to write a heading, and surround the heading with anti-math
-mode to cancel the math environment that \text{rlfi puts in.}
+mode to cancel the math environment that \text{rlfi puts
+in.}
 \begin{reduce}
 out "scratchfile.red"$
 write "off echo;"$  % do not understand why needed in 2021??
@@ -1306,6 +1312,20 @@ if cmanf then for i:=1:nx do write "dxx(",i,")/dt = ",ff(i);
 
 \subsection{\LaTeX\ version}
 
+Include order of error to make printing more robust. But we
+cannot use \verb|small^toosmall| in the following as that is
+set to zero (for the asymptotics), so we hard code that
+\verb|small| appears as \verb|varepsilon|~\(\varepsilon\). 
+Further, to avoid \verb|sigma^3| being replaced by zero,
+introduce \verb|sigma_| that maps to~\(\sigma\).
+\begin{reduce}
+clear order_;  operator order_;
+defid order_,name="O";
+defindex order_(arg,arg);
+defid sigma_,name="\sigma";
+\end{reduce}
+
+
 As before, we have to write expressions to file for later
 reading so they get printed without extraneous dross in the
 \LaTeX\ source. First open up the temporary file
@@ -1324,9 +1344,12 @@ blank lines in the \LaTeX.
 write "write ""\)
 \paragraph{Time dependent ",textask," coordinates}
 \("";";
-for i:=1:nz do write "z_(",i,"):=z_(",i,");"; 
-for i:=1:ny do write "y_(",i,"):=y_(",i,");";
-for i:=1:nx do write "x_(",i,"):=x_(",i,");"; 
+for i:=1:nz do write "z_(",i,"):=z_(",i,
+    ") +order_(varepsilon^",toosmall-1,",sigma_^2);"; 
+for i:=1:ny do write "y_(",i,"):=y_(",i,
+    ") +order_(varepsilon^",toosmall-1,",sigma_^2);";
+for i:=1:nx do write "x_(",i,"):=x_(",i,
+    ") +order_(varepsilon^",toosmall-1,",sigma_^2);"; 
 \end{reduce}
 
 Write the resultant stochastic normal form to file, with a
@@ -1336,9 +1359,12 @@ auto-math of rlfi.
 write "write ""\)
 \paragraph{Result ",textask," DEs}
 \("";";
-if umanf then for i:=1:nz do write "hh(",i,"):=hh(",i,");";
-if smanf then for i:=1:ny do write "gg(",i,"):=gg(",i,");";
-if cmanf then for i:=1:nx do write "ff(",i,"):=ff(",i,");";
+if umanf then for i:=1:nz do write "hh(",i,"):=hh(",i,
+    ") +order_(varepsilon^",toosmall,",sigma_^3);";
+if smanf then for i:=1:ny do write "gg(",i,"):=gg(",i,
+    ") +order_(varepsilon^",toosmall,",sigma_^3);";
+if cmanf then for i:=1:nx do write "ff(",i,"):=ff(",i,
+    ") +order_(varepsilon^",toosmall,",sigma_^3);";
 write "end;";
 \end{reduce}
 
