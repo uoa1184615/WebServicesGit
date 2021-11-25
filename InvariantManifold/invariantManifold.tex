@@ -24,7 +24,6 @@ Sciences, University of Adelaide, South Australia~5005,
 \def\dde{\textsc{dde}}% delay diff equation
 \newcommand{\adj}[1]{#1^\dagger} % denotes cc transpose
 % following is for output of coordinate transform
-\def\cis\big(#1\big){\,e^{#1i}}
 \def\eps{\varepsilon}
 
 \begin{document}
@@ -139,25 +138,30 @@ basis for projecting onto the invariant manifold.
 \verb|Reduce| is executing---the invariant manifold is
 parametrised by variables \verb|s(1)|, \verb|s(2)|, \ldots,
 and the dynamics by their evolution in time.
+
 \item A \LaTeX\ source report written to the file
 \verb|invarManReport.tex| (and
 \verb|invarManReportSys.tex|)---the invariant manifold is
 parametrised by variables \(s_1\), \(s_2\), \ldots, and the
 dynamics by their evolution in time.  Generate a pdf version
 by executing \verb|pdflatex invarManReport|\,.
+
 \item Global variable \verb|uu| gives the constructed 
 invariant manifold such that \verb|coeffn(uu,e_(i,1),1)| 
 gives the \(i\)th~coordinate, \verb|ui|, of the invariant 
 manifold as a function of~\verb|s(j)|,~\(s_j\).
-\item Global variable \verb|ff_| gives the evolution on the 
-invariant manifold, such that \verb|coeffn(ff,e_(j,1),1)| 
+
+\item Global variable \verb|gg| gives the evolution on the 
+invariant manifold, such that \verb|coeffn(gg,e_(j,1),1)| 
 gives the time derivative of~\verb|s(j)|,~\(\dot s_j\).
+
 \item Global variable \verb|zs| (optional): in the case of 
 a slow manifold (where all specified eigenvalues are zero), 
 \verb|zs|~gives the normals to the isochrons at the slow 
 manifold, such that \verb|coeffn(zs,e_(i,j),1)| as a 
 function of~\sv, is the \(i\)th~component of the 
 \(j\)th~normal vector to the isochron.
+
 \end{itemize}
 One may change the appearance of the output somewhat. For
 example, it is often useful to execute  \verb|factor s;|
@@ -846,12 +850,13 @@ let { l1_inv(e_(~j,~k)*exp(~a),exp)
 
 
 \section{Initialise LaTeX output}
-% AJR, 21 aug 2012 -- Aug 2014
+% AJR, 21 aug 2012 -- Aug 2014 -- Nov 2021
 
-Set the default output to be inline mathematics.
-\begin{reduce}
-mathstyle math;
-\end{reduce}
+%% not needed as prinlaend/begin hardcodes it, nov 2021
+%Set the default output to be inline mathematics.
+%\begin{reduce}
+%mathstyle math; 
+%\end{reduce}
 
 Define the Greek alphabet with \verb|small| as well.
 \begin{reduce}
@@ -957,7 +962,7 @@ shut "scratchfile.red";
 
 Now print the dynamical system to the LaTeX sub-file.
 \begin{reduce}
-write "Ignore the following 15 lines of LaTeX"$
+write "Ignore the following 13 lines of LaTeX"$
 on latex$
 out "invarManReportSys.tex"$
 in "scratchfile.red"$
@@ -1216,8 +1221,9 @@ clear tmp_zz; array tmp_zz(m,n);
 defid tmp_,name="u";
 defid tmp_s,name="\dot s";
 defid tmp_z,name="\vec z";
-defid tmp_zz,name="z";
-defindex tmp_zz(down,down);
+operator zs_;%(m,n);
+defid zs_,name="z";
+defindex zs_(down,down);
 \end{reduce}
 
 Gather complicated result
@@ -1226,6 +1232,14 @@ Gather complicated result
 for k:=1:m do for j:=1:n do 
     tmp_zz(k,j):=(1*coeffn(zs,e_(j,k),1));
 \end{reduce}
+
+Include order of error to make printing more robust.
+\begin{reduce}
+operator order_;
+defid order_,name="O";
+defindex order_(arg);
+\end{reduce}
+
 
 Write to a file the commands needed to write the LaTeX
 expressions. Write the invariant manifold to one order lower
@@ -1238,12 +1252,12 @@ write "write ""\)
 These give the location of the invariant manifold in
 terms of parameters~\(s\sb j\).
 \("";";
-for j:=1:n do write "tmp_(",j,
-  "):=coeffn(small*uu,e_(",j,",1),1)/small;";
+for j:=1:n do write "tmp_(",j,"):=coeffn(small*uu,e_(",j,
+        ",1),1)/small +order_(varepsilon^",toosmall-1,");";
 if length(gg)>30 then begin
 write "on rounded; print_precision 4$"$
-for j:=1:n do write "tmp_(",j,
-  "):=coeffn(small*uu,e_(",j,",1),1)/small;";
+for j:=1:n do write "tmp_(",j,"):=coeffn(small*uu,e_(",j,
+        ",1),1)/small +order_(varepsilon^",toosmall-1,");";
 write "off rounded;"$
 end;
 \end{reduce}
@@ -1256,10 +1270,12 @@ write "write ""\)
 The system evolves on the invariant manifold such
 that the parameters evolve according to these ODEs.
 \("";";
-for j:=1:m do write "tmp_s(",j,"):=1*coeffn(gg,e_(",j,",1),1);";
+for j:=1:m do write "tmp_s(",j,"):=1*coeffn(gg,e_(",j
+           ,",1),1)+order_(varepsilon^",toosmall,");";
 if length(gg)>30 then begin
 write "on rounded; print_precision 4$"$
-for j:=1:m do write "tmp_s(",j,"):=1*coeffn(gg,e_(",j,",1),1);";
+for j:=1:m do write "tmp_s(",j,"):=1*coeffn(gg,e_(",j
+           ,",1),1)+order_(varepsilon^",toosmall,");";
 write "off rounded;"$
 end;
 \end{reduce}
@@ -1279,13 +1295,14 @@ the model of uncertainties in the original system.
 The normal vector \(\vec z\sb j:=(z\sb{j1},\ldots,z\sb{jn})\)
 \("";";
   for i:=1:m do for j:=1:n do 
-  write "tmp_zz(",i,",",j,"):=tmp_zz(",i,",",j,");";
-end;
+  write "zs_(",i,",",j,"):=tmp_zz(",i,",",j
+       ,")+order_(varepsilon^",toosmall,");";
+end;%if itisSlowMan_
 \end{reduce}
 
 Finish the scratchfile.
 \begin{reduce}
-write "end;";
+write ";end;";
 shut "scratchfile.red";
 \end{reduce}
 
@@ -1328,9 +1345,9 @@ deflist('((!( !\!b!i!g!() (!) !\!b!i!g!)) (!P!I !\!p!i! )
 \end{reduce}
 
 Override the procedure that prints annoying messages about
-multicharacter symbols. It ends the output of one
-expression. This is just a copy from \verb|rlfi.red| with
-the appropriate if-statement deleted. While interfering,
+multicharacter symbols.  It ends the output of one
+expression.  This is just a copy from \verb|rlfi.red| with
+the appropriate if-statement deleted.  While interfering,
 hardcode that the mathematics is in inline mode.
 \begin{reduce}
 symbolic procedure prinlaend;
@@ -1370,7 +1387,6 @@ symbolic procedure latexon;
   prin2t "\documentclass[11pt,a5paper]{article}";
   prin2t "\usepackage[a5paper,margin=13mm]{geometry}";
   prin2t "\usepackage{parskip,time} \raggedright";
-  prin2t "\def\exp\big(#1\big){\,{\rm e}^{#1}}";
   prin2t "\def\eps{\varepsilon}";
   prin2t "\title{Invariant manifold of your dynamical system}";
   prin2t "\author{A. J. Roberts, University of Adelaide\\";

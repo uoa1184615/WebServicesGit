@@ -1,0 +1,13 @@
+% 129.127.149.251 Thursday 25th November 2021 01:01:48 AM
+in_tex "../invariantManifold.tex"$
+factor small;
+invariantmanifold(
+    mat((u2*u3
+,-u2*(r1*u1-r2*u2)/c
+,u3*(r1*u1-r2*u2-c^2)/c-u1*(1-u1)
+)),
+    mat((0,0)),
+    mat((1,0,-1/c),(0,1,0)),
+    mat((1,0,0),(0,1,0)),
+    3);
+end;

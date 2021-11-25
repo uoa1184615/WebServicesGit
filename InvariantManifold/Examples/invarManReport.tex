@@ -1,7 +1,6 @@
 \documentclass[11pt,a5paper]{article}
 \usepackage[a5paper,margin=13mm]{geometry}
 \usepackage{parskip,time} \raggedright
-\def\exp\big(#1\big){\,{\rm e}^{#1}}
 \def\eps{\varepsilon}
 \title{Invariant manifold of your dynamical system}
 \author{A. J. Roberts, University of Adelaide\\
@@ -24,35 +23,14 @@ terms of parameters~\(s\sb j\).
 \(
 \)\par
 
-\(u_{1}=-1/8 \exp \big(-i t\big) s_{3} s_{2} \eps i-9/16 \exp \big(-i t
-\big) s_{2}^{2} s_{1} \eps+\exp \big(-i t\big) s_{2}+7/96 \exp \big(-3 i
- t\big) s_{2}^{3} \eps+1/8 \exp \big(i t\big) s_{3} s_{1} \eps i-9/16 
-\exp \big(i t\big) s_{2} s_{1}^{2} \eps+\exp \big(i t\big) s_{1}+7/96 
-\exp \big(3 i t\big) s_{1}^{3} \eps
+\(u_{1}=O\big(\varepsilon ^{2}\big)+s_{1}
 \)\par
 
-\(u_{2}=-3/8 \exp \big(-i t\big) s_{3} s_{2} \eps+3/16 \exp \big(-i t\big)
- s_{2}^{2} s_{1} \eps i-\exp \big(-i t\big) s_{2} i-7/32 \exp \big(-3 i 
-t\big) s_{2}^{3} \eps i-3/8 \exp \big(i t\big) s_{3} s_{1} \eps-3/16 
-\exp \big(i t\big) s_{2} s_{1}^{2} \eps i+\exp \big(i t\big) s_{1} i+7/
-32 \exp \big(3 i t\big) s_{1}^{3} \eps i
+\(u_{2}=O\big(\varepsilon ^{2}\big)+s_{2}
 \)\par
 
-\(u_{3}=3/8 \exp \big(-i t\big) s_{3} s_{2} \eps i+3/16 \exp \big(-i t
-\big) s_{2}^{2} s_{1} \eps+\exp \big(-i t\big) s_{2}-1/96 \exp \big(-3 i
- t\big) s_{2}^{3} \eps-3/8 \exp \big(i t\big) s_{3} s_{1} \eps i+3/16 
-\exp \big(i t\big) s_{2} s_{1}^{2} \eps+\exp \big(i t\big) s_{1}-1/96 
-\exp \big(3 i t\big) s_{1}^{3} \eps
-\)\par
-
-\(u_{4}=1/8 \exp \big(-i t\big) s_{3} s_{2} \eps-9/16 \exp \big(-i t\big) 
-s_{2}^{2} s_{1} \eps i-\exp \big(-i t\big) s_{2} i+1/32 \exp \big(-3 i t
-\big) s_{2}^{3} \eps i+1/8 \exp \big(i t\big) s_{3} s_{1} \eps+9/16 \exp
- \big(i t\big) s_{2} s_{1}^{2} \eps i+\exp \big(i t\big) s_{1} i-1/32 
-\exp \big(3 i t\big) s_{1}^{3} \eps i
-\)\par
-
-\(u_{5}=s_{3}
+\(u_{3}=\eps \big(s_{2} s_{1} c^{-3} r2-s_{2} s_{1} c^{-3}+s_{1}^{2} c^{-1
+}-s_{1}^{2} c^{-3} r1\big)+O\big(\varepsilon ^{2}\big)-s_{1} c^{-1}
 \)\par
 
 \(
@@ -63,16 +41,50 @@ that the parameters evolve according to these ODEs.
 \(
 \)\par
 
-\(\dot s_{1}=1/32 s_{3}^{2} s_{1} \eps^{2} i-3/16 s_{3} s_{2} s_{1}^{2} 
-\eps^{2}-1/4 s_{3} s_{1} \eps+805/256 s_{2}^{2} s_{1}^{3} \eps^{2} i+3/8
- s_{2} s_{1}^{2} \eps i
+\(\dot s_{1}=\eps^{2} \big(s_{2}^{2} s_{1} c^{-3} r2-s_{2}^{2} s_{1} c^{-3
+}+s_{2} s_{1}^{2} c^{-1}-s_{2} s_{1}^{2} c^{-3} r1\big)-\eps s_{2} s_{1}
+ c^{-1}+O\big(\varepsilon ^{3}\big)
 \)\par
 
-\(\dot s_{2}=-1/32 s_{3}^{2} s_{2} \eps^{2} i-3/16 s_{3} s_{2}^{2} s_{1} 
-\eps^{2}-1/4 s_{3} s_{2} \eps-805/256 s_{2}^{3} s_{1}^{2} \eps^{2} i-3/8
- s_{2}^{2} s_{1} \eps i
+\(\dot s_{2}=\eps \big(s_{2}^{2} c^{-1} r2-s_{2} s_{1} c^{-1} r1\big)+O
+\big(\varepsilon ^{3}\big)
 \)\par
 
-\(\dot s_{3}=0
+\(
+\)
+\paragraph{Normals to isochrons at the slow manifold}
+Use these vectors: to project initial conditions
+onto the slow manifold; to project non-autonomous
+forcing onto the slow evolution; to predict the
+consequences of modifying the original system; in
+uncertainty quantification to quantify effects on
+the model of uncertainties in the original system.
+The normal vector \(\vec z\sb j:=(z\sb{j1},\ldots,z\sb{jn})\)
+\(
+\)\par
+
+\(z_{11}=\eps^{2} \big(-s_{2}^{2} c^{-4} r2+3 s_{2}^{2} c^{-4}-2 s_{2} s_{
+1} c^{-2}+2 s_{2} s_{1} c^{-4} r1\big)+\eps s_{2} c^{-2}+O\big(
+\varepsilon ^{3}\big)+1
+\)\par
+
+\(z_{12}=\eps^{2} \big(-s_{2} s_{1} c^{-4} r2+s_{2} s_{1} c^{-4}\big)+O
+\big(\varepsilon ^{3}\big)
+\)\par
+
+\(z_{13}=2 \eps^{2} s_{2}^{2} c^{-3}+\eps s_{2} c^{-1}+O\big(\varepsilon 
+^{3}\big)
+\)\par
+
+\(z_{21}=\eps^{2} s_{2}^{2} c^{-4} r1+O\big(\varepsilon ^{3}\big)
+\)\par
+
+\(z_{22}=O\big(\varepsilon ^{3}\big)+1
+\)\par
+
+\(z_{23}=\eps^{2} s_{2}^{2} c^{-3} r1+O\big(\varepsilon ^{3}\big)
+\)\par
+
+\(
 \)\par
 \end{document}

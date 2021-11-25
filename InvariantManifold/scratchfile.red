@@ -8,9 +8,9 @@ These give the location of the invariant manifold in
 terms of parameters~\(s\sb j\).
 \(";
 
-tmp_(1):=coeffn(small*uu,e_(1,1),1)/small;
+tmp_(1):=coeffn(small*uu,e_(1,1),1)/small +order_(varepsilon^4);
 
-tmp_(2):=coeffn(small*uu,e_(2,1),1)/small;
+tmp_(2):=coeffn(small*uu,e_(2,1),1)/small +order_(varepsilon^4);
 
 
 write "\)
@@ -19,7 +19,7 @@ The system evolves on the invariant manifold such
 that the parameters evolve according to these ODEs.
 \(";
 
-tmp_s(1):=1*coeffn(gg,e_(1,1),1);
+tmp_s(1):=1*coeffn(gg,e_(1,1),1)+order_(varepsilon^5);
 
 
 write "\)
@@ -33,8 +33,8 @@ the model of uncertainties in the original system.
 The normal vector \(\vec z\sb j:=(z\sb{j1},\ldots,z\sb{jn})\)
 \(";
 
-tmp_zz(1,1):=tmp_zz(1,1);
+zs_(1,1):=tmp_zz(1,1)+order_(varepsilon^5);
 
-tmp_zz(1,2):=tmp_zz(1,2);
+zs_(1,2):=tmp_zz(1,2)+order_(varepsilon^5);
 
-end;
+;end;

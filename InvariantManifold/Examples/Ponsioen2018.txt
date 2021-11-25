@@ -1,0 +1,36 @@
+% Simple nonlinear normal mode example 7.1 of Ponsioen,
+% Pedergnanaa, Haller, 2018, doi:10.1016/j.jsv.2018.01.048 
+% Here order 8 computes to the same order as PPH because the
+% nonlinearity is small*cubic.  But a difference is that here
+% we also expand in small c (=u5=s3=0.03) whereas I believe PPH 
+% are exact in c.
+% AJR, 20 Oct 2021
+in_tex "../invariantManifold.tex"$
+factor s(1),s(2),exp;
+% encode ODEs (28), (31), (34) 
+% where u1=x1, u2=x2, u3=dx1/dt, u4=dx2/dt, u5=c=s3
+k:=1;   
+c:=u5; % PPH used c=0.03
+kappa:=1/2; 
+invariantmanifold(
+    mat((u3,
+    u4,
+    -2*k*u1+k*u2-2*c*u3+c*u4-kappa*u1^3,
+    +k*u1-2*k*u2+c*u3-2*c*u4,
+    0)),
+    mat(( i, -i, 0) ),
+    mat( (1,1,i,i,0), (1,1,-i,-i,0), (0,0,0,0,1) ),
+    mat( (1,1,i,i,0), (1,1,-i,-i,0), (0,0,0,0,1) ),
+    8)$  
+
+% transform appearance of output to match PPH (61)+(62)
+% Nearly matches, less than 1% error, so good but...  Is the 
+% difference due to slightly different definition of rho and r?
+small:=1;
+let s(3)=>3/100; on rounded; print_precision 5$
+ds1dt:=coeffn(gg,e_(1,1),1)$
+ds2dt:=coeffn(gg,e_(2,1),1)$
+drdt:=  sub({s(1)=r*eit,s(2)=r/eit}, (ds1dt/eit+ds2dt*eit)/2    );
+dqdt:=1+sub({s(1)=r*eit,s(2)=r/eit}, (ds1dt/eit-ds2dt*eit)/2/i/r);
+% question are r and rho slightly different to make match better??
+end;
