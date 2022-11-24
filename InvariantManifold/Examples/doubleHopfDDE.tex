@@ -2,31 +2,49 @@
 \subsection{\texttt{doubleHopfDDE}: Double Hopf interaction in a 2D DDE} 
 \label{doubleHopfDDE}
 
-\cite{Erneux2009} [\S7.2] explored an example of a laser subject to optoelectronic feedback, coded as a delay differential equation.
-For certain parameter values it has a two frequency Hopf bifurcation.
-Near Erneux's parameters $(\eta,\theta)=(3/5,2)$, the system may be represented as
+\cite{Erneux2009} [\S7.2] explored an example of a laser
+subject to optoelectronic feedback, coded as a delay
+differential equation. For certain parameter values it has a
+two frequency Hopf bifurcation. Near Erneux's parameters
+$(\eta,\theta)=(3/5,2)$, the system may be represented as
 \begin{align*}&
 \dot u_{1}=-4(1+\delta)^2\big[\tfrac58u_2+\tfrac38u_2(t-\pi)\big]
 \\&
 \dot u_{2}= u_1(1+ u_2).
 \end{align*}
-for small parameter~\(\delta\).
-Due to the delay,~\(u_2(t-\pi)\), this system is effectively an infinite-dimensional dynamical system.
-Here we describe the emergent dynamics on its four-dimensional centre manifold.
+for small parameter~\(\delta\). Due to the
+delay,~\(u_2(t-\pi)\), this system is effectively an
+infinite-dimensional dynamical system. Here we describe the
+emergent dynamics on its four-dimensional centre manifold.
 
-The linearisation of this system at the origin has modes with frequencies \(\omega=1,2\), and corresponding eigenvectors \((1,\mp i/\omega)e^{\pm i\omega t}\).  Corresponding  eigenvectors of the adjoint are \((1,\mp i\omega)e^{\pm i\omega t}\).
-We model the nonlinear interaction of these four modes over long times.
-%We code the parameter~\(a\) as `small', and observe it is consequently considered as `small squared' because all nonlinear terms and already `small' terms are multiplied by~\verb|small|.
+The linearisation of this system at the origin has modes
+with frequencies \(\omega=1,2\), and corresponding
+eigenvectors \((1,\mp i/\omega)e^{\pm i\omega t}\). 
+Corresponding  eigenvectors of the adjoint are \((1,\mp
+i\omega)e^{\pm i\omega t}\). We model the nonlinear
+interaction of these four modes over long times.
+
 
 Start by loading the procedure.
 \begin{reduce}
 in_tex "../invariantManifold.tex"$
 \end{reduce}
-In the printed output, group terms with like powers of amplitudes~\(s_j\), the complex exponential, and the parameter~\(\delta\).
+But turn off \verb|gcd| as it wrecks this code for some unknown reason.
+\begin{reduce}
+off gcd,ezgcd; 
+\end{reduce}
+In the printed output, group terms with like powers of
+amplitudes~\(s_j\), the complex exponential, and the
+parameter~\(\delta\).
 \begin{reduce}
 factor s,delta,exp;
 \end{reduce}
-Execute the construction of the slow manifold for this system, where \verb|u2(pi)| denotes the delayed variable~\(u_2(t-\pi)\), and where \verb|1+small*delta| reflects that we wish to use the `small' parameter~\(\delta\) to explore regimes where this factor is near the value~\(1\).
+Execute the construction of the slow manifold for this
+system, where \verb|u2(pi)| denotes the delayed
+variable~\(u_2(t-\pi)\), and where \verb|1+small*delta|
+reflects that we wish to use the `small'
+parameter~\(\delta\) to explore regimes where this factor is
+near the value~\(1\).
 \begin{reduce}
 invariantmanifold(
     mat(( -4*(1+small*delta)^2*(5/8*u2 +3/8*u2(pi)),
@@ -37,7 +55,8 @@ invariantmanifold(
     3 )$
 end;
 \end{reduce}
-The code works for errors of order higher than cubic, but is much slower: takes several minutes per iteration.
+The code works for errors of order higher than cubic, but is
+much slower: takes several minutes per iteration.
 
 The procedure actually analyses the embedding system
 \begin{align*}&
@@ -49,9 +68,13 @@ The procedure actually analyses the embedding system
 
 
 \paragraph{The centre manifold} 
-These give the location of the invariant manifold in
-terms of parameters~\(s\sb j\).
-Here, \(u_1\approx s_1e^{it}+s_2e^{-it}+s_3e^{i2t}+s_4e^{-i2t}\) so that (for real solutions) \(s_1,s_2\) are complex conjugate amplitudes that modulate the oscillations of frequency \(\omega=1\)\,, whereas \(s_3,s_4\) are complex conjugate amplitudes that modulate the oscillations of frequency \(\omega=2\)\,.
+These give the location of the invariant manifold in terms
+of parameters~\(s\sb j\). Here, \(u_1\approx
+s_1e^{it}+s_2e^{-it}+s_3e^{i2t}+s_4e^{-i2t}\) so that (for
+real solutions) \(s_1,s_2\) are complex conjugate amplitudes
+that modulate the oscillations of frequency \(\omega=1\)\,,
+whereas \(s_3,s_4\) are complex conjugate amplitudes that
+modulate the oscillations of frequency \(\omega=2\)\,.
 \begin{align*}&
 u_{1}=\ParMath{\exp \big(-i t\big) s_{4} s_{1} \eps \big(0.2309 i-0.04495
 \big)+\exp \big(-i t\big) s_{2}+0.1667 \exp \big(-4 i t\big) s_{4}^{2}
@@ -76,8 +99,10 @@ _{3}^{2} \eps-0.5625 \exp \big(3 i t\big) s_{3} s_{1} \eps-0.5 \exp
 
  
 \paragraph{Centre manifold ODEs} 
-The system evolves on the invariant manifold such
-that the parameters evolve according to these ODEs that characterise how the modulation of the oscillations evolve due to their nonlinear interaction.
+The system evolves on the invariant manifold such that the
+parameters evolve according to these ODEs that characterise
+how the modulation of the oscillations evolve due to their
+nonlinear interaction.
 \begin{align*}&
 \dot s_{1}=\ParMath{s_{4} s_{3} s_{1} \eps^{2} \big(-0.03089 i+0.05032\big)+s
 _{3} s_{2} \eps \big(-0.08991 i-0.03816\big)+s_{2} s_{1}^{2} \eps^{2

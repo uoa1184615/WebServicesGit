@@ -1,0 +1,18 @@
+write "
+Guido Schneider (2022) example from p.29 of a talk.
+u3=s3=epsilon
+AJR, 1 Jul 2022
+";
+
+in_tex "../invariantManifold.tex"$
+factor s(3),i;
+invariantmanifold(
+    mat((i*u3*(u1+u1*u2)
+        ,i*u2-i*u1^2
+        ,0)),
+    mat(( 0,i,0 )),
+    mat( (1,0,0),(0,1,0),(0,0,1) ),
+    mat( (1,0,0),(0,1,0),(0,0,1) ),
+    7);
+
+end;

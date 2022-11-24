@@ -8,7 +8,7 @@ Sciences, University of Adelaide, South Australia~5005,
 \textsc{Australia}. \url{https://profajroberts.github.io/}}}
 
 \date{Nov 2013 -- \today}
-
+%TODO: remember to change the 'version' date for each update
 
 
 %TODO: change to matrices or arrays??
@@ -66,7 +66,7 @@ Download and unzip the folder
 \emph{Reduce} and load the procedure by executing the
 command \verb|in_tex "invariantManifold.tex"$|
 \footnote{This script changes many internal settings of
-\emph{Reduce}, so best to do only when needed.} Test your
+\emph{Reduce}, so best done only when needed.} Test your
 installation by then executing \verb|exampleslowman();|
 \quad(see \cref{ss:eg}).
 
@@ -108,7 +108,7 @@ modes corresponding to the given eigenvalues of the
 invariant manifold basis---possibly complex-valued;
 
 \item \verb|adjvecs|, a comma separated list of vectors
-within \verb|mat(...)|, usually the adjoint eigenvectors of
+within \verb|mat(...)|, often the adjoint eigenvectors of
 the modes corresponding to the given eigenvalues of the
 invariant manifold basis;  
 
@@ -274,10 +274,15 @@ delays)---currently code a max of nine variables.
 load_package rlfi; 
 operator u1,u2,u3,u4,u5,u6,u7,u8,u9;
 \end{reduce}
+Usually seems best to use the \verb|gcd| option, but sometimes worse, so set here in order for a user to optionally turn off before invoking the procedure.
+\begin{reduce}
+on gcd,ezgcd; 
+\end{reduce}
+
 
 Now define the procedure as an operator so we can define
 procedures internally, and may be flexible with its
-arguments.
+arguments. \eqref{secFin} marks the end of the procedure.
 \begin{reduce}
 operator invariantmanifold;
 for all odefns, evals, evecs, adjvecs, toosmall let
@@ -300,7 +305,7 @@ pp, est, eyem, m;
 
 Write an intro message.
 \begin{reduce}
-write "Construct an invariant manifold (version 21 Jun 2021)"$
+write "Construct an invariant manifold (version 25 Nov 2022)"$
 \end{reduce}
 
 
@@ -314,11 +319,11 @@ zz := tp adjvecs;
 
 Define default parameters for the iteration:
 \verb|maxiter|~is the maximum number of allowed iterations.
-Specific problems may override these defaults.
+Specific problems may override this default.
 \begin{reduce}
 maxiter:=29$
-factor small; 
 \end{reduce}
+%factor small; 
 
 For optional trace printing of test cases: comment out
 second line when not needed.
@@ -330,7 +335,8 @@ trace:=0$
 
 The \verb|rationalize| switch makes code much faster with
 complex numbers. The switch \verb|gcd| seems to wreck
-convergence, so leave it off.
+convergence for \verb|doubleHofDDE|, so leave it off.
+But seems OK for all other examples.
 \begin{reduce}
 on div; off allfac; on revpri; 
 on rationalize;
@@ -411,6 +417,16 @@ let { df(exp(~u),t) => df(u,t)*exp(u)
     , exp(~u)^~p => exp(p*u)
     };
 \end{reduce}
+Also try mapping any user supplied sinusoids into 
+this \verb|exp()| so that we can handle harmonically 
+forced systems.  Only invoke on the supplied \ode{}s as 
+delay differential equations use trig functions.
+\begin{reduce}
+ff:=(ff where { cos(~u) => (exp(i*u)+exp(-i*u))/2
+              , sin(~u) => (exp(i*u)-exp(-i*u))/(2*i) 
+              } );
+\end{reduce}
+
 
 Need function~\verb|conj_| to do parsimonious complex
 conjugation.   
@@ -419,10 +435,13 @@ procedure conj_(a)$ sub(i=-i,a)$
 \end{reduce}
 
 Make an array of eigenvalues for simplicity (\verb|evals|
-not used hereafter).
+not used hereafter).  Substitute \verb|small=0| in the
+eigenvalues just in case someone wants to detune eigenvalues
+in the analysis and supply the same parameter in the
+eigenvalues.
 \begin{reduce}
 clear eval_;  array eval_(m);
-for j:=1:m do eval_(j):=evals(1,j);
+for j:=1:m do eval_(j):=sub(small=0,evals(1,j));
 \end{reduce}
 
 
@@ -572,7 +591,8 @@ ll:=ll-lladj;
 % following maybe only for pure centre modes??
 write
 reslin:=(ll*(ee*dexp_)-(ee*dexp_)*aa_
-    where exp(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(-i*a)+i*sin(-i*a))*exp(a) ); 
+    where exp(~a)*d_(1,t,~dt)
+    => sub(t=-dt,cos(-i*a)+i*sin(-i*a))*exp(a) ); 
 ok:=1$
 for j:=1:n do for k:=1:m do 
     ok:=if reslin(j,k)=0 then ok else 0$
@@ -729,7 +749,8 @@ in the complex conjugate transpose adjoint.
 \begin{reduce}
   for ii:=1:length(modes_(k_)) do for j:=1:n do 
       llzz_(n+ii,j):=conj_(zz(j,part(modes_(k_),ii)));
-  if trace then write "finished Force the updates to be orthogonal";
+  if trace then write 
+  "finished Force the updates to be orthogonal";
 \end{reduce}
 
 Set the bottom-right corner of the matrix to zero.
@@ -745,7 +766,8 @@ the same size for all eigenvalues.
     for j:=1:n+i-1 do llzz_(n+i,j):=llzz_(j,n+i):=0;
     llzz_(n+i,n+i):=1;
   end;
-  if trace then write "finished Add some trivial rows and columns";
+  if trace then write 
+  "finished Add some trivial rows and columns";
 \end{reduce}
 
 Invert the matrix and unpack into arrays ready for use by
@@ -757,7 +779,7 @@ the inversion operators.
   l_invs(k_):=for i:=1:n sum for j:=1:n sum e_(i,j)*llzz_(i,j);
   g_invs(k_):=for i:=1:length(modes_(k_)) sum 
     for j:=1:n sum e_(part(modes_(k_),i),j)*llzz_(i+n,j);
-if trace then write "finished Invert the matrix and unpack";
+  if trace then write "finished Invert the matrix and unpack";
 \end{reduce}
 
 Unpack the conjugate transpose for inverse operators used
@@ -780,7 +802,8 @@ inverse of the matrix.
       for j:=1:length(modes_(k_)) sum 
           e_(part(modes_(k_),ii),part(modes_(k_),j))
           *conj_(llzz_(j+n,ii+n));
-  if trace then write "finished Unpack the conjugate transpose";
+  if trace then write 
+  "finished Unpack the conjugate transpose";
 end;
 \end{reduce}
 
@@ -940,8 +963,10 @@ defid tmp_,name="\dot u";
 defid tmp_s,name="\vec e";
 defid tmp_z,name="\vec z";
 rhs_:=rhsfn$
-for k:=1:m do tmp_s(k):={for j:=1:n collect ee(j,k),exp(eval_(k)*t)};
-for k:=1:m do tmp_z(k):={for j:=1:n collect zz(j,k),exp(eval_(k)*t)};
+for k:=1:m do tmp_s(k):=
+    {for j:=1:n collect ee(j,k),exp(eval_(k)*t)};
+for k:=1:m do tmp_z(k):=
+    {for j:=1:n collect zz(j,k),exp(eval_(k)*t)};
 \end{reduce}
 
 We have to be shifty here because \verb|rlfi| does not work
@@ -953,7 +978,8 @@ write "off echo;"$  % do not understand why needed in 2021??
 write "write ""\)
 \paragraph{The specified dynamical system}
 \("";";
-for j:=1:n do write "tmp_(",j,"):=coeffn(rhs_,e_(",j,",1),1);";
+for j:=1:n do write "tmp_(",j,"):=
+    coeffn(rhs_,e_(",j,",1),1);";
 write "write ""\)
 \paragraph{Invariant subspace basis vectors}
 \("";";
@@ -1328,6 +1354,7 @@ shut "invarManReport.tex"$
 
 
 \section{Fin}
+\label{secFin}
 That's all folks, so end the procedure. 
 \begin{reduce}
 return Finished_constructing_invariant_manifold_of_system$ 
@@ -1393,7 +1420,7 @@ symbolic procedure latexon;
   prin2t "\documentclass[11pt,a5paper]{article}";
   prin2t "\usepackage[a5paper,margin=13mm]{geometry}";
   prin2t "\usepackage{parskip,time} \raggedright";
-  prin2t "\def\eps{\varepsilon}";
+  prin2t "\def\eps{\varepsilon} \def\_{_}";
   prin2t "\title{Invariant manifold of your dynamical system}";
   prin2t "\author{A. J. Roberts, University of Adelaide\\";
   prin2t "\texttt{http://orcid.org/0000-0001-8930-1552}}";

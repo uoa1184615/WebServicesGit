@@ -1,0 +1,30 @@
+Comment This is Numerical Example 1, p.74, by Udwadia,
+Firdaus E. (2022). “Control of Nonhyperbolic Dynamical
+Systems Through Center Manifold Control”. In: Nonlinear
+Approaches in Engineering Application, ed. by L. Dai and R.
+N. Jazar. Springer Nature. Chap. 3. doi:
+10.1007/978-3-030-82719-9_3.    AJR, 23 May 2022;
+
+in_tex "../invariantManifold.tex"$
+%factor s,exp;
+% encode ODEs with small control w(x)
+w:=small^2*8*u1^4*(1-small^2*2*u1^2);
+invariantmanifold(
+    mat((u1*u2+small*(u1^3/2+u1*u2^2)
+    ,-u2-2*u1^2+small*(u1^2*u2)+w)),
+    mat((0)), mat((1,0)), mat((1,0)),
+    19)$
+end;
+
+Comment The analysis confirms the exact results: 
+The slow manifold is (to one order lower)
+u1 = s(1)
+                    2
+u2 =  - 2*small*s(1)
+The evolution of the real/complex amplitudes
+               3       2     3          4     5
+ds(1)/dt =  - ---*small *s(1)  + 4*small *s(1)
+               2
+;
+
+end;

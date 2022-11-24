@@ -1,0 +1,52 @@
+write "
+Seek singularity in forced system cf Haller (2016). 
+AJR, 16 Jun 2022
+";
+
+in_tex "../invariantManifold.tex"$
+factor small;
+eps:=1/4;
+if 0 then
+invariantmanifold(
+    mat((-u1*u2
+        ,-u2+u1^2-0*u2^2-u3
+        ,0
+        )),
+    mat(( 0,0 )),
+    mat( (1,0,0), (0,0,1) ),
+    mat( (1,0,0), (0,0,1) ),
+    19)
+else
+invariantmanifold(
+    mat((-u1*u2
+        ,-u2+u1^2-0*u2^2-eps
+        )),
+    mat(( 0 )),
+    mat( (1,0) ),
+    mat( (1,0) ),
+    49)$
+
+Comment Analyse ODE/DDE system du/dt = 
+
+[          - small*u1*u2         ]
+[                                ]
+[                 2    1         ]
+[ - u2 + small*(u1  - ---*exp(0))]
+[                      4         ]
+;
+let exp(0)=>1; % because of the constant term
+
+%dsdt:=sub(small=1,coeffn(gg,e_(1,1),1));
+%dsdt1:=coeff(coeffn(dsdt,s(1),1),s(2));
+%dsdt3:=coeff(coeffn(dsdt,s(1),3),s(2));
+u2:=sub(small=1,coeffn(uu,e_(2,1),1));
+u2f:=u2/(s(1)^2-eps);
+write "Seek coeffs in s1^2.  Appears to diverge for
+s1^2>0.05 which is divergence for |s1|>0.25 to be compared
+to fixed point at |s1|=0.5.  Unclear whether always
+divergent, or whether convergent up to the fixed points.";
+on rounded; off nat;
+cs:=coeff((u2f where s(1)^2=>x),x);
+on nat; off rounded;
+
+end;

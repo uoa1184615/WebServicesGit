@@ -1,0 +1,21 @@
+write "
+Stoychev (2022) example 3.5. 
+AJR, 22 Jun 2022
+";
+
+in_tex "../invariantManifold.tex"$
+factor small,s(4);
+b:=1;
+invariantmanifold(
+    mat(( u4*u1+u2-u4*u1*(u1^2+u2^2)
+        ,-u1+u4*u2-u4*u2*(u1^2+u2^2)
+        ,-b*u3+(3*u4+b)*u1^3+3*u1^2*u2-3*u4*u3*(u1^2+u2^2)
+        ,0
+        )),
+    mat(( i,-i,-b,0 )),
+    mat( (1/2,i/2,0,0), (1/2,-i/2,0,0), (0,0,1,0), (0,0,0,1) ),
+    mat( (1,i,0,0), (1,-i,0,0), (0,0,1,0), (0,0,0,1) ),
+    5);
+
+
+end;
