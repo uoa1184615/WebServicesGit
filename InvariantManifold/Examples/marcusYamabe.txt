@@ -1,21 +1,23 @@
-Comment Discover Marcus--Yamabe instability.  Sets u3 and u4
-so that when s3=s4 are real (they stay real), then
-u3=s3*cos(t) and u4=s3*sin(t).  Find instability predicted
-when 3/2*s3*s4 = 3/2*s3^2 >1 as then the induced growth of
-s1 and s2 (for s1=s2) overcomes the exp(-t) that is in u1 =
-exp(-t+i*t)*s1 + exp(-t-i*t)*s2.    AJR, 30 Jan 2022;
+Comment Discover Marcus--Yamabe instability
+\cite[p.197]{Chicone2006}.  New version of
+invariantManifold.tex caters for sinsusoidal non-autonomous
+coefficients and forcing.   Find instability predicted when
+3/2*small^2 >1, i.e. |small|>0.8165, e.g. small=1, as then
+the induced growth of s1 and s2 (for s1=s2) overcomes the
+exp(-t) that is in u1 = exp(-t+i*t)*s1 + exp(-t-i*t)*s2.
+AJR, 25 Nov 2022;
 
 in_tex "../invariantManifold.tex"$
-factor s,exp;
+factor small;
 % encode ODEs
 invariantmanifold(
-    mat((-u1+u2 +3/2*u3^2 *u1 -3/2*u3*u4*u2,
-         -u1-u2 -3/2*u3*u4*u1 +3/2*u4^2 *u2,
-         -u4, +u3 )),
-    mat(( -1+i, -1-i, i, -i )),
-    mat( (1,i,0,0), (1,-i,0,0), (0,0,1/2,-i/2), (0,0,1/2,i/2) ),
-    mat( (1,i,0,0), (1,-i,0,0), (0,0,1,-i), (0,0,1,i) ),
-    99)$
+    mat((-u1+u2 +small*( 3/2*cos(t)^2*u1 -3/2*cos(t)*sin(t)*u2),
+         -u1-u2 +small*(-3/2*cos(t)*sin(t)*u1 +3/2*sin(t)^2*u2)
+         )),
+    mat(( -1+i, -1-i )),
+    mat( (1,i), (1,-i) ),
+    mat( (1,i), (1,-i) ),
+    9)$
 end;
 
 end;

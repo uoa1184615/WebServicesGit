@@ -1,0 +1,70 @@
+%!TEX root = ../diverseExamples.tex
+% AJR, 26 Nov 2022;
+\subsection{\texttt{marcusYamabe}: Discover Marcus--Yamabe instability}
+\label{marcusYamabe}
+
+In {nonautonomous} systems, such as \(\dot{\uv}=L(t)\uv\),
+just because eigenvalues of~\(L(t)\) have real-part
+negative, for all~\(t\), does not mean that all
+solutions~\(\uv(t)\) decay. Here consider the
+{Marcus--Yamabe system} \cite[p.197]{Chicone2006}
+\begin{equation}\label{eq:oscmyi}
+\de t{\uv}=L(t)\uv \quad\text{for }L:=\begin{bmatrix} 
+-1+\rat32\varepsilon^2\cos^2 t & 1-\rat32\varepsilon^2\sin t\,\cos t\\
+-1-\rat32\varepsilon^2\sin t\,\cos t&-1+\rat32\varepsilon^2\sin^2t
+\end{bmatrix}.
+\end{equation}
+For example, for \(\varepsilon=1\), the eigenvalues
+of~\(L(t)\) are \(\rat14(-1\pm\sqrt7i)\) (independent of
+time). Despite the eigenvalues having negative real-part,
+there are growing solutions \(\uv=(-\cos t,\sin t)e^{t/2}\).
+
+Here analyse the system with the late-2022 version of
+\verb|invariantManifold.tex| that caters for sinusoidal
+non-autonomous coefficients and forcing.   
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+factor small;
+\end{reduce}
+
+Encode the system with \(\verb|small|=\varepsilon\).  We
+find instability predicted when \(\tfrac32\varepsilon^2
+>1\); that is, \(|\varepsilon|>0.8165\); for example,
+\(\varepsilon=1\) as commented above.  Then the induced
+growth of complex amplitudes~\(s_1\) and~\(s_2\) overcomes
+the \(e^{-t}\) decay that is in \(u_1 = e^{(-1+i)t}s_1 +
+e^{(-1-i)t}s_2\).
+\begin{reduce}
+invariantmanifold(
+    mat((-u1+u2 +small*( 3/2*cos(t)^2*u1 -3/2*cos(t)*sin(t)*u2),
+         -u1-u2 +small*(-3/2*cos(t)*sin(t)*u1 +3/2*sin(t)^2*u2)
+         )),
+    mat(( -1+i, -1-i )),
+    mat( (1,i), (1,-i) ),
+    mat( (1,i), (1,-i) ),
+    9)$
+end;
+\end{reduce}
+The function finds the following exact time-dependent
+transformation of this linear system. These parameterise
+state space in terms of~\(s\sb j\):
+\begin{align*}&
+u_{1}=\exp \big(-i t-t\big) s_{2}+\exp \big(i t-t\big) s_{1}+O\big(
+\varepsilon ^{8}\big)
+\\&
+u_{2}=-\exp \big(-i t-t\big) s_{2} i+\exp \big(i t-t\big) s_{1} i+O\big(
+\varepsilon ^{8}\big)
+\end{align*}
+Then the system evolves in state space such that the
+parameters evolve according to these \ode{}s.
+\begin{align*}&
+\dot s_{1}=\eps^{2} \big(3/4 s_{2}+3/4 s_{1}\big)+O\big(\varepsilon ^{9}
+\big)
+\\&
+\dot s_{2}=\eps^{2} \big(3/4 s_{2}+3/4 s_{1}\big)+O\big(\varepsilon ^{9}\big)
+\end{align*}
+The eigenvalues of the above system are \(\lambda =0,
+\tfrac32\varepsilon^2\).  Hence the net growth of~\uv\ is at
+rate~\(-1+\tfrac32\varepsilon^2\); for example, at the
+unstable rate~\(+1/2\) when \(\varepsilon=1\).
+

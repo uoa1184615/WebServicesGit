@@ -5,6 +5,11 @@ Bauer, W., Cotter, C.~J. \harvardand\ Wingate, B.  \harvardyearleft
   2021\harvardyearright , Higher order phase averaging for highly oscillatory
   systems, Technical report, \url{http://www.arxiv.org/abs/2102.11644}.
 
+\harvarditem{Chicone}{2006}{Chicone2006}
+Chicone, C.  \harvardyearleft 2006\harvardyearright , {\em Ordinary
+  Differential Equations with Applications}, Vol.~34 of {\em Texts in Applied
+  Mathematics}, Springer.
+
 \harvarditem{Erneux}{2009}{Erneux2009}
 Erneux, T.  \harvardyearleft 2009\harvardyearright , {\em Applied Delay
   Differential equations}, Vol.~3 of {\em Surveys and Tutorials in the Applied
@@ -42,8 +47,8 @@ Roberts, A.~J.  \harvardyearleft 2015\harvardyearright , {\em Model emergent
   dynamics in complex systems}, SIAM, Philadelphia.
 \newline\harvardurl{http://bookstore.siam.org/mm20/}
 
-\harvarditem{Roberts}{2019}{Roberts2018a}
-Roberts, A.~J.  \harvardyearleft 2019\harvardyearright , Backwards theory
+\harvarditem{Roberts}{2022}{Roberts2018a}
+Roberts, A.~J.  \harvardyearleft 2022\harvardyearright , Backwards theory
   supports modelling via invariant manifolds for non-autonomous dynamical
   systems, Technical report, [\url{http://arxiv.org/abs/1804.06998}].
 
