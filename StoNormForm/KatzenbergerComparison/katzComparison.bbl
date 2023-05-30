@@ -1,0 +1,422 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{Boxler89}{article}{}
+    \name{author}{1}{}{%
+      {{hash=BP}{%
+         family={Boxler},
+         familyi={B\bibinitperiod},
+         given={P.},
+         giveni={P\bibinitperiod},
+      }}%
+    }
+    \keyw{Centre Manifold Theory, Stochastic Differential equation}
+    \strng{namehash}{BP1}
+    \strng{fullhash}{BP1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1989}
+    \field{labeldatesource}{year}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \verb{doi}
+    \verb 10.1007/BF01845701
+    \endverb
+    \field{pages}{509\bibrangedash 545}
+    \field{title}{A Stochastic Version Of The Centre Manifold Theorem}
+    \field{volume}{83}
+    \field{journaltitle}{Probab. Th. Rel. Fields}
+    \field{year}{1989}
+  \endentry
+
+  \entry{Chao95}{article}{}
+    \name{author}{2}{}{%
+      {{hash=CX}{%
+         family={Chao},
+         familyi={C\bibinitperiod},
+         given={Xu},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{CXRAJ1}
+    \strng{fullhash}{CXRAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1996}
+    \field{labeldatesource}{year}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \verb{doi}
+    \verb 10.1016/0378-4371(95)00387-8
+    \endverb
+    \field{pages}{62\bibrangedash 80}
+    \field{title}{On the low-dimensional modelling of {Stratonovich} stochastic
+  differential equations}
+    \field{volume}{225}
+    \field{journaltitle}{Physica~A}
+    \field{year}{1996}
+  \endentry
+
+  \entry{ReduceManual}{report}{}
+    \name{author}{2}{}{%
+      {{hash=HAC}{%
+         family={Hearn},
+         familyi={H\bibinitperiod},
+         given={Anthony\bibnamedelima C.},
+         giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod},
+      }}%
+      {{hash=SR}{%
+         family={Sch\"opf},
+         familyi={S\bibinitperiod},
+         given={Rainer},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HACSR1}
+    \strng{fullhash}{HACSR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{year}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{abstract}{%
+    This document provides the user with a description of the algebraic
+  programming system REDUCE. The capabilities of this system include: 1.
+  expansion and ordering of polynomials and rational functions, 2.
+  substitutions and pattern matching in a wide variety of forms, 3. automatic
+  and user controlled simplification of expressions, 4. calculations with
+  symbolic matrices, 5. arbitrary precision integer and real arithmetic, 6.
+  facilities for defining new functions and extending program syntax, 7.
+  analytic differentiation and integration, 8. factorization of polynomials, 9.
+  facilities for the solution of a variety of algebraic equations, 10.
+  facilities for the output of expressions in a variety of formats, 11.
+  facilities for generating numerical programs from symbolic input, 12. Dirac
+  matrix calculations of interest to high energy physicists.%
+    }
+    \field{title}{Reduce User's Manual}
+    \list{institution}{1}{%
+      {\url{http://reduce-algebra.sourceforge.net/}}%
+    }
+    \field{type}{techreport}
+    \field{year}{2018}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Katzenberger91}{article}{}
+    \name{author}{1}{}{%
+      {{hash=KG}{%
+         family={Katzenberger},
+         familyi={K\bibinitperiod},
+         given={G.S.},
+         giveni={G\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{KG1}
+    \strng{fullhash}{KG1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1991}
+    \field{labeldatesource}{year}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{abstract}{%
+    We consider a sequence of $\mathbb{R}^d$-valued semimartingales $\{X_n\}$
+  satisfying $X_n(t) = X_n(0) + \int^t_0\sigma_n(X_n(s-))dZ_n(s) +
+  \int^t_0F(X_n(s-))dA_n(s),$ where $\{Z_n\}$ is a "well-behaved" sequence of
+  $\mathbb{R}^e$-valued semimartingales, $\sigma_n$ is a continuous $d \times
+  e$ matrix-valued function, $F$ is a vector field whose deterministic flow has
+  an asymptotically stable manifold of fixed points $\Gamma$, and $A_n$ is a
+  nondecreasing process which asymptotically puts infinite mass on every
+  interval. Many Markov processes with lower dimensional diffusion
+  approximations can be written in this form. Intuitively, if $X_n(0)$ is close
+  to $\Gamma$, the drift term $F dA_n$ forces $X_n$ to stay close to $\Gamma$,
+  and any limiting process must actually stay on $\Gamma$. If $X_n(0)$ is only
+  in the domain of attraction of $\Gamma$ under the flow of $F$, then the drift
+  term immediately carries $X_n$ close to $\Gamma$ and forces $X_n$ to stay
+  close to $\Gamma$. We make these ideas rigorous, give conditions under which
+  $\{X_n\}$ is relatively compact in the Skorohod topology and give a
+  stochastic integral equation for the limiting process(es).%
+    }
+    \verb{doi}
+    \verb 10.1214/aop/1176990225
+    \endverb
+    \field{number}{4}
+    \field{pages}{1587\bibrangedash 1628}
+    \field{title}{Solutions of a stochastic differential equation forced onto a
+  manifold by a large drift}
+    \field{volume}{19}
+    \field{journaltitle}{Annals of Probability}
+    \field{year}{1991}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Parsons2015}{report}{}
+    \name{author}{2}{}{%
+      {{hash=PTL}{%
+         family={Parsons},
+         familyi={P\bibinitperiod},
+         given={Todd\bibnamedelima L.},
+         giveni={T\bibinitperiod\bibinitdelim L\bibinitperiod},
+      }}%
+      {{hash=RT}{%
+         family={Rogers},
+         familyi={R\bibinitperiod},
+         given={Tim},
+         giveni={T\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{PTLRT1}
+    \strng{fullhash}{PTLRT1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2015}
+    \field{labeldatesource}{year}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \field{abstract}{%
+    We review the development and applications of a systematic framework for
+  dimension reduction in stochastic dynamical systems that exhibit a separation
+  of timescales. When a multidimensional stochastic dynamical system possesses
+  quantities that are approximately conserved on short timescales, it is common
+  to observe on long timescales that trajectories remain close to some
+  lower-dimensional subspace. Here, we derive explicit and general formulae for
+  a reduced-dimension description of such a process that is exact in the limit
+  of small noise and well-separated slow and fast dynamics. The
+  Michaelis-Menten law of enzyme-catalyzed reactions is explored as a worked
+  example. Extensions of the method are presented for infinite dimensional
+  systems and processes coupled to general noise sources.%
+    }
+    \field{title}{Dimension reduction via timescale separation in stochastic
+  dynamical systems}
+    \list{institution}{1}{%
+      {[\url{http://arXiv.org/abs/1510.07031}]}%
+    }
+    \field{type}{techreport}
+    \field{year}{2015}
+  \endentry
+
+  \entry{Parsons2017}{article}{}
+    \name{author}{2}{}{%
+      {{hash=PTL}{%
+         family={Parsons},
+         familyi={P\bibinitperiod},
+         given={Todd\bibnamedelima L.},
+         giveni={T\bibinitperiod\bibinitdelim L\bibinitperiod},
+      }}%
+      {{hash=RT}{%
+         family={Rogers},
+         familyi={R\bibinitperiod},
+         given={Tim},
+         giveni={T\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{PTLRT1}
+    \strng{fullhash}{PTLRT1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2017}
+    \field{labeldatesource}{year}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \field{abstract}{%
+    Systems composed of large numbers of interacting agents often admit an
+  effective coarse-grained description in terms of a multidimensional
+  stochastic dynamical system, driven by small-amplitude intrinsic noise. In
+  applications to biological, ecological, chemical and social dynamics it is
+  common for these models to posses quantities that are approximately conserved
+  on short timescales, in which case system trajectories are observed to remain
+  close to some lower-dimensional subspace. Here, we derive explicit and
+  general formulae for a reduced-dimension description of such processes that
+  is exact in the limit of small noise and well-separated slow and fast
+  dynamics. The Michaelis--Menten law of enzyme-catalysed reactions, and the
+  link between the Lotka--Volterra and Wright--Fisher processes are explored as
+  a simple worked examples. Extensions of the method are presented for infinite
+  dimensional systems and processes coupled to non-Gaussian noise sources.%
+    }
+    \verb{doi}
+    \verb 10.1088/1751-8121/aa86c7
+    \endverb
+    \field{issn}{1751-8121}
+    \field{number}{41}
+    \field{pages}{1\bibrangedash 33}
+    \field{title}{Dimension reduction for stochastic dynamical systems forced
+  onto a manifold by large drift: a constructive approach with examples from
+  theoretical biology}
+    \field{volume}{50}
+    \field{journaltitle}{Journal of Physics A: Mathematical and Theoretical}
+    \field{month}{09}
+    \field{year}{2017}
+  \endentry
+
+  \entry{Roberts05c}{article}{}
+    \name{author}{1}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{RAJ1}
+    \strng{fullhash}{RAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2006}
+    \field{labeldatesource}{year}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \verb{doi}
+    \verb 10.1112/S146115700000125X
+    \endverb
+    \field{pages}{193\bibrangedash 221}
+    \field{title}{Resolving the multitude of microscale interactions accurately
+  models stochastic partial differential equations}
+    \field{volume}{9}
+    \field{journaltitle}{LMS J.~Computation and Maths}
+    \field{year}{2006}
+  \endentry
+
+  \entry{Roberts06k}{article}{}
+    \name{author}{1}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \keyw{Stochastic dynamical systems; Multiscale modelling}
+    \strng{namehash}{RAJ1}
+    \strng{fullhash}{RAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2008}
+    \field{labeldatesource}{year}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \verb{doi}
+    \verb 10.1016/j.physa.2007.08.023
+    \endverb
+    \field{pages}{12\bibrangedash 38}
+    \field{title}{Normal form transforms separate slow and fast modes in
+  stochastic dynamical systems}
+    \field{volume}{387}
+    \field{journaltitle}{Physica~A}
+    \field{year}{2008}
+  \endentry
+
+  \entry{Roberts09c}{report}{}
+    \name{author}{1}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \keyw{SDE; stochastic differential equation; slow manifold; multiscale}
+    \strng{namehash}{RAJ1}
+    \strng{fullhash}{RAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2009--\the\year}
+    \field{labeldatesource}{year}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{abstract}{%
+    Via the web form, you obtain a normal form of any supplied stochastic
+  differential equation (SDE), or deterministic, autonomous or non-autonomous,
+  ODE, when the S/ODE has fast and slow modes. The normal form decouples the
+  slow modes from the fast and so supplies you with a faithful large time model
+  of the stochastic dynamics. Being a coordinate transform you are assured that
+  the dynamics are attractive over some finite domain and apply for all time.%
+    }
+    \field{title}{Derive invariant manifolds and/or normal forms of general
+  stochastic or non-autonomous, multiscale, differential equations}
+    \list{institution}{1}{%
+      {\url{http://tuck.adelaide.edu.au/sdenf.php} [\today]}%
+    }
+    \field{type}{techreport}
+    \field{year}{2009--\the\year}
+  \endentry
+
+  \entry{Roberts2014a}{book}{}
+    \name{author}{1}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {SIAM, Philadelphia}%
+    }
+    \keyw{multiscale modeling, emergent dynamics, dynamical systems, model
+  reduction, perturbation applications}
+    \strng{namehash}{RAJ1}
+    \strng{fullhash}{RAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2015}
+    \field{labeldatesource}{year}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{abstract}{%
+    Arising out of the growing interest in and applications of modern dynamical
+  systems theory, this book explores how to derive relatively simple dynamical
+  equations that model complex physical interactions. The author's objectives
+  are to use sound theory to explore algebraic techniques, develop interesting
+  applications, and discover general modeling principles. Model Emergent
+  Dynamics in Complex Systems unifies into one powerful and coherent approach
+  the many varied extant methods for mathematical model reduction and
+  approximation. Using mathematical models at various levels of resolution and
+  complexity, the book establishes the relationships between such multiscale
+  models and clarifying difficulties and apparent paradoxes and addresses model
+  reduction for systems, resolves initial conditions, and illuminates control
+  and uncertainty. The basis for the author's methodology is the theory and the
+  geometric picture of both coordinate transforms and invariant manifolds in
+  dynamical systems; in particular, center and slow manifolds are heavily used.
+  The wonderful aspect of this approach is the range of geometric
+  interpretations of the modeling process that it produces---simple geometric
+  pictures inspire sound methods of analysis and construction. Further,
+  pictures drawn of state spaces also provide a route to better assess a
+  model's limitations and strengths. Geometry and algebra form a powerful
+  partnership and coordinate transforms and manifolds provide a powerfully
+  enhanced and unified view of a swathe of other complex system modeling
+  methodologies such as averaging, homogenization, multiple scales, singular
+  perturbations, two timing, and WKB theory.%
+    }
+    \field{isbn}{9781611973556}
+    \field{title}{Model emergent dynamics in complex systems}
+    \verb{url}
+    \verb http://bookstore.siam.org/mm20/
+    \endverb
+    \field{year}{2015}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+\enddatalist
+\endinput

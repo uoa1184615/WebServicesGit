@@ -5,28 +5,25 @@
 in_tex "../invariantManifold.tex"$
 factor exp,small;
 % encode ODEs 
-% where u1=x1, u2=x2, u3=dx1/dt, u4=dx2/dt, u5=c=s3
-k:=2/10;  
-f1:=1; f2:=f3:=0; 
-c1:=1/10; c2:=2/10; c3:=3/10;
-w:=1+w1;
+k:=2/10*small;  
+f2:=f3:=0; %f1:=1; 
+factor f1;
+%c1:=1/10; 
+c2:=2/10; c3:=3/10;
+w:=1;%+w1;
 invariantmanifold(
-    mat(( u2, -u1-k*(u1-u3)^3            -(c1*u2+f1*u7),
-          u4, -u3-k*(u3-u1)^3-k*(u3-u5)^3-(c2*u4+f2*u7),
-          u6, -u5-k*(u5-u3)^3            -(c3*u6+f3*u7),
-          w*u8, -w*u7 )),
-    mat(( i,-i,i,-i,i,-i,i,-i )),
-    mat( (1,+i,0,0,0,0,0,0), (1,-i,0,0,0,0,0,0),
-         (0,0,1,+i,0,0,0,0), (0,0,1,-i,0,0,0,0),
-         (0,0,0,0,1,+i,0,0), (0,0,0,0,1,-i,0,0),
-         (0,0,0,0,0,0,1,+i), (0,0,0,0,0,0,1,-i)
+    mat(( u2, -u1-k*(u1-u3)^3            -(c1*u2+f1*cos(w*t)),
+          u4, -u3-k*(u3-u1)^3-k*(u3-u5)^3-(c2*u4+f2*cos(w*t)),
+          u6, -u5-k*(u5-u3)^3            -(c3*u6+f3*cos(w*t))
+          )),
+    mat(( i,-i)),
+    mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
         ),
-    mat( (1,+i,0,0,0,0,0,0), (1,-i,0,0,0,0,0,0),
-         (0,0,1,+i,0,0,0,0), (0,0,1,-i,0,0,0,0),
-         (0,0,0,0,1,+i,0,0), (0,0,0,0,1,-i,0,0),
-         (0,0,0,0,0,0,1,+i), (0,0,0,0,0,0,1,-i)
+    mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
         ),
-    2 )$
+    4 )$
+
+end;
 
 % transform appearance of output to match PPH (61)+(62)
 % Nearly matches, less than 1% error, so good but...  Is the 
@@ -40,12 +37,9 @@ ds3dt:=coeffn(gg,e_(3,1),1)$
 ds4dt:=coeffn(gg,e_(4,1),1)$
 ds5dt:=coeffn(gg,e_(5,1),1)$
 ds6dt:=coeffn(gg,e_(6,1),1)$
-ds7dt:=coeffn(gg,e_(7,1),1)$
-ds8dt:=coeffn(gg,e_(8,1),1)$
 ss:={s(1)=r1*eit,s(2)=r1/eit
     ,s(3)=r2*eit,s(4)=r2/eit
-    ,s(5)=r3*eit,s(6)=r3/eit
-    ,s(7)=r4*eit,s(8)=r4/eit}$
+    ,s(5)=r3*eit,s(6)=r3/eit}$
 on latex;
 dr1dt:=  sub(ss, (ds1dt/eit+ds2dt*eit)/2    );
 dq1dt:=1+sub(ss, (ds1dt/eit-ds2dt*eit)/2/i/r1);
@@ -53,8 +47,6 @@ dr2dt:=  sub(ss, (ds3dt/eit+ds4dt*eit)/2    );
 dq2dt:=1+sub(ss, (ds3dt/eit-ds4dt*eit)/2/i/r2);
 dr3dt:=  sub(ss, (ds5dt/eit+ds6dt*eit)/2    );
 dq3dt:=1+sub(ss, (ds5dt/eit-ds6dt*eit)/2/i/r3);
-dr4dt:=  sub(ss, (ds7dt/eit+ds8dt*eit)/2    );
-dq4dt:=1+sub(ss, (ds7dt/eit-ds8dt*eit)/2/i/r4);
 off latex;
 % question are r and rho slightly different to make match better??
 end;

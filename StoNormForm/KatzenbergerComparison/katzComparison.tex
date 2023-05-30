@@ -1,0 +1,413 @@
+\documentclass[11pt,a5paper]{article}
+\IfFileExists{ajr.sty}{\usepackage{ajr}}{}
+\usepackage{amsmath,reducecode,defns,mybiblatex,mycleveref}
+\numberwithin{equation}{section}
+
+\title{Compare Katzenberger's formulas with my analysis of stochastic ODEs}
+\author{A.J. Roberts}
+\date{12 Dec 2022 -- \today}
+
+
+\Vec x\Vec f\Vec h\Vec{eta}
+\def\ou\big(#1,#2,#3\big)%
+    {{{\rm e}^{\if#31\else#3\fi t}\star}#1\,}
+\def\eps{\varepsilon}
+\def\ssm{\textsc{ssm}}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section*{Discussion}
+
+\cite{Katzenberger91} argued a geometric basis to modelling the slow dynamics in a slow-fast stochastic differential equation.
+It is great that this argument accounts for nonlinear noise-noise interactions, and the drift effects they cause.
+This modelling is Markovian.
+
+In contrast, stochastic slow manifold theory developing from \cite{Boxler89} leads to a proof that non-Markovian effects are generally required \cite[]{Chao95, Roberts06k}.  
+However, some additional \emph{weak solution} analysis may justify a Markovian model \cite[]{Chao95, Roberts05c}, albeit only emergent from algebraic decay of transients.
+
+\cref{sde1,sde2,sde3} explore three simple \sde\ systems to understand the relation between the modelling of \cite{Katzenberger91} and that of systematic stochastic slow manifolds \cite[]{Roberts06k, Roberts09c}.
+
+\cref{secKratz} codes the procedure of \cite{Parsons2015, Parsons2017}, in the computer algebra  package Reduce \cite[]{ReduceManual}, to evaluate the \sde\ modelling of \cite{Katzenberger91}.
+Choose a system to analyse with the following parameter, in~\(\{1,2,3\}\):
+\begin{reduce}
+sys:=3;
+\end{reduce}
+
+\paragraph{Comparison and questions}
+\begin{itemize}
+\item \cite{Katzenberger91} analysis is based upon heuristic arguments about the geometry near a deterministic critical manifold.
+The stochastic slow manifolds (\ssm) are based upon exact algebra of the system for all states in a finite domain, to a chosen error \cite[e.g.,][]{Roberts06k}.%, and as implemented in the web service \cite[]{Roberts09c}.
+
+\item \cite{Katzenberger91} models are Markovian, whereas \ssm\ theory proves that non-Markovian effects generally occur---as seen in all three examples.  The missed non-Markovian effects are the same order of magnitude as the drift resolved by \cite{Katzenberger91}.
+
+\item \cite{Katzenberger91} assumes one can choose a deterministically defined slow variable.  Whereas I prove that in general, to avoid non-Markovian \emph{linear} effects, that the true slow variable is stochastically related to state space variables \cite[e.g.,][]{Roberts06k}.
+
+\item The drifts predicted by the two approaches agree in the first two examples, but quantitatively disagree in the third example.  Since the \ssm\ result is based upon exact algebra, \emph{either \cite{Katzenberger91} is wrong, or \cite{Parsons2015, Parsons2017} wrongly expresses his results, or my code wrongly implements their expressions.  Which?  What happens in the example of \cref{sde3}?}
+
+\item But even when the drifts agree, the \ssm\ proves that the drifts only emerge from transients that decay algebraically in time, whereas \cite{Katzenberger91} gives no hint of such required long time spans.
+
+\item Questions about \cite{Parsons2015, Parsons2017}: is (18) really the required pseudo-inverse?  and (19) has multiple solutions, so what is ``the'' solution?
+
+\item Equations~(22) and~(23) in \cite{Parsons2017} look wrong to me:  for example, \(J=\begin{bmat}0&0\\0&-1\end{bmat}\) then~(22) gives the pseudo-inverse is \(J^+:=\frac1\lambda J=-J=\begin{bmat}0&0\\0&1\end{bmat}\), whereas~(18) gives \(J^+:=+J=\begin{bmat}0&0\\0&-1\end{bmat}\).  Instead, do they really mean \(J^+:=\frac1{\lambda^2}J\)?
+
+And from the given~(22), (23) should surely be \(P=I-\frac1\lambda J^2\)?
+
+\end{itemize}
+
+
+
+
+\section{Irreducible noise more-or-less matches}
+\label{sde1}
+
+This first system (\(\verb|sys|=1\)) is (nearly) the canonical irreducible system identified by \cite{Chao95}---irreducible because its stochastic slow manifold is the same algebraic form as the system itself!
+In Ito form (and with \(\sqrt\mu=\sigma\)) the system is
+%\begin{subequations}\label{eqs1}%
+\begin{align}&
+\#1\text{ Ito},&&
+dx_1=\sigma x_2dW ,&&
+dx_2=-x_2dt+\sigma dW .
+\label{eq1Ito}
+\end{align}
+In the Stratonovich form, with white noise \(\eta=dW/dt\), this is
+\begin{align}&
+\#1\text{ Strat},&&
+\dot x_1=-\tfrac12\sigma^2+\sigma x_2\eta\,,&&
+\dot x_2=-x_2 +\sigma\eta\,.
+\label{eq1Str}
+\end{align}
+For this and the other two examples, the \(x_1\)-axis, \(x_2=0\), is the deterministic (\(\sigma=0\)) critical manifold.
+Deterministically the isochrons, the stable foliation, are just parallel lines \(x_1={}\)constant.
+
+The code of \cref{secKratz} here generates the output of \cref{out1}.
+It asserts that for \(z=x_1\) the slow model is simply
+\begin{equation}
+\dot z=0,
+\label{eq1Katz}
+\end{equation}
+that is, nothing at all.
+
+
+For comparison, my web service \cite[]{Roberts09c} constructs the coordinate transform to \(XY\)-variables, where \(y_1=x_2\) and \(w_1=\eta\),
+\begin{align}&
+x_{1}=X_{1} -\sigma  \ou\big(w_{1},tt,1\big) Y_{1}+O\big(
+\sigma^{2}\big)
+\nonumber\\&
+y_{1}=Y_{1}+ \sigma  \ou\big(w_{1},tt,-1\big)+O\big(\sigma^{2}
+\big)
+\label{eq1ct}
+\end{align}
+And in these new variables the (Stratonovich) state space evolution is (the parameter~\(\eps\) in my analysis \cite[]{Roberts09c} is a robust \emph{ordering parameter} to more-or-less ensure convergence to a valid model---usually set my \(\eps=1\))
+\begin{align}&
+\dot X_{1}=-1/2 \sigma ^{2} \eps
++\sigma ^{2} \ou\big(w_{1},tt,-1\big) w_{1}
++O\big(\sigma^{3}\big)
+\nonumber\\&
+\dot Y_{1}=-Y_{1}+O\big(\sigma^{3}\big)
+\label{eq1nf}
+\end{align}
+In the new \(XY\)-coordinate system: \(Y_1\to0\) exponentially quickly;  leaving~\(X_1\) to be the \emph{true slow variable} for all time; as throughout \(X_1\)~evolves as above via the multiplicative noise-noise interactions---the system itself is linear in dynamical variables.
+
+The slow~\(X_1\) evolution is non-Markovian through the dependence upon past history of the noise, but also the coordinate transform and hence the interpretation of~\(X_1\) is non-Markovian in its generic dependence upon the near-future of the noise via the term \(\sigma  \ou\big(w_{1},tt,1\big) Y_{1}\), albeit zero on the stochastic slow manifold.  
+
+\cite{Chao95, Roberts05c} argued that one could \emph{weakly model} the \(X_1\)~evolution via analysis of its Fokker--Planck \pde.  
+The result is that on long times, with errors decaying algebraically in time, one may be justified in using the \emph{weak} model \(\dot X_1=\sigma^2\tfrac12\eta'\) for some new white noise~\(\eta'\).
+The zero drift agrees with~\eqref{eq1Katz} of \cite{Katzenberger91}, but~\eqref{eq1Katz} misses the `small' fluctuations, and misses the long-time required for justification.
+
+
+
+%\end{subequations}
+
+
+
+
+\section{Parabolic isochrons more-or-less matches}
+\label{sde2}
+
+This second system (\(\verb|sys|=2\)) has a drift simply generated by excursions off the deterministic slow manifold.
+In Ito form the system is
+%\begin{subequations}\label{eqs2}%
+\begin{align}&
+\#2\text{ Ito},&&
+dx_1=x_2^2dt\,,&&
+dx_2=-x_2dt+\sigma dW .
+\label{eq2Ito}
+\end{align}
+In the Stratonovich form, with white noise \(\eta=dW/dt\), this is
+\begin{align}&
+\#2\text{ Strat},&&
+\dot x_1=x_2^2\,,&&
+\dot x_2=-x_2+\sigma\eta\,.
+\label{eq2Str}
+\end{align}
+Deterministically the isochrons are parabolas \(x_1=c-\tfrac12x_2^2\) for each~\(c\).
+
+The code of \cref{secKratz} here generates the output of \cref{out2}.
+It asserts that for \(z=x_1\) the slow model is simply
+\begin{equation}
+\dot z=\tfrac12\sigma^2,
+\label{eq2Katz}
+\end{equation}
+that is, a slow drift without any fluctuations.
+
+For comparison, my web service \cite[]{Roberts09c} constructs the coordinate transform to \(XY\)-variables, where \(y_1=x_2\) and \(w_1=\eta\),
+\begin{align}&
+x_{1}=X_{1}+ \sigma  \eps \big(-\ou\big(w_{1},tt,1\big) Y_{1}-\ou\big(w_{1},tt,
+-1\big) Y_{1}\big)-1/2 \eps Y_{1}^{2}+O\big(\sigma^{2}
+\big)
+\nonumber\\&
+y_{1}=Y_{1}+ \sigma  \ou\big(w_{1},tt,-1\big)+O\big(\sigma^{2}
+\big)
+\label{eq2ct}
+\end{align}
+And in these new variables the (Stratonovich) state space evolution is
+\begin{align}&
+\dot X_{1}=\sigma ^{2} \eps \ou\big(w_{1},tt,-1\big) w_{1}+O\big(
+\sigma^{3}\big)
+\nonumber\\&
+\dot Y_{1}=-Y_{1}+O\big(\sigma^{3}\big)
+\label{eq2nf}
+\end{align}
+In the new \(XY\)-coordinate system: \(Y_1\to0\) exponentially quickly; and throughout \(X_1\)~evolves as above via the nonlinear noise-noise interactions.
+
+\cite{Chao95, Roberts05c} showed that one could \emph{weakly} model the \(X_1\)~evolution via analysis of its Fokker--Planck \pde.  
+The result is that on long times, with errors decaying algebraically in time, one may be justified in using the \emph{weak} model \(\dot X_1=\sigma^2(\tfrac12+\tfrac12\eta')\) for some new white noise~\(\eta'\).
+The drift agrees with~\eqref{eq2Katz} of \cite{Katzenberger91}, but~\eqref{eq2Katz} misses the `small' fluctuations, and misses the long-time required for justification.
+
+%\end{subequations}
+
+
+
+
+
+\section{Variously sloping isochrons appear problematic}
+\label{sde3}
+
+This third system (\(\verb|sys|=3\)) has a drift generated by excursions off the deterministic slow manifold, but now due to variously sloping isochrons.
+In Ito form the system is
+%\begin{subequations}\label{eqs3}%
+\begin{align}&
+\#3\text{ Ito},&&
+dx_1=x_1x_2\,dt\,,&&
+dx_2=-x_2dt+\sigma dW .
+\label{eq3Ito}
+\end{align}
+In the Stratonovich form, with white noise \(\eta=dW/dt\), this is
+\begin{align}&
+\#3\text{ Strat},&&
+\dot x_1=x_1x_2\,,&&
+\dot x_2=-x_2+\sigma\eta\,.
+\label{eq3Str}
+\end{align}
+Deterministically the isochrons are the curves \(x_1=ce^{-x_2}\) for each~\(c\): these not only curve but also have varying slant.
+
+The code of \cref{secKratz} here generates the output of \cref{out3}.
+It asserts that for \(z=x_1\) the slow model is 
+\begin{equation}
+\dot z= \tfrac12\sigma^2(2+u_1+u_2z)z +\sigma z \eta,
+\label{eq3Katza}
+\end{equation}
+in terms of two undetermined constants~\(u_i\) arising in the non-unique solutions for matrices
+\(X_1:=\begin{bmat}(u_1-1)/z&u_1\\u_1&u_1z\end{bmat}\) and
+\(X_2:=\begin{bmat}u_2/z&u_2\\u_2&u_2z\end{bmat}\).
+\emph{I presume the desired unique solution} is the non-simgular one without any division by variable~\(z\), in which case \(u_1:=1\) and \(u_2:=0\) leading to
+\begin{equation}
+\dot z= \tfrac32\sigma^2z +\sigma z \eta,
+\label{eq3Katz}
+\end{equation}
+that is, an exponentially unstable drift with multiplicative fluctuations.
+(Do the fluctuations stabilise the drift?) 
+
+For comparison, my web service \cite[]{Roberts09c} constructs the coordinate transform to \(XY\)-variables, where \(y_1=x_2\) and \(w_1=\eta\),
+\begin{align}&
+x_{1}=X_{1} 
+-\eps X_{1} Y_{1}
+-\sigma  \eps \ou\big(w_{1},tt,-1\big) X_{1}
+\quad{}
++1/2 \eps^{2} X_{1} Y_{1}^{2}
++\sigma  \eps^{2} \ou\big(w_{1},tt,-1\big) X_{1} Y_{1}
+\nonumber\\&\qquad{}
+-1/6 \eps^{3} X_{1} Y_{1}^{3}
+-1/2 \sigma  \eps^{3} \ou\big(w_{1},tt,-1\big) X_{1} Y_{1}^{2}
++O\big(\varepsilon ^{4},\sigma^{2}\big)
+\nonumber\\&
+y_{1}=Y_{1}+ \sigma  \ou\big(w_{1},tt,-1\big)+O\big(\varepsilon ^{4},\sigma^{2}
+\big)
+\label{eq3ct}
+\end{align}
+And in these new variables the (Stratonovich) state space evolution is
+\begin{align}&
+\dot X_{1}=\sigma  \eps w_{1} X_{1}+O\big(
+\varepsilon ^{5},\sigma^{3}\big)
+\nonumber\\&
+\dot Y_{1}=-Y_{1}+O\big(\varepsilon ^{5},\sigma^{3}\big)
+\label{eq3nf}
+\end{align}
+In the new \(XY\)-coordinate system: \(Y_1\to0\) exponentially quickly; and throughout \(X_1\)~evolves as above via the nonlinear noise-noise interactions.
+Here the noise is multiplicative so we need to consider the Ito form in order to compare to~\eqref{eq3Katz} of \cite{Katzenberger91}:
+applying the transform rule \cite[e.g.,][Thm.~20.9]{Roberts2014a} gives
+\begin{equation}
+dX_{1}=+\tfrac12\sigma^2X_1\,dt+\sigma  \eps X_{1}\,dW +O\big(
+\sigma^{3}\big)
+\label{eq:3slowIto}
+\end{equation}
+The drift differs from that of~\eqref{eq3Katz} which is apparently the prediction of \cite{Katzenberger91}.  (These can only be brought into line by choosing \(u_1=-1\) to give the weird result that \(X_1:=\begin{bmat}-2/z&-1\\-1&-z\end{bmat}\).)
+
+\paragraph{Question:} \emph{is there a mistake in my coding?  in the interpretation of~\(X_i\)? in \cite{Parsons2015, Parsons2017}? or in \cite{Katzenberger91}?}
+
+
+%\end{subequations}
+
+
+
+
+
+
+
+\section{Katzenberger modelling}
+\label{secKratz}
+
+Dynamical variables are \verb|x(i)|, and white noises \verb|eta(i)|.
+For the systems, set the Ito interpretation which \cite{Parsons2015, Parsons2017}  address in their \sde\ form
+\begin{equation}
+\dot\xv=\fv(\xv)+\epsilon\hv(\xv)+\sigma G(\xv)\etav(t).
+\label{eqKatz}
+\end{equation} 
+\begin{reduce}
+operator x,eta;
+f :=tp mat(( (if sys=2 then x(2)^2 else 0)
+            +(if sys=3 then x(1)*x(2) else 0) 
+            , -x(2) ));
+gg:=tp mat(( (if sys=1 then x(2) else 0) , 1 ));
+h :=tp mat(( 0,0 ));
+etav:=tp mat((eta(1)));
+\end{reduce}
+By design, the systems have critical manifold \(x_2=0\) so define \verb|man| for when we substitute this, parameterised by~\verb|z|.
+\begin{reduce}
+man:={x(1)=>z,x(2)=>0}; 
+\end{reduce}
+
+\paragraph{Mostly, the following is general}
+Get the dimensionality of the system, and define corresponding zero and identity matrices.
+\begin{reduce}
+n:=part(length(f),1);
+matrix Zero(n,n); 
+Id:=Zero$ for i:=1:n do Id(i,i):=1;
+\end{reduce}
+
+
+Form Jacobian of~\(f\), evaluated on the critical manifold, and its transpose.
+\begin{reduce}
+tmp:=Zero$
+for i:=1:n do for j:=1:n do tmp(i,j):=df(f(i,1),x(j));
+Jac:=sub(man,tmp);
+JacT:=tp Jac; 
+\end{reduce}
+Since here eigenvalues of~\(J\) are only~\(0\) and~\(-1\), then ``the pseudo-inverse'' according to equation~(18) of \cite{Parsons2015, Parsons2017} is simply~\(J\) itself:
+\begin{reduce}
+JacPI:=Jac;   
+\end{reduce}
+But~(18) is only one possible pseudo-inverse because, for example, the definition of the Moore--Penrose pseudo-inverse uses the \textsc{svd} ((18)~and the Moore--Penrose are the same only for symmetric matrices).  Perhaps some pseudo-inverse proportional to~\(J^T\) would be better?
+
+Useful proc to access a given element in an array of matrices
+\begin{reduce}
+procedure el(a,i,j)$ a(i,j)$
+\end{reduce}
+
+Via the equation following (18) of \cite{Parsons2015, Parsons2017}, compute the Hessians evaluated on the critical manifold.
+\begin{reduce}
+array Hes(n);
+for i:=1:n do begin
+  tmp:=Zero;
+  for j:=1:n do for k:=1:n do 
+      tmp(j,k):=df(f(i,1),x(j),x(k));
+  write Hes(i):=sub(man,tmp);
+end;
+\end{reduce}
+
+Solve the Lyapunov equation~(19) of \cite{Parsons2015, Parsons2017}---\emph{but there are multiple solutions} (I do not see that \cite{Parsons2015, Parsons2017} identify what to do with the multiple solutions).
+For the moment parametrise them all with~\verb|u#|. 
+\begin{reduce}
+array xx(n);
+operator u;
+us:= for i:=1:n join for j:=1:n collect u(i,j)$
+for l:=1:n do begin
+  tmp:=Zero$
+  for i:=1:n do for j:=1:n do tmp(i,j):=u(i,j);
+  res19:=JacT*tmp+tmp*Jac+Hes(l);
+  eqns:= for i:=1:n join for j:=1:n collect res19(i,j);
+  soln:=( solve(eqns,us) where arbcomplex(~i)=>mkid(u,i) );
+  write xx(l):=sub(soln,tmp);
+end;
+\end{reduce}
+Check the general solution is OK.
+\begin{reduce}
+for i:=1:n do if JacT*xx(i)+xx(i)*Jac+Hes(i) neq Zero
+    then rederr("**** Failure in solving a Lyapunov system");
+\end{reduce}
+
+Compute the projection matrix \(P=\verb|pp|\) via equation~(20) of \cite{Parsons2015, Parsons2017}:
+\begin{reduce}
+pp:=Id-JacPI*Jac;
+\end{reduce}
+
+Then compute \(Q=\verb|qq|\) via equation~(21) of \cite{Parsons2015, Parsons2017}, first overwriting~\verb|xx| to store complicated sub-expressions.
+\begin{reduce}
+array qq(n),php(n);
+for l:=1:n do begin
+  php(l):=(tp pp)*Hes(l)*pp;
+  xx(l):=xx(l)-(tp JacPI)*Hes(l)*pp-(tp pp)*Hes(l)*JacPI;
+end;
+\end{reduce}
+Second, evaluate equation~(21) to get matrix~\(Q_i\).
+\begin{reduce}
+for i:=1:n do begin
+  tmp:=Zero;
+  for j:=1:n do for k:=1:n do 
+      tmp(j,k):=for l:=1:n sum
+          -JacPI(i,l)*el(php(l),j,k)+pp(i,l)*el(xx(l),j,k);
+  write qq(i):=tmp;
+end;
+\end{reduce}
+
+Plug into formula~(8) of \cite{Parsons2015} [p.8], equivalently into~(7) of \cite{Parsons2017}.
+\begin{reduce}
+array gqg(n);
+factor sigma,epsilon;
+tmp:=0*f$
+for i:=1:n do begin
+  write gqg(i):=(tp gg)*qq(i)*gg;
+  tmp(i,1):=trace(gqg(i));
+end;
+dzdtdrift:=sub(man, epsilon*pp*h+sigma^2/2*tmp );
+dzdtnoise:=sub(man, sigma*pp*gg*etav );
+\end{reduce}
+
+
+Finish the reduce script.
+\begin{reduce}
+end;%script
+\end{reduce}
+
+
+
+\subsection{Algebra for system \cref{eq1Ito}}
+\label{out1}
+\verbatimlisting{outSys1.txt}
+
+
+\subsection{Algebra for system \cref{eq2Ito}}
+\label{out2}
+\verbatimlisting{outSys2.txt}
+
+
+\subsection{Algebra for system \cref{eq3Ito}}
+\label{out3}
+\verbatimlisting{outSys3.txt}
+
+
+\end{document}

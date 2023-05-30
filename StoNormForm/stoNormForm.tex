@@ -90,12 +90,14 @@ variables~\(x_j(t)\), fast stable variables~\(y_j(t)\)
 (linearly growing).  For an \sde\ with $n_x$~slow modes,
 $n_y$~fast stable modes, and/or \(n_z\)~fast unstable modes,
 you must denote the slow modes by~\verb|x(1)| through
-to~\verb|x(nx)|, the stable fast modes by~\verb|y(1)|
-through to~\verb|y(ny)|, and the unstable fast modes
-by~\verb|z(1)| through to~\verb|z(nz)|. Each non-autonomous
-factor must be denoted by~\verb|w(.)| where the dot denotes
-almost any label you care to choose: simple numbers such
-as~\verb|w(1)| and/or~\verb|w(2)| are the usual choices; but
+to~\verb|x(nx)| (or aliases \verb|x1|,\ldots), the stable
+fast modes by~\verb|y(1)| through to~\verb|y(ny)| (or
+aliases \verb|y1|,\ldots), and the unstable fast modes
+by~\verb|z(1)| through to~\verb|z(nz)| (or aliases
+\verb|z1|,\ldots). Each non-autonomous factor must be
+denoted by~\verb|w(.)| where the dot denotes almost any
+label you care to choose: simple numbers such as~\verb|w(1)|
+and/or~\verb|w(2)| are the usual choices (no aliases); but
 other labels may be used. Often \verb|w(.)| is a
 Stratonovich white noise, a derivative of a Stratonovich
 Wiener process. Analyse deterministic, autonomous, systems
@@ -238,8 +240,8 @@ procedure \verb|examplenormform()|:
 \begin{reduce}
 procedure examplenormform(theman);  
     stonormalform(
-    {-x(1)*y(1)},
-    {-y(1)+x(1)^2-2*y(1)^2+w(1)},
+    {-x1*y1},
+    {-y1+x1^2-2*y1^2+w(1)},
     {},
     3, theman )$
 \end{reduce}
@@ -419,7 +421,7 @@ umanf := inlist(theman,{uman,cuman,csuman})$
 Write an intro message.
 \begin{reduce}
 write "Construct a stochastic ",textask
-     ," (version 16 June 2021)"$
+     ," (version 30 May 2023)"$
 \end{reduce}
 
 Parameter \verb|maxiter|~is the maximum number of allowed
@@ -467,6 +469,12 @@ list in~\verb|dxdt|.
 xrhs_:=dxdt$
 write "no. of slow modes ",nx:=length(xrhs_);
 \end{reduce}
+Define aliases \verb|xi| map to \verb|x(i)|, except one 
+\emph{must} use the \verb|x(i)|-form \emph{within} any 
+\verb|df(,t)| on the right-hand side.
+\begin{reduce}
+for i:=1:nx do set(mkid(x,i),x(i));
+\end{reduce}
 
 Multiply all the right-hand sides by~\verb|small| so we can
 control the truncation of the asymptotic construction
@@ -485,7 +493,7 @@ xrhs_:=(xrhs_ where w(~j)=>sigma*w(j,1)/small)$
 xrhs_:=(xrhs_ where w(~j,1)=>w(j))$
 \end{reduce}
 
-Section~\ref{sec:dwti} writes the resulting differential
+\cref{sec:dwti} writes the resulting differential
 equations for information.
 \begin{reduce}
 if trace then for i:=1:nx do 
@@ -500,6 +508,12 @@ in the list in~\verb|dydt|.
 \begin{reduce}
 yrhs_:=dydt$
 write "no. of stable fast modes ",ny:=length(yrhs_);
+\end{reduce}
+Define aliases \verb|yi| map to \verb|y(i)|, except one 
+\emph{must} use the \verb|y(i)|-form \emph{within} any 
+\verb|df(,t)| on the right-hand side.
+\begin{reduce}
+for i:=1:ny do set(mkid(y,i),y(i));
 \end{reduce}
 
 \paragraph{Extract decay rates}
@@ -605,6 +619,12 @@ in the list in~\verb|dzdt|.
 zrhs_:=dzdt$
 write "no. of unstable fast modes ",nz:=length(zrhs_);
 \end{reduce}
+Define aliases \verb|zi| map to \verb|z(i)|, except one 
+\emph{must} use the \verb|z(i)|-form \emph{within} any 
+\verb|df(,t)| on the right-hand side.
+\begin{reduce}
+for i:=1:nz do set(mkid(z,i),z(i));
+\end{reduce}
 
 \paragraph{Extract growth rates}
 Extract the linear growth rates of the fast equations into
@@ -691,7 +711,6 @@ for information.
 if trace then for i:=1:nz do 
     write "dz(",i,")/dt = ",1*part(zrhs_,i);
 \end{reduce}
-
 
 
 

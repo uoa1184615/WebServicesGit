@@ -1,0 +1,294 @@
+% Simple nonlinear normal mode example 6.1 of Mingwu Li,
+% Shobhit Jain, George Haller, 2021.  Revision 2 of draft
+% lost the earlier epsilons.  AJR, 22 Oct 2021 -- Dec 2022
+%!TEX root = ../diverseExamples.tex
+\subsection{\texttt{oscForcedChain}: harmonically forced chain of oscillations} 
+\label{oscForcedChain}
+
+Mingwu Li et al.~(2022) discussed the following system of the forcing of a small chain of coupled oscillators.  To analyse, first load the function.
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+factor small,i;
+\end{reduce}
+Then encode the \ode{}s
+\begin{align*}&
+\ddot x_1+x_1+c_1\dot x_1+k(x_1-x_2)^3=f_1\cos\omega t\,,
+\\&
+\ddot x_2+x_2+c_2\dot x_2+k[(x_2-x_1)^3+(x_2-x_3)^3]=0\,,
+\\&
+\ddot x_3+x_3+c_3\dot x_3+k(x_3-x_2)^3=0\,,
+\end{align*}
+as follows with \(x_1=u_1\), \(\dot x_1=u_2\),  \(x_2=u_3\), \(\dot x_2=u_4\),  \(x_3=u_5\), \(\dot x_3=u_6\), 
+\begin{reduce}
+odes:=mat((u2, -u1-k*(u1-u3)^3            -c_1*u2+f
+          ,u4, -u3-k*(u3-u1)^3-k*(u3-u5)^3-c_2*u4
+          ,u6, -u5-k*(u5-u3)^3            -c_3*u6
+          ));
+\end{reduce}
+The procedure introduces the ordering parameter~\(\varepsilon\) to actually analyse the following system:
+\begin{align*}&
+\ddot x_1+x_1+\varepsilon\left\{c_1\dot x_1+k(x_1-x_2)^3-f_1\cos\omega t\right\}=0\,,
+\\&
+\ddot x_2+x_2+\varepsilon\left\{ c_2\dot x_2+k[(x_2-x_1)^3+(x_2-x_3)^3] \right\}=0\,,
+\\&
+\ddot x_3+x_3+\varepsilon\left\{ c_3\dot x_3+k(x_3-x_2)^3 \right\}=0\,,
+\end{align*}
+
+Set parameters nearly as in Mingwu Li et al.~(2022), but let \(c_1\) remain variable.
+\begin{reduce}
+k:=2/10;  
+f:=f_1*cos(w*t);
+factor f_1;
+c_2:=2/10; c_3:=3/10; %c_1:=1/10; 
+\end{reduce}
+Set forcing frequency to one for simplicity;
+\begin{reduce}
+w:=1;
+\end{reduce}
+
+
+
+
+
+\subsubsection{Time dependent reparametrisation of entire state space}
+Each of the three oscillators have identical frequency of one, and the  damping is numerically small, so get the procedure to treat as small by giving unperturbed eigenvalues and eigenvectors.
+\begin{reduce}
+invariantmanifold(odes,
+    mat(( i,-i,i,-i,i,-i)),
+    mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0),
+         (0,0,1,+i,0,0), (0,0,1,-i,0,0),
+         (0,0,0,0,1,+i), (0,0,0,0,1,-i)
+        ),
+    mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0),
+         (0,0,1,+i,0,0), (0,0,1,-i,0,0),
+         (0,0,0,0,1,+i), (0,0,0,0,1,-i)
+        ),
+    2 )$
+\end{reduce}
+
+\paragraph{The state space}
+These give the location in state space in
+terms of parameters~\(s\sb j\).
+\begin{align*}&
+u_{1}=\exp \big(-i t\big) s_{2}+\exp \big(i t\big) s_{1}+O\big(
+\varepsilon \big)
+\\&
+u_{2}=i \big(-\exp \big(-i t\big) s_{2}+\exp \big(i t\big) s_{1}\big)+O
+\big(\varepsilon \big)
+\\&
+u_{3}=\exp \big(-i t\big) s_{4}+\exp \big(i t\big) s_{3}+O\big(
+\varepsilon \big)
+\\&
+u_{4}=i \big(-\exp \big(-i t\big) s_{4}+\exp \big(i t\big) s_{3}\big)+O
+\big(\varepsilon \big)
+\\&
+u_{5}=\exp \big(-i t\big) s_{6}+\exp \big(i t\big) s_{5}+O\big(
+\varepsilon \big)
+\\&
+u_{6}=i \big(-\exp \big(-i t\big) s_{6}+\exp \big(i t\big) s_{5}\big)+O
+\big(\varepsilon \big)
+\end{align*}
+
+\paragraph{State space ODEs}
+The system evolves such
+that the parameters evolve according to these ODEs.  They show forcing, weak damping, nonlinear interaction among the modulation of the three modes.
+\begin{align*}&
+\dot s_{1}=-\tfrac{1}{4} f\_1 i \eps+i \eps \big(-\tfrac{3}{10} s_{4} s_{3}^{2}+\tfrac{3}{5} s_{4} 
+s_{3} s_{1}-\tfrac{3}{10} s_{4} s_{1}^{2}+\tfrac{3}{10} s_{3}^{2} s_{2}
+\\&\quad{}
+-\tfrac{3}{5} s_{3} s_{2} s_
+{1}+\tfrac{3}{10} s_{2} s_{1}^{2}\big)-\tfrac{1}{2} \eps s_{1} c\_1+O\big(\varepsilon ^{2}
+\big)
+\\&
+\dot s_{2}=\tfrac{1}{4} f\_1 i \eps+i \eps \big(\tfrac{3}{10} s_{4}^{2} s_{3}-\tfrac{3}{10} s_{4}^{
+2} s_{1}-\tfrac{3}{5} s_{4} s_{3} s_{2}+\tfrac{3}{5} s_{4} s_{2} s_{1}
+\\&\quad{}
++\tfrac{3}{10} s_{3} s_{2}^{2
+}-\tfrac{3}{10} s_{2}^{2} s_{1}\big)-\tfrac{1}{2} \eps s_{2} c\_1+O\big(\varepsilon ^{2}
+\big)
+\\&
+\dot s_{3}=i \eps \big(-\tfrac{3}{10} s_{6} s_{5}^{2}+\tfrac{3}{5} s_{6} s_{5} s_{3}-\tfrac{3}{10} 
+s_{6} s_{3}^{2}+\tfrac{3}{10} s_{5}^{2} s_{4}-\tfrac{3}{5} s_{5} s_{4} s_{3}
+\\&\quad{}
++\tfrac{3}{5} s_{4} s_{
+3}^{2}-\tfrac{3}{5} s_{4} s_{3} s_{1}+\tfrac{3}{10} s_{4} s_{1}^{2}
+-\tfrac{3}{10} s_{3}^{2} s_{2}+3
+/5 s_{3} s_{2} s_{1}
+\\&\quad{}
+-\tfrac{3}{10} s_{2} s_{1}^{2}\big)-\tfrac{1}{10} \eps s_{3}+O\big(
+\varepsilon ^{2}\big)
+\\&
+\dot s_{4}=i \eps \big(\tfrac{3}{10} s_{6}^{2} s_{5}-\tfrac{3}{10} s_{6}^{2} s_{3}-\tfrac{3}{5} s_{
+6} s_{5} s_{4}+\tfrac{3}{5} s_{6} s_{4} s_{3}+\tfrac{3}{10} s_{5} s_{4}^{2}
+\\&\quad{}
+-\tfrac{3}{5} s_{4}^{2} 
+s_{3}+\tfrac{3}{10} s_{4}^{2} s_{1}+\tfrac{3}{5} s_{4} s_{3} s_{2}-\tfrac{3}{5} s_{4} s_{2} s_{1}-3
+/10 s_{3} s_{2}^{2}
+\\&\quad{}
++\tfrac{3}{10} s_{2}^{2} s_{1}\big)-\tfrac{1}{10} \eps s_{4}+O\big(
+\varepsilon ^{2}\big)
+\\&
+\dot s_{5}=i \eps \big(\tfrac{3}{10} s_{6} s_{5}^{2}-\tfrac{3}{5} s_{6} s_{5} s_{3}+\tfrac{3}{10} s
+_{6} s_{3}^{2}-\tfrac{3}{10} s_{5}^{2} s_{4}+\tfrac{3}{5} s_{5} s_{4} s_{3}
+\\&\quad{}
+-\tfrac{3}{10} s_{4} s_{
+3}^{2}\big)-\tfrac{3}{20} \eps s_{5}+O\big(\varepsilon ^{2}\big)
+\\&
+\dot s_{6}=i \eps \big(-\tfrac{3}{10} s_{6}^{2} s_{5}+\tfrac{3}{10} s_{6}^{2} s_{3}+\tfrac{3}{5} s_
+{6} s_{5} s_{4}-\tfrac{3}{5} s_{6} s_{4} s_{3}-\tfrac{3}{10} s_{5} s_{4}^{2}
+\\&\quad{}
++\tfrac{3}{10} s_{4}^{2
+} s_{3}\big)-\tfrac{3}{20} \eps s_{6}+O\big(\varepsilon ^{2}\big)
+\end{align*}
+
+
+
+
+
+
+\subsubsection{Emergent mode at general frequency}
+
+Here suppose damping~\(c_1\) is significantly smaller than the other damping.  Hence here consider the first oscillator as dominantly the `master' mode.  First, analyse for general frequency~\(\omega\) by `clearing'~\verb|w|.
+\begin{reduce}
+clear w;
+invariantmanifold(odes,
+    mat(( i,-i)),
+    mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
+        ),
+    mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
+        ),
+    2 )$
+\end{reduce}
+
+\paragraph{The invariant manifold}
+These give the location of the invariant manifold in
+terms of parameters~\(s\sb j\).  There are divisions by \((1-\omega^2)\) flagging resonance when the forcing is at the resonant frequency.
+\begin{align*}&
+u_{1}=f\_1 \eps \big(-\tfrac{1}{2} \exp \big(-i t w\big)-\tfrac{1}{2} \exp \big(i t w\big)
+\big)/\big(w^{2}-1\big)+i \eps \big(\tfrac{1}{4} \exp \big(-i t\big) s_{2} c\_1-1
+/4 \exp \big(i t\big) s_{1} c\_1\big)
+\\&\quad{}
++\eps \big(-\tfrac{3}{20} \exp \big(-i t
+\big) s_{2}^{2} s_{1}+\tfrac{1}{40} \exp \big(-3 i t\big) s_{2}^{3}-\tfrac{3}{20} \exp 
+\big(i t\big) s_{2} s_{1}^{2}+\tfrac{1}{40} \exp \big(3 i t\big) s_{1}^{3}\big)
+\\&\quad{}
++
+\exp \big(-i t\big) s_{2}+\exp \big(i t\big) s_{1}+O\big(\varepsilon ^{2
+}\big)
+\\&{}
+u_{2}=f\_1 i \eps \big(\tfrac{1}{2} \exp \big(-i t w\big) w-\tfrac{1}{2} \exp \big(i t w
+\big) w\big)/\big(w^{2}-1\big)+i \eps \big(-\tfrac{3}{20} \exp \big(-i t\big) s_{
+2}^{2} s_{1}
+\\&\quad{}
+-\tfrac{3}{40} \exp \big(-3 i t\big) s_{2}^{3}+\tfrac{3}{20} \exp \big(i t
+\big) s_{2} s_{1}^{2}+\tfrac{3}{40} \exp \big(3 i t\big) s_{1}^{3}\big)+i \big(-
+\exp \big(-i t\big) s_{2}+\exp \big(i t\big) s_{1}\big)
+\\&\quad{}
++\eps \big(-\tfrac{1}{4} 
+\exp \big(-i t\big) s_{2} c\_1-\tfrac{1}{4} \exp \big(i t\big) s_{1} c\_1\big)+O
+\big(\varepsilon ^{2}\big)
+\\&{}
+u_{3}=i \eps \big(3 \exp \big(-i t\big) s_{2}^{2} s_{1}+\tfrac{3}{1609} \exp 
+\big(-3 i t\big) s_{2}^{3}-3 \exp \big(i t\big) s_{2} s_{1}^{2}-\tfrac{3}{1609} 
+\exp \big(3 i t\big) s_{1}^{3}\big)
+\\&\quad{}
++\eps \big(-\tfrac{40}{1609} \exp \big(-3 i t
+\big) s_{2}^{3}-\tfrac{40}{1609} \exp \big(3 i t\big) s_{1}^{3}\big)+O\big(
+\varepsilon ^{2}\big)
+\\&{}
+u_{4}=i \eps \big(\tfrac{120}{1609} \exp \big(-3 i t\big) s_{2}^{3}-\tfrac{120}{1609} \exp
+ \big(3 i t\big) s_{1}^{3}\big)
+\\&\quad{}
++\eps \big(3 \exp \big(-i t\big) s_{2}^{2
+} s_{1}+\tfrac{9}{1609} \exp \big(-3 i t\big) s_{2}^{3}+3 \exp \big(i t\big) s_{2
+} s_{1}^{2}+\tfrac{9}{1609} \exp \big(3 i t\big) s_{1}^{3}\big)+O\big(
+\varepsilon ^{2}\big)
+\\&{}
+u_{5}=O\big(\varepsilon ^{2}\big)
+\\&{}
+u_{6}=O\big(\varepsilon ^{2}\big)
+\end{align*}
+
+\paragraph{Invariant manifold ODEs}
+The system evolves on the invariant manifold such
+that the parameters evolve according to these ODEs.
+With general forcing frequency the algorithm does not detect resonance here, it only shows up as above divisions by \((1-\omega^2)\).
+These evolution equations only show nonlinear frequency modification and the damping at rate~\(c_{1}/{2}\).
+\begin{align*}&
+\dot s_{1}=\tfrac{3}{10} i \eps s_{2} s_{1}^{2}-\tfrac{1}{2} \eps s_{1} c\_1+O\big(
+\varepsilon ^{2}\big)
+\\&{}
+\dot s_{2}=-\tfrac{3}{10} i \eps s_{2}^{2} s_{1}-\tfrac{1}{2} \eps s_{2} c\_1+O\big(
+\varepsilon ^{2}\big)
+\end{align*}
+
+
+
+
+
+\subsubsection{Emergent mode at frequency one}
+So here, set forcing frequency back to one and re-analyse.
+\begin{reduce}
+w:=1;
+invariantmanifold(odes,
+    mat(( i,-i)),
+    mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
+        ),
+    mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
+        ),
+    2 )$
+\end{reduce}
+
+\paragraph{Invariant manifold ODEs}
+The system evolves on the invariant manifold such
+that the parameters evolve according to these ODEs.
+They show the forcing directly pumps the mode.
+\begin{align*}&
+\dot s_{1}=-\tfrac{1}{4} f\_1 i \eps+\tfrac{3}{10} i \eps s_{2} s_{1}^{2}-\tfrac{1}{2} \eps s_{1} 
+c\_1+O\big(\varepsilon ^{2}\big)
+\\&
+\dot s_{2}=\tfrac{1}{4} f\_1 i \eps-\tfrac{3}{10} i \eps s_{2}^{2} s_{1}-\tfrac{1}{2} \eps s_{2} 
+c\_1+O\big(\varepsilon ^{2}\big)
+\end{align*}
+
+
+
+
+
+\subsubsection{Emergent mode near frequency one}
+For forcing \(f\propto \cos[(1+\omega')t]\) for small~\(\omega'\) we write \(f:=a\cos t-b\sin t\) where \(a=f_1\cos \omega't\) and \(b=f_1\sin \omega't\).   Then \(\de ta=-\omega'b\) and \(\de tb=+\omega'a\) so code these relations, and truncate independently in small~\(\omega'\).
+\begin{reduce}
+f:=a*cos(t)-b*sin(t);
+depend a,t; depend b,t;
+let { df(a,t)=>-wd*b, df(b,t)=>wd*a, wd^3=>0 }; 
+\end{reduce}
+Construct the invariant manifold for detuned forcing and find little difference, just a slowly modulating forcing through~\(a(t),b(t)\).
+\begin{reduce}
+invariantmanifold(odes,
+    mat(( i,-i)),
+    mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
+        ),
+    mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
+        ),
+    2 )$
+\end{reduce}
+
+\paragraph{Invariant manifold ODEs}
+The system evolves on the invariant manifold such
+that the parameters evolve according to these ODEs.
+\begin{align*}&
+\dot s_{1}=i \eps \big(\tfrac{3}{10} s_{2} s_{1}^{2}-\tfrac{1}{4} a\big)+\eps \big(-\tfrac{1}{2} s_
+{1} c\_1+\tfrac{1}{4} b\big)+O\big(\varepsilon ^{2},\omega'^3\big)
+\\&
+\dot s_{2}=i \eps \big(-\tfrac{3}{10} s_{2}^{2} s_{1}+\tfrac{1}{4} a\big)+\eps \big(-\tfrac{1}{2} s
+_{2} c\_1+\tfrac{1}{4} b\big)+O\big(\varepsilon ^{2},\omega'^3\big)
+\end{align*}
+
+
+
+
+
+\paragraph{Finish the script}
+\begin{reduce}
+end;
+\end{reduce}

@@ -55,7 +55,8 @@ cubic nonlinearity to match.
 \begin{reduce}
 invariantmanifold(
     mat(( u3, u4,
-    -2*u1+u2-small*u1^3/2+small*3/10*(-u3+u4)+small*f_1*sin(t),
+    -2*u1+u2-small*u1^3/2+small*3/10*(-u3+u4)
+        +small*f_1*sin(t),
     u1-2*u2+small*3/10*(u3-2*u4)*f_2*cos(t/2) )),
     mat(( i,-i )),
     mat( (1,1,+i,+i), (1,1,-i,-i) ),

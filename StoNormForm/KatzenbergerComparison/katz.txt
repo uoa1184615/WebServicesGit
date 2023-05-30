@@ -1,0 +1,88 @@
+Comment  Code the procedure of Parsons & Rogers (2015) for
+computing the SDE modelling of Katzenburger (1991).   AJR,
+12 Dec 2022. Restrict dimension of system to 2 for the
+moment.  Choose system with sys=0 or =1: 0, irreducible
+noise, and 1, is other. ;
+n:=2;
+sys:=1;
+
+matrix Zero(n,n); % defines zero matrix, next the identity
+Id:=Zero$ for i:=1:n do Id(i,i):=1;
+
+% variables are x(i), and white noises eta(i)
+operator x,eta;
+f:=tp mat(( sys*(a*x(1)*x(2)+b*x(2)^2) , -x(2) ));
+gg:=tp mat(((1-sys)*x(2),1));
+h:=tp mat((0,0));
+etas:=tp mat((eta(1)));
+man:={x(1)=>z,x(2)=>0}; % restrict systems to this case
+
+% form Jacobian
+tmp:=Zero$
+for i:=1:n do for j:=1:n do tmp(i,j):=df(f(i,1),x(j));
+Jac:=sub(man,tmp);
+% since eigenvalues are 0 and -1, then the pseudo-inverse
+% according to Parsons2015 (18) is the following (but
+% another defn uses the SVD so this is only one possible
+% pseudo-inverse)
+JacPI:=Jac;   
+JacT:=tp Jac; 
+
+% useful proc to access a given element in an array of matrices
+procedure el(a,i,j); a(i,j);
+
+% Hessian, after Parson2015 (18)
+array Hes(n);
+for i:=1:n do begin
+  tmp:=Zero;
+  for j:=1:n do for k:=1:n do 
+      tmp(j,k):=df(f(i,1),x(j),x(k));
+  write Hes(i):=sub(man,tmp);
+end;
+
+% Solve Parsons2015 (19)---but there are multiple solutions
+% so for the moment parametrise them??
+array xx(2);
+operator u;
+us:= for i:=1:n join for j:=1:n collect u(i,j);
+for l:=1:n do begin
+  tmp:=Zero$
+  for i:=1:n do for j:=1:n do tmp(i,j):=u(i,j);
+  res19:=JacT*tmp+tmp*Jac+Hes(l);
+  eqns:= for i:=1:n join for j:=1:n collect res19(i,j);
+  soln:=solve(eqns,us);
+  write xx(l):=(sub(soln,tmp) where arbcomplex(~i)=>u(i));
+end;
+for i:=1:n do write res19:=JacT*xx(i)+xx(i)*Jac+Hes(i);
+
+% Parsons2015 (20), P=pp
+pp:=Id-JacPI*Jac;
+
+% Parsons2015 (21), Q=qq and using xx to store complicated expression
+array qq(n),php(n);
+for l:=1:n do begin
+  php(l):=(tp pp)*Hes(l)*pp;
+  xx(l):=xx(l)-(tp JacPI)*Hes(l)*pp-(tp pp)*Hes(l)*JacPI;
+end;
+for i:=1:n do begin
+  tmp:=Zero;
+  for j:=1:n do for k:=1:n do 
+      tmp(j,k):=for l:=1:n sum
+          -JacPI(i,l)*el(php(l),j,k)+pp(i,l)*el(xx(l),j,k);
+  write qq(i):=tmp;
+end;
+
+% Plug into formula (8) Parsons2015, p.8
+array gqg(n);
+factor sigma,epsilon;
+tmp:=0*f$
+for i:=1:n do begin
+  write gqg(i):=(tp gg)*qq(i)*gg;
+  tmp(i,1):=trace(gqg(i));
+end;
+dzdtdrift:=sub(man, epsilon*pp*h+sigma^2/2*tmp );
+dzdtnoise:=sub(man, sigma*pp*gg*etas );
+
+
+
+end;%script
