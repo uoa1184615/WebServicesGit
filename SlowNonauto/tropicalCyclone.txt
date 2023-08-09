@@ -1,0 +1,13 @@
+% system (24) of Slyman et al., 2307.15583
+% AJR, 5 Aug 2023
+in_tex "slowNonauto.tex"$
+factor small,sigma,s,c;
+let sign(c)=>1; 
+slownonauto(
+    mat(( (1-gamma)*small*u2^3 -(1-gamma*small^3*u2^3)*u1^2 +w(1)
+        , (1-u2)*u1-c*u2 +w(2) )),
+    mat((1,1/c)),
+    mat((-c)),
+    mat((0,1)),
+    5 )$
+end;

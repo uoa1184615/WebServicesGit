@@ -1,0 +1,12 @@
+% future noise only occurs in the full coord transform
+in_tex "slowNonauto.tex"$
+factor small,sigma;
+slownonauto(
+    mat(( small*epsilon*u1+small*u1^3
+         -u1*u2*(1-small*w(1))
+    , -u2+u1^2+u2^2+u2*w(1) )),
+    mat((1,0)),
+    mat((-1)),
+    mat((0,1)),
+    5 )$
+end;

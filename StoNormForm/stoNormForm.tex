@@ -1188,13 +1188,20 @@ parts of possibly resonant, \verb|res0| and the
 rest,~\verb|res1|; then allocate to the evolution or the
 transform.
 \begin{reduce}
+%write
     res:=sub(y4y,res);
+%write
     res0:=reso_(res,yz,+rats_(i));
+%write
     res1:=res-res0*yz^rats_(i);
     if smanf then gg(i):=gg(i)+znon_(res0,tt)
     else if znon_(res0,tt) neq 0 
         then rederr("oops y-res: contact me");
     if trace then write "dY",i,"/dt = ",gg(i);
+%write ratsi:=rats_(i);
+%write zint0:=zint_(res0,tt);
+%write zint1:=zres_(res1,ttyz,rats_(i));
+%write
     y_(i):=y_(i) +zint_(res0,tt) -zres_(res1,ttyz,rats_(i));
     if trace then write "y",i," = ",y(i);
   end;

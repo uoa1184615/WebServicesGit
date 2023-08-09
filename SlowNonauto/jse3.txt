@@ -1,0 +1,12 @@
+% Example 3 of Justin Eilertsen, 2305.13348
+in_tex "slowNonauto.tex"$
+factor small,sigma;
+let sign(-a_1-a_2)=>-1;
+slownonauto(
+    mat(( -a_1*u1+a_2*u2+g_1*w(1)
+         , a_1*u1-a_2*u2+g_2*w(2)-b_2*u2 )),
+    mat((1,a_1/a_2)),
+    mat((-a_1-a_2)),
+    mat((1,-1)),
+    3 )$
+end;

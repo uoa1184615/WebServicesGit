@@ -1,0 +1,20 @@
+% system (24) of Slyman et al., 2307.15583
+in_tex "../stoNormForm.tex"$
+factor small,sigma,xx,c;
+% system (24) with bookkeeping parameter small
+ff := tp mat(( 
+    (1-gamma)*small*m^3 -(1-gamma*small^3*m^3)*v^2 +w(1)
+    ,(1-m)*v-c*m +w(2) 
+    ));
+% transform to linearly separated form in new time t=c*tau
+% so w(i) should be interpreted with a sqrt(c) factor
+v:=x1; m:=x1/c+y1;
+ll := mat((1,0),(1/c,1));
+ff1:=(1/ll)*ff/c;
+% construct stochastic slow manifold
+stonormalform(
+    {ff1(1,1)},
+    {ff1(2,1)},
+    { },
+    3, cman );
+end;

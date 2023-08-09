@@ -1,0 +1,15 @@
+% Example 5.1 of Potzsche & Rasmussen (2006) 
+in_tex "slowNonauto.tex"$
+factor small,sigma,rho;
+sigmae:=1+w(s); 
+rhoe:=1+small*rho+w(rho); 
+betae:=1+w(beta);
+slownonauto(
+    mat(( sigmae*(u2-u1)
+    , rhoe*u1-u2-u1*u3
+    , -betae*u3+u1*u2 )),
+    mat((1,1,0)),
+    mat((-2,-1)),
+    mat((1,-1,0),(0,0,1)),
+    3 )$
+end;

@@ -1,0 +1,86 @@
+on div; off allfac; on revpri;
+load_package rlfi; 
+operator u;
+depend u,t;
+operator w;
+let sigma^3=>0;
+%on rationalize;
+nu:=2; ns:=nf:=1;
+depend w,tt;
+depend tt,t,ttf;
+clear ou; operator ou; linear ou;
+if 1 then
+let { df(ou(~f,tt,~mu),t)=>-sign(mu)*f+mu*ou(f,tt,mu)
+    , ou(1,tt,~mu)=>1/abs(mu) when mu neq 0
+    , ou(ou(~r,tt,~nu),tt,~mu) => 
+      (ou(r,tt,mu)+ou(r,tt,nu))/abs(mu-nu) 
+      when (sign(mu)+sign(nu)=0)and(sign(mu)neq 0)
+    , ou(ou(~r,tt,~nu),tt,~mu) => 
+      -sign(mu)*(ou(r,tt,mu)-ou(r,tt,nu))/(mu-nu)
+      when (sign(mu)=sign(nu))and(mu neq nu)
+    }$
+clear reso_; operator reso_; linear reso_;
+let { reso_(~a,yz,~r)=>1 when df(a,yz)*yz=r*a
+    , reso_(~a,yz,~r)=>0 when df(a,yz)*yz neq r*a
+    };
+depend yz,ttf;
+clear zres_; operator zres_; linear zres_;
+let zres_(~a,ttf,~r)=>ou(sign(df(a,yz)*yz/a-r)
+    *sub(yz=1,a),tt,df(a,yz)*yz/a-r);
+
+clear zint_; operator zint_; linear zint_;
+clear znon_; operator znon_; linear znon_;
+zrules:= { zint_(w(~i),tt)=>0,    znon_(w(~i),tt)=>w(i)
+    , zint_(1,tt)=>0,        znon_(1,tt)=>1
+    , zint_(w(~i)*~r,tt)=>0, znon_(w(~i)*~r,tt)=>w(i)*r
+    , zint_(ou(~r,tt,~mu),tt)
+      =>ou(r,tt,mu)/mu+zint_(r,tt)/abs(mu)
+    , znon_(ou(~r,tt,~mu),tt)=>znon_(r,tt)/abs(mu)
+    , zint_(ou(~r,tt,~mu)^2,tt)=>ou(~r,tt,~mu)^2/(2*mu)
+                              +zint_(r*ou(r,tt,mu),tt)/abs(mu)
+    , znon_(ou(~r,tt,~mu)^2,tt)=>znon_(r*ou(r,tt,mu),tt)/abs(mu)
+    , zint_(ou(~r,tt,~~mu)*ou(~s,tt,~~nu),tt)
+      =>ou(r,tt,mu)*ou(s,tt,nu)/(mu+nu)
+      +zint_(sign(mu)*r*ou(s,tt,nu)+sign(nu)*s*ou(r,tt,mu),tt)
+      /(mu+nu) when mu+nu neq 0
+    , znon_(ou(~r,tt,~~mu)*ou(~s,tt,~~nu),tt)=>
+      +znon_(sign(mu)*r*ou(s,tt,nu)+sign(nu)*s*ou(r,tt,mu),tt)
+      /(mu+nu) when mu+nu neq 0
+    , zint_(ou(~r,tt,~~mu)*ou(~s,tt,~~nu),tt)=>
+      ou(ou(r,tt,-nu),tt,-nu)*ou(s,tt,nu)
+      +zint_(ou(ou(r,tt,-nu),tt,-nu)*s,tt) 
+      when (mu+nu=0)and(sign(nu)>0)
+    , znon_(ou(~r,tt,~~mu)*ou(~s,tt,~~nu),tt)=>
+      znon_(ou(ou(r,tt,-nu),tt,-nu)*s,tt) 
+      when (mu+nu=0)and(sign(nu)>0)
+    }$ % let/zrules
+
+operator s;
+depend s,t;
+
+%c:=2;
+
+let sign(c)=>1;
+%test:=( znon_(ou(ou(w(1),tt, - c),tt, - c)*ou(w(1),tt, - c),tt) 
+%where znon_(ou(~r,tt,~~mu)*ou(~s,tt,~~nu),tt)=>
+%      +znon_(sign(mu)*r*ou(s,tt,nu)+sign(nu)*s*ou(r,tt,mu),tt)
+%      /(mu+nu) when mu+nu neq 0
+%      );
+testy:=( znon_( 
+    +aa*ou(w(1),tt, - c)*w(1)
+    +bb*ou(w(1),tt, - c)^2
+    +cc*ou(ou(w(1),tt, - c),tt, - c)*ou(w(1),tt, - c)
+    +dd*ou(ou(w(1),tt, - c)^2,tt, - c)
+    +ee*ou(w(1),tt, - c)
+    +ff*ou(ou(w(1),tt, - c),tt, - c)
+       ,tt) where zrules );
+mode1:=4*c**(-4)*s(1)*sigma**2*small**2*ou(w(1),tt, - c)*w(1) - 5*c**(-3)*s(1)*sigma**2
+*small**2*ou(w(1),tt, - c)**2 + c**(-2)*s(1)*sigma**2*small**2*( - 4*ou(ou(w(1),
+tt, - c),tt, - c)*ou(w(1),tt, - c) - 2*ou(ou(w(1),tt, - c)**2,tt, - c)) - 2*c**(
+-4)*s(1)**2*sigma*small**2*ou(w(1),tt, - c) - 4*c**(-3)*s(1)**2*sigma*small**2*
+ou(ou(w(1),tt, - c),tt, - c)$
+testz:=( znon_(mode1 ,tt) where zrules );
+end;
+%where znon_(ou(~r,tt,~~mu)*ou(~s,tt,~~nu),tt)=>
+%      +znon_(sign(mu)*r*ou(s,tt,nu)+sign(nu)*s*ou(r,tt,mu),tt)
+%      /(mu+nu) when mu+nu neq 0;

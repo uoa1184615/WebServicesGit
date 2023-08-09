@@ -278,6 +278,13 @@ Usually seems best to use the \verb|gcd| option, but sometimes worse, so set her
 \begin{reduce}
 on gcd,ezgcd; 
 \end{reduce}
+%Similarly, try loading LaTeX names of symbols here so that a user can override.  Works to some extent, but do not know how to change u() and s().
+%\begin{reduce}
+%defid u1,name="u_1"; 
+%defid u2,name="u_2"; 
+%defid u3,name="u_3"; 
+%defid u4,name="u_4"; 
+%\end{reduce}
 
 
 Now define the procedure as an operator so we can define
@@ -305,7 +312,7 @@ pp, est, eyem, m;
 
 Write an intro message.
 \begin{reduce}
-write "Construct an invariant manifold (version 25 Nov 2022)"$
+write "Construct an invariant manifold (version 17 Jun 2023)"$
 \end{reduce}
 
 
@@ -582,7 +589,6 @@ in the product.
 \begin{reduce}
 if not ok then for iter:=1:2 do begin
 write "WARNING: I NEED TO ADJUST LINEAR OPERATOR";
-write
 lladj:=reslin*tp map(conj_(~b),zz*cexp_);
 write
 lladj:=(lladj where {exp(0)=>1, exp(~a)=>0 when a neq 0});
@@ -936,15 +942,15 @@ defid e_,name="e";
 defindex d_(arg,down,down);
 defid d_,name="D";
 defindex u(down);
-defid u1,name="u\sb1"; 
-defid u2,name="u\sb2"; 
-defid u3,name="u\sb3"; 
-defid u4,name="u\sb4"; 
-defid u5,name="u\sb5"; 
-defid u6,name="u\sb6"; 
-defid u7,name="u\sb7"; 
-defid u8,name="u\sb8"; 
-defid u9,name="u\sb9"; 
+defid u1,name="u_1"; 
+defid u2,name="u_2"; 
+defid u3,name="u_3"; 
+defid u4,name="u_4"; 
+defid u5,name="u_5"; 
+defid u6,name="u_6"; 
+defid u7,name="u_7"; 
+defid u8,name="u_8"; 
+defid u9,name="u_9"; 
 defindex s(down);
 defid exp,name="\exp";
 defindex exp(arg);
@@ -1282,7 +1288,7 @@ write "off echo;"$ % do not understand why needed in 2021??
 write "write ""\)
 \paragraph{The invariant manifold}
 These give the location of the invariant manifold in
-terms of parameters~\(s\sb j\).
+terms of parameters~\(s_ j\).
 \("";";
 for j:=1:n do write "tmp_(",j,"):=coeffn(small*uu,e_(",j,
         ",1),1)/small +order_(varepsilon^",toosmall-1,");";
@@ -1324,7 +1330,7 @@ forcing onto the slow evolution; to predict the
 consequences of modifying the original system; in
 uncertainty quantification to quantify effects on
 the model of uncertainties in the original system.
-The normal vector \(\vec z\sb j:=(z\sb{j1},\ldots,z\sb{jn})\)
+The normal vector \(\vec z_ j:=(z_{j1},\ldots,z_{jn})\)
 \("";";
   for i:=1:m do for j:=1:n do 
   write "zs_(",i,",",j,"):=tmp_zz(",i,",",j

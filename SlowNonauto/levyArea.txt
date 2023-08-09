@@ -1,0 +1,15 @@
+% Levy Area Contraction 2 June 2023: fails due to Invalid
+% Simplification of znon_.  However, when I test each
+% individually they do not individually complain.
+in_tex "slowNonauto.tex"$
+factor small,sigma;
+a:=1;
+let { sign(-1-a*i)=>-1 , sign(-1+a*i)=>-1 };
+slownonauto(
+    mat(( u4, u5, u1*u5-u2*u4
+    , -u4-a*u5+w(1), -u5+a*u4+w(2) )),
+    mat((1,0,0,0,0),(0,1,0,0,0),(0,0,1,0,0)),
+    mat((-1+i*a,-1-i*a)),
+    mat((0,0,0,1,-i),(0,0,0,1,+i)),
+    3 )$
+end;

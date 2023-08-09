@@ -1,0 +1,258 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{Chao95}{article}{}
+    \name{author}{2}{}{%
+      {{hash=CX}{%
+         family={Chao},
+         familyi={C\bibinitperiod},
+         given={Xu},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{CXRAJ1}
+    \strng{fullhash}{CXRAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1996}
+    \field{labeldatesource}{}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \verb{doi}
+    \verb 10.1016/0378-4371(95)00387-8
+    \endverb
+    \field{pages}{62\bibrangedash 80}
+    \field{title}{On the low-dimensional modelling of {Stratonovich} stochastic
+  differential equations}
+    \field{volume}{225}
+    \field{journaltitle}{Physica~A}
+    \field{year}{1996}
+  \endentry
+
+  \entry{Zhenquan00}{article}{}
+    \name{author}{2}{}{%
+      {{hash=LZ}{%
+         family={Li},
+         familyi={L\bibinitperiod},
+         given={Zhenquan},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{LZRAJ1}
+    \strng{fullhash}{LZRAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2007}
+    \field{labeldatesource}{}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \field{number}{3}
+    \field{pages}{241\bibrangedash 249}
+    \field{title}{A flexible error estimate for the application of centre
+  manifold theory}
+    \verb{url}
+    \verb http://www.ripublication.com/gjpamv3/gjpamv3n3_5.pdf
+    \endverb
+    \field{volume}{3}
+    \field{journaltitle}{Global Journal of Pure and Applied Mathematics}
+    \field{year}{2007}
+  \endentry
+
+  \entry{Roberts89b}{article}{}
+    \name{author}{1}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \keyw{initial conditions, long term evolution, modelling dynamical systems,
+  initial slip, centre manifold}
+    \strng{namehash}{RAJ1}
+    \strng{fullhash}{RAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1989}
+    \field{labeldatesource}{}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{abstract}{%
+    A centre manifold or invariant manifold description of the evolution of a
+  dynamical system provides a simplified view of the long term evolution of the
+  system. In this work, I describe a procedure to estimate the appropriate
+  starting position on the manifold which best matches an initial condition off
+  the manifold. I apply the procedure to three examples: a simple dynamical
+  system, a five-equation model of quasi-geostrophic flow, and shear dispersion
+  in a channel. The analysis is also relevant to determining how best to
+  account, within the invariant manifold description, for a small forcing in
+  the full system.%
+    }
+    \verb{doi}
+    \verb 10.1017/S0334270000006470
+    \endverb
+    \field{pages}{48\bibrangedash 75}
+    \field{title}{Appropriate initial conditions for asymptotic descriptions of
+  the long term evolution of dynamical systems}
+    \field{volume}{31}
+    \field{journaltitle}{J.~Austral. Math. Soc.~B}
+    \field{year}{1989}
+  \endentry
+
+  \entry{Roberts96a}{article}{}
+    \name{author}{1}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{RAJ1}
+    \strng{fullhash}{RAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1997}
+    \field{labeldatesource}{}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \verb{doi}
+    \verb 10.1016/S0010-4655(96)00162-2
+    \endverb
+    \field{pages}{215\bibrangedash 230}
+    \field{title}{Low-dimensional modelling of dynamics via computer algebra}
+    \field{volume}{100}
+    \field{journaltitle}{Computer Phys. Comm.}
+    \field{year}{1997}
+  \endentry
+
+  \entry{Roberts97b}{article}{}
+    \name{author}{1}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{RAJ1}
+    \strng{fullhash}{RAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2000}
+    \field{labeldatesource}{}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{abstract}{%
+    To ease analysis and simulation we make low-dimensional models of
+  complicated dynamical systems. Centre manifold theory provides a systematic
+  basis for the reduction of dimensionality from some detailed dynamical
+  prescription down to a relatively simple model. An initial condition for the
+  detailed dynamics also has to be projected onto the low-dimensional model,
+  but except in meteorology this issue has received scant attention. Herein,
+  based upon the algorithm in (Roberts, 1997), I develop a straightforward
+  algorithm for the computer algebra derivation of this projection. The method
+  is systematic and is based upon the geometric picture underlying centre
+  manifold theory. The method is applied to examples of a pitchfork and a Hopf
+  bifurcation. There is a close relationship between this projection of initial
+  conditions and the correct projection of forcing onto a model. I reaffirm
+  this connection and show how the effects of forcing, both interior and from
+  the boundary, should be properly included in a dynamical model.%
+    }
+    \verb{doi}
+    \verb 10.1016/S0010-4655(99)00494-4
+    \endverb
+    \field{number}{3}
+    \field{pages}{187\bibrangedash 206}
+    \field{title}{Computer algebra derives correct initial conditions for
+  low-dimensional dynamical models}
+    \field{volume}{126}
+    \field{journaltitle}{Computer Phys. Comm.}
+    \field{year}{2000}
+  \endentry
+
+  \entry{Roberts2014a}{book}{}
+    \name{author}{1}{}{%
+      {{hash=RAJ}{%
+         family={Roberts},
+         familyi={R\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {SIAM, Philadelphia}%
+    }
+    \keyw{multiscale modeling, emergent dynamics, dynamical systems, model
+  reduction, perturbation applications}
+    \strng{namehash}{RAJ1}
+    \strng{fullhash}{RAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2015}
+    \field{labeldatesource}{}
+    \field{sortinit}{R}
+    \field{sortinithash}{R}
+    \field{abstract}{%
+    Arising out of the growing interest in and applications of modern dynamical
+  systems theory, this book explores how to derive relatively simple dynamical
+  equations that model complex physical interactions. The author's objectives
+  are to use sound theory to explore algebraic techniques, develop interesting
+  applications, and discover general modeling principles. Model Emergent
+  Dynamics in Complex Systems unifies into one powerful and coherent approach
+  the many varied extant methods for mathematical model reduction and
+  approximation. Using mathematical models at various levels of resolution and
+  complexity, the book establishes the relationships between such multiscale
+  models and clarifying difficulties and apparent paradoxes and addresses model
+  reduction for systems, resolves initial conditions, and illuminates control
+  and uncertainty. The basis for the author's methodology is the theory and the
+  geometric picture of both coordinate transforms and invariant manifolds in
+  dynamical systems; in particular, center and slow manifolds are heavily used.
+  The wonderful aspect of this approach is the range of geometric
+  interpretations of the modeling process that it produces---simple geometric
+  pictures inspire sound methods of analysis and construction. Further,
+  pictures drawn of state spaces also provide a route to better assess a
+  model's limitations and strengths. Geometry and algebra form a powerful
+  partnership and coordinate transforms and manifolds provide a powerfully
+  enhanced and unified view of a swathe of other complex system modeling
+  methodologies such as averaging, homogenization, multiple scales, singular
+  perturbations, two timing, and WKB theory.%
+    }
+    \field{isbn}{9781611973556}
+    \field{title}{Model emergent dynamics in complex systems}
+    \verb{url}
+    \verb http://bookstore.siam.org/mm20/
+    \endverb
+    \field{year}{2015}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+\enddatalist
+\endinput

@@ -1,0 +1,181 @@
+\documentclass[12pt,a5paper]{article}
+\IfFileExists{ajr.sty}{\usepackage{ajr}}{}
+\usepackage{amsmath,defns,mybiblatex,reducecode}
+
+\title{Enzyme kinetics: reduction of the chemical Langevin equation (\cle)}
+\author{JSE \and AJR}
+\date{\today}
+\def\cle{\textsc{cle}}
+\Vec f\Vec u\Vec z
+\Cal M
+\def\ou\big(#1,#2,#3\big)%
+    {{{\rm e}^{\if#31\else#3\fi t}\star}#1\,}
+\def\eps{\varepsilon} \def\_{_}
+
+
+\begin{document}
+
+\maketitle
+
+Too many constants obscure a first analysis:
+so set all \(k_i:=1\).
+The \cle\ system then is
+\begin{equation}
+\begin{bmatrix} \dot s \\ \dot  c \end{bmatrix}
+=\begin{bmatrix} sc+c \\-sc-2c \end{bmatrix}
++e_0\begin{bmatrix} -s\\s \end{bmatrix}
++\sigma\fv(t) \label{eq:cle}
+\end{equation}
+for some stochastic forcing~\fv.
+
+I would phrase it that the manifold~\(\cM_0\) of equilibria is \(c=e_0=0\) for all~\(s\).
+
+\paragraph{Deterministic analysis is basis for forcing}
+Analyse via my web service\footnote{\url{https://tuck.adelaide.edu.au/gencm.php} based upon \cite{Roberts96a}.} for deterministic systems via the following input.  The variable \(s_0\) denotes the point of analysis on~\(\cM_0\) so \(s:=s_0+u_1\) and \(c:=0+u_2\).
+\begin{verbatim}
+RHS function = ( (s_0+u1)*u2  +u2 -e_0*(s_0+small*u1)
+,-(s_0+u1)*u2-2*u2 +e_0*(s_0+small*u1) )
+Invariant eigenvalues = 0
+Invariant eigenvectors = (1,0)
+Adjoint basis = (1,0)
+Order of error = 3
+factor small,e_0
+\end{verbatim}
+The above and the web service then introduces artificial~\(\verb|small|\equiv\varepsilon\) to actually analyse the system
+\begin{align*}&
+\dot u_1=(s_0+1+\varepsilon u_1)u_2-\varepsilon e_0(s_0+\varepsilon u_1),
+\\&
+\dot u_2=-(s_0+2+\varepsilon u_1)u_2+\varepsilon e_0(s_0+\varepsilon u_1).
+\end{align*}
+
+\paragraph{Orders of errors}
+The web service operates to errors~\Ord{\varepsilon^p} for some specified~\(p\).
+Frankly, the simplest way to understand the errors in terms of physical variables is to simply construct to sufficient order in the artificial~\(\varepsilon\), and then variously truncate the expansions in terms of physical variables (ignoring~\(\varepsilon\)) as best befits the desired use of the model (justified by \cite{Zhenquan00} and/or \S5.5 by \cite{Roberts2014a}).  
+
+However, here I think we can give~\(\varepsilon\) a more traditional meaning.  Here, multiplying both \ode{}s by~\(\varepsilon\) shows that variable~\(\varepsilon\) counts the nonlinearity in~\uv\ and half the number of~\(e_0\) factors. 
+So physically (that is, \(\varepsilon=1\)) a construction to errors~\Ord{\varepsilon^p} is equivalent to physical errors~\Ord{|\uv|^{p+1}+e_0^{(p+1)/2}}.  And these errors are so for every~\(s_0\).  For simplicity, let's just write errors~\Ord{p} for such errors.
+
+To errors~\Ord{3}, the slow manifold is then simply
+\begin{equation}
+u_1=s_1\,, \quad
+u_2=\varepsilon \frac{e_0s_0}{2+s_0} 
++\varepsilon^2\frac{2e_0s_1}{(2+s_0)^2}\,, \quad
+\dot s_1=-\varepsilon \frac{e_0s_0}{2+s_0}
+-\varepsilon^2\frac{2e_0s_1}{(2+s_0)^2} \,.
+\end{equation}
+Instead of the local variable~\(s_1\), phrase in terms of, say, \(S(t)=s_0+\varepsilon s_1(t)\):
+\begin{subequations}\label{eqs:}%
+\begin{align}&
+s=s_0+\varepsilon u_1&&=s_0+\varepsilon s_1+\Ord{3}
+&&=S+\Ord{3},
+\\&
+c=0+\varepsilon u_2&&=\varepsilon^2 \frac{e_0s_0}{2+s_0}+\Ord{3}
+&&=\varepsilon^2 \frac{e_0S}{2+S}+\Ord{3},
+\\&
+\dot S=0+\varepsilon \dot s_1&&=-\varepsilon^2 \frac{e_0s_0}{2+s_0}+\Ord{3}
+&&=-\varepsilon^2 \frac{e_0S}{2+S}+\Ord{3}.
+\end{align}
+\end{subequations}
+
+
+\paragraph{The leading order forcing}
+The web service \citep[based upon][]{Roberts97b} gives the projection vector
+\begin{equation}
+\zv=\begin{bmatrix} 1-\varepsilon^2 \frac {e_02(1+S)}{(2+S)^3} 
+\\
+\frac{1+S}{2+S} -\varepsilon^2 \frac {e_0S(3+2S)}{(2+S)^4}
+\end{bmatrix} +\Ord{3}
+\end{equation}
+\cite{Roberts89b} argued this projection gives the leading order forcing term should be \(\zv\cdot\fv\) with errors quadratic in the size of the forcing, namely, errors here are~\Ord{\sigma^2}.  The leading order term in this projection appears the same as JSE's~(4).
+
+JSE appears to ignore \(\zeta_2,\zeta_3\), so shall I  (although they both appear to be~\Ord{1}, the same as~\(\zeta_1\)).
+So here \(\fv =\sigma\zeta_1 \sqrt{k_1(e_0-c)s} (-1,1) \equiv\sigma\zeta_1 \sqrt{(\varepsilon^2 e_0-c)S} (-1,1)\) and \(\varepsilon^2 e_0-c=\varepsilon^2 (e_0-e_0\frac{S}{2+S}) +\Ord3 =\varepsilon^2 2e_0/(2+S)+\Ord3\).
+So then the forcing of the slow differential equation becomes 
+\begin{equation}
+\zv\cdot\fv=-\frac{\sigma\zeta_1\varepsilon}{2+S}\sqrt{\frac{2e_0S}{2+S}}+\Ord{2,\sigma^2}.
+\label{eq:}
+\end{equation}
+This appears to have many similarities, but also differences, to JSE's version.  Need to check the above.
+
+
+
+\paragraph{New equation-free non-autonomous construction}
+Unfortunately, as yet the code needs a polynomial expression for the differential equations, so for this system the square-roots in the noise cannot all be dealt with.  For an example, let's try this alternative.
+
+\begin{reduce}
+% Example CLE of Justin Eilertsen
+in_tex "slowNonauto.tex"$
+on gcd;
+factor small,sigma,e_0,ou,w;
+let sign(-2-s_0)=>-1;
+slownonauto(
+    mat(( (s_0+u1)*u2  +u2 -e_0*(s_0+small*u1)
+        ,-(s_0+u1)*u2-2*u2 +e_0*(s_0+small*u1) ))
+    +w(1)*mat((-1,1))*sqrt(s_0)*(1+small*u1/s_0/2) ,
+    mat((1,0)),
+    mat((-2-s_0)),
+    mat((-1-s_0,2+s_0)),
+    2 )$
+write "**** simplifying form with s_1=0";
+u_1:=sub(s(1)=0,u_(1,1));
+u_2:=sub(s(1)=0,u_(2,1));
+dsdt:=sub(s(1)=0,ff(1));
+end;
+\end{reduce}
+
+That is, here I model~\eqref{eq:cle} with forcing \(\fv:= \begin{bmat}
+-\sqrt{s}\\ \sqrt{s} \end{bmat}w_1\)\,.     Expanding the about each~\(s_0\), \(\sqrt{s}=\sqrt{s_0}(1+u_1/s_0/2+\cdots)\).
+The procedure then tweaks the above given system to actually analyse the following:
+\begin{subequations}\label{eqs:}%
+\begin{align}&
+\dot u_{1}=-1/2 \sqrt {s\_0} w_{1} \sigma  \eps u_{1} s\_0^{-1}-\sqrt {
+s\_0} w_{1} \sigma -e\_0 \eps^{2} u_{1}-e\_0 \eps s\_0+\eps u_{2} u_{1}+
+u_{2} s\_0+u_{2}
+\\&
+\dot u_{2}=1/2 \sqrt {s\_0} w_{1} \sigma  \eps u_{1} s\_0^{-1}+\sqrt {
+s\_0} w_{1} \sigma +e\_0 \eps^{2} u_{1}+e\_0 \eps s\_0-\eps u_{2} u_{1}-
+u_{2} s\_0-2 u_{2}
+\end{align}
+\end{subequations}
+The constructed slow manifold is rather complicated, and maybe only of peripheral interest, but starts\footnote{Check where the deterministic \Ord{\varepsilon} term in \(u_1\) comes from??}
+\begin{subequations}\label{eqs:}%
+\begin{align}
+u_1&=s_1
+-e\_0 \eps \frac{s\_0^{2}+s\_0}{(2+ s\_0)^2}
+-\sigma  \frac{( s\_0+1)\sqrt {s\_0}}{s\_0+2}\ou\big(w_{1},tt,(-s\_0-2)\big) 
++O\big(\varepsilon^2 +\sigma^{2}\big)
+\\
+u_2&=\frac{e\_0 \eps s\_0}{s\_0+2}
++\sigma\sqrt {s\_0} \ou\big(w_{1},tt,(-s\_0-2)\big) 
++O\big(\varepsilon^2 +\sigma^{2}\big)
+\end{align}
+\end{subequations}
+The emergent slow evolution is then constructed to be
+\begin{align}
+\dot S&=
+-\frac{\eps e\_0  S}{S+2}
+-\frac{\sigma\sqrt {S}  }{S+2} w_{1}
++\frac{\sigma ^{2} \eps (1-S)}{2(2+S)^2} \ou\big(w_{1},tt,(-S-2)\big) w_{1}
+%+w_{1} \sigma  \eps \big(-\sqrt {S} s_{1} S^{-1}+1/2 \sqrt {S} s_{1}\big)/\big(S^{2}+4 S+4\big)
++O\big(\varepsilon ^{2},\sigma^{3}\big).
+\label{eq:dSdt}
+\end{align}
+
+\paragraph{Weak modelling of noise-noise interactions}
+The model~\eqref{eq:dSdt} is a `strong' pathwise model.
+\cite{Chao95} [\S4.1] first argued that noise-noise interactions \(\ou\big(w_{1},tt,(-S-2)\big) w_{1}\) could be approximated `weakly', in distribution, by its differential \(\mapsto \tfrac12\,dt+\frac1{2\sqrt{S+2}}dW'_1\) for some new independent noise~\(W'_1\), and causing a drift~\(\tfrac12\).  
+This weak approximation is valid to errors decaying \emph{algebraically} in time (I recall like~\(1/\Delta t\) in some sense??, where \(\Delta t\) is `time step' or `time resolution' for the slow model).
+That is, a weak emergent slow manifold model, with noise induced drift, is
+\begin{align}
+\dot S&=
+-\frac{\eps e\_0  S}{S+2}
+-\frac{\sigma\sqrt {S}  }{S+2} w_{1}
++\frac{\sigma ^{2} \eps (1-S)}{2(2+S)^2} \left(\frac12+\frac{W'_1}{2\sqrt{S+2}}\right)
++O\big(\varepsilon ^{2},\sigma^{3},\Delta t^{-1}\big).
+\label{eq:dSdtweak}
+\end{align}
+ 
+
+
+
+\end{document}
