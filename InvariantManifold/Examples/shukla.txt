@@ -1,0 +1,16 @@
+% Simple example of Shukla & Datta 2023
+% "Asymptotic theory for damped dynamics of gas-filled bubbles"
+in_tex "../invariantManifold.tex"$
+factor i,small,s;
+invariantmanifold(
+    mat((u2
+        ,-w^2*u1+(Q*u1^2-4*u3*u2-3/2*u2^2)
+          +small*(3/2*u1*u2^2+8*u3*u1*u2-P*u1^3)
+        ,0)),
+    mat(( i*w,-i*w,0 )),
+    mat( (1,i*w,0),(1,-i*w,0),(0,0,1) ),
+    mat( (1,i*w,0),(1,-i*w,0),(0,0,1) ),
+    3 )$
+
+end;
+

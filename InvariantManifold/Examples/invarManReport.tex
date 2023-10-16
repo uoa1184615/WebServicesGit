@@ -21,15 +21,22 @@ These give the location of the invariant manifold in
 terms of parameters~\(s\_ j\).
 \(
 \)\par
-\(k_0=O\big(\varepsilon ^{3}\big)+k_0
+\(u_{1}=\big(2 s_{3} s_{2} i \eps \exp \big(-i t w\big) w\big)/\big(w^{2}+
+1\big)+\big(-2 s_{3} s_{1} i \eps \exp \big(i t w\big) w\big)/\big(w^{2}
++1\big)+s_{2}^{2} \eps \big(-1/3 \exp \big(-2 i t w\big) q w^{-2}-1/2 
+\exp \big(-2 i t w\big)\big)+s_{2} s_{1} \eps \big(2 q w^{-2}-3\big)+s_{
+2} \exp \big(-i t w\big)+s_{1}^{2} \eps \big(-1/3 \exp \big(2 i t w\big)
+ q w^{-2}-1/2 \exp \big(2 i t w\big)\big)+s_{1} \exp \big(i t w\big)+O
+\big(\varepsilon ^{2}\big)
 \)\par
-\(k_1=O\big(\varepsilon ^{3}\big)+k_1
+\(u_{2}=\big(-2 s_{3} s_{2} \eps \exp \big(-i t w\big)\big)/\big(w^{2}+1
+\big)+\big(-2 s_{3} s_{1} \eps \exp \big(i t w\big)\big)/\big(w^{2}+1
+\big)+s_{2}^{2} i \eps \big(2/3 \exp \big(-2 i t w\big) q w^{-1}+\exp 
+\big(-2 i t w\big) w\big)-s_{2} i \exp \big(-i t w\big) w+s_{1}^{2} i 
+\eps \big(-2/3 \exp \big(2 i t w\big) q w^{-1}-\exp \big(2 i t w\big) w
+\big)+s_{1} i \exp \big(i t w\big) w+O\big(\varepsilon ^{2}\big)
 \)\par
-\(x=x+O\big(\varepsilon ^{3}\big)
-\)\par
-\(u_{4}=x \eps^{2} \big(-k_1^{2} k\_2 k\_5^{-3}+k_1^{2} k\_5^{-2}
-\big)+x \eps k_1 k\_5^{-1}-\eps^{2} k_1 k_0 k\_5^{-2}+O\big(
-\varepsilon ^{3}\big)
+\(u_{3}=s_{3}+O\big(\varepsilon ^{2}\big)
 \)\par
 \(
 \)
@@ -38,63 +45,15 @@ The system evolves on the invariant manifold such
 that the parameters evolve according to these ODEs.
 \(
 \)\par
-\(\dot k_0=O\big(\varepsilon ^{4}\big)
+\(\dot s_{1}=-2 s_{3}^{2} s_{1} i \eps^{2} w^{-1}-2 s_{3} s_{1} \eps+s_{2}
+ s_{1}^{2} i \eps^{2} \big(3/2 p w^{-1}-5/3 q^{2} w^{-3}+5/2 q w^{-1}-9/
+4 w\big)+O\big(\varepsilon ^{3}\big)
 \)\par
-\(\dot k_1=O\big(\varepsilon ^{4}\big)
+\(\dot s_{2}=2 s_{3}^{2} s_{2} i \eps^{2} w^{-1}-2 s_{3} s_{2} \eps+s_{2}
+^{2} s_{1} i \eps^{2} \big(-3/2 p w^{-1}+5/3 q^{2} w^{-3}-5/2 q w^{-1}+9
+/4 w\big)+O\big(\varepsilon ^{3}\big)
 \)\par
-\(\dot x=x \eps^{3} \big(2 k_1^{3} k\_2^{3} k\_5^{-5}-3 k_1^{3
-} k\_2^{2} k\_5^{-4}+k_1^{3} k\_2 k\_5^{-3}\big)+x \eps^{2} \big(-
-k_1^{2} k\_2^{2} k\_5^{-3}+k_1^{2} k\_2 k\_5^{-2}\big)+x \eps 
-\big(k_1 k\_2 k\_5^{-1}-k_1\big)+\eps^{3} \big(2 k_1^{2} k_0 
-k\_2^{2} k\_5^{-4}-k_1^{2} k_0 k\_2 k\_5^{-3}\big)-\eps^{2} k_1 k_0 k\_2 k\_5^{-2}+\eps k_0+O\big(\varepsilon ^{4}\big)
-\)\par
-\(
-\)
-\paragraph{Normals to isochrons at the slow manifold}
-Use these vectors: to project initial conditionsonto the slow manifold; to project non-autonomousforcing onto the slow evolution; to predict the
-consequences of modifying the original system; in
-uncertainty quantification to quantify effects on
-the model of uncertainties in the original system.
-The normal vector \(\vec z\_ j:=(z\_{j1},\ldots,z\_{jn})\)
-\(
-\)\par
-\(z_{11}=O\big(\varepsilon ^{4}\big)+1
-\)\par
-\(z_{12}=O\big(\varepsilon ^{4}\big)
-\)\par
-\(z_{13}=O\big(\varepsilon ^{4}\big)
-\)\par
-\(z_{14}=O\big(\varepsilon ^{4}\big)
-\)\par
-\(z_{21}=O\big(\varepsilon ^{4}\big)
-\)\par
-\(z_{22}=O\big(\varepsilon ^{4}\big)+1
-\)\par
-\(z_{23}=O\big(\varepsilon ^{4}\big)
-\)\par
-\(z_{24}=O\big(\varepsilon ^{4}\big)
-\)\par
-\(z_{31}=\eps^{3} \big(-4 k_1^{2} k\_2^{2} k\_5^{-5}+2 k_1^{2} k\_2 
-k\_5^{-4}\big)+\eps^{2} k_1 k\_2 k\_5^{-3}+O\big(\varepsilon ^{4}\big)
-\)\par
-\(z_{32}=x \eps^{3} \big(-16 k_1^{2} k\_2^{3} k\_5^{-6}+21 k_1^{2}
- k\_2^{2} k\_5^{-5}-6 k_1^{2} k\_2 k\_5^{-4}\big)+x \eps^{2} \big(
-4 k_1 k\_2^{2} k\_5^{-4}-3 k_1 k\_2 k\_5^{-3}\big)-x \eps k\_2 
-k\_5^{-2}+\eps^{3} \big(-6 k_1 k_0 k\_2^{2} k\_5^{-5}+3 k_1 k_0 
-k\_2 k\_5^{-4}\big)+\eps^{2} k_0 k\_2 k\_5^{-3}+O\big(\varepsilon ^{4}
-\big)
-\)\par
-\(z_{33}=\eps^{3} \big(-10 k_1^{3} k\_2^{3} k\_5^{-6}+12 k_1^{3} k\_2
-^{2} k\_5^{-5}-3 k_1^{3} k\_2 k\_5^{-4}\big)+\eps^{2} \big(3 k_1^{2}
- k\_2^{2} k\_5^{-4}-2 k_1^{2} k\_2 k\_5^{-3}\big)-\eps k_1 k\_2 k\_5
-^{-2}+O\big(\varepsilon ^{4}\big)+1
-\)\par
-\(z_{34}=\eps^{3} \big(-20 k_1^{3} k\_2^{4} k\_5^{-7}+30 k_1^{3} k\_2
-^{3} k\_5^{-6}-12 k_1^{3} k\_2^{2} k\_5^{-5}+k_1^{3} k\_2 k\_5^{-4}
-\big)+\eps^{2} \big(6 k_1^{2} k\_2^{3} k\_5^{-5}-6 k_1^{2} k\_2^{2} 
-k\_5^{-4}+k_1^{2} k\_2 k\_5^{-3}\big)+\eps \big(-2 k_1 k\_2^{2} k\_5
-^{-3}+k_1 k\_2 k\_5^{-2}\big)+O\big(\varepsilon ^{4}\big)+k\_2 k\_5^{
--1}
+\(\dot s_{3}=O\big(\varepsilon ^{3}\big)
 \)\par
 \(
 \)\par

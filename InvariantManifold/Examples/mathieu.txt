@@ -1,0 +1,18 @@
+% Simple example of Dear & Mahadevan 2309.05038 why does
+% this fail in the web service? Answer: due to a glitch in
+% the particular version of Reduce on the web, the zero RHS
+% do not get written to the report correctly.  A work-around
+% is to replace "0" with say "small^9"
+in_tex "../invariantManifold.tex"$
+factor i,small;
+invariantmanifold(
+    mat((u2
+    ,-(1/4+u3+2*u4*cos(t))*u1
+    ,0,0)),
+    mat(( i/2,-i/2,0,0 )),
+    mat( (1,i/2,0,0),(1,-i/2,0,0),(0,0,1,0),(0,0,0,1) ),
+    mat( (1,i/2,0,0),(1,-i/2,0,0),(0,0,1,0),(0,0,0,1) ),
+    3 )$
+
+end;
+

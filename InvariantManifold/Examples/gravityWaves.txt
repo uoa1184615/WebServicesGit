@@ -1,0 +1,39 @@
+% Simple example of Gravitational wave oscillations in
+% bimetric cosmology 2309.08536.  Model modulation of
+% oscillations in (5.1) with u1=mu, u2=dmu/dt, u3=nu,
+% u4=dnu/dt, z=s  The leading approximation is then 
+% mu=u1=s1*exp(i*t)+s2*exp(-i*t)+... and
+% nu=u3=s3*exp(i*c*t)+s4*exp(-i*c*t) +...  for complex
+% amplitudes s1, s2, s3, s4.  AJR, 25 Sep 2023
+
+% Problem: why does time dependence of r appear in the
+% modulation whereas that of p does not????  There must be
+% some artefact in the separation of resonant and
+% non-resonant? or in the use of the definition of the
+% amplitudes????   Needs investigation*****************
+
+in_tex "../invariantManifold.tex"$
+factor i,small;
+
+% code time dependence of perturbations
+depend p,t;  operator p;  defindex p(down);
+let { df(p,t)=>small*p(1), df(p(~n),t)=>small*p(n+1) };
+depend q,t;  operator q;  defindex q(down);
+let { df(q,t)=>small*q(1), df(q(~n),t)=>small*q(n+1) };
+depend r,t; operator r;  defindex r(down);
+let { df(r,t)=>small*r(1), df(r(~n),t)=>small*r(n+1) };
+depend z,t;  operator z;  defindex z(down);
+let { df(z,t)=>small*z(1), df(z(~n),t)=>small*z(n+1) };
+
+invariantmanifold(
+    mat((u2
+    ,-(1+small*p)*u1+small*q*u3
+    ,u4
+    ,-(c^2+small*r/alpha^2)*u3+small*z/alpha^2*u1)),
+    mat(( i,-i,i*c,-i*c )),
+    mat( (1,i,0,0),(1,-i,0,0),(0,0,1,i*c),(0,0,1,-i*c) ),
+    mat( (1,i,0,0),(1,-i,0,0),(0,0,1,i*c),(0,0,1,-i*c) ),
+    4 )$
+
+end;
+
