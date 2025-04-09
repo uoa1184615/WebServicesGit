@@ -1,0 +1,88 @@
+% Simple example of Stabile et al 2411.09769 
+% Two critical oscillating modes at P_0=2 with generalised eigenvector.
+% AJR, 2024-11-21
+Comment  to  andre.de-figueiredo-stabile@ensta-paris.fr
+Dear Andre,
+
+I was very interested to read your preprint on "Reduced-order modelling of parameter-dependent systems with invariant manifolds: application to Hopf bifurcations in follower force problems" as I have long argued for cognate application of centre manifolds et al.   May I take the liberty of making some comments and queries.
+
+First, please note that the so-called 'parametrization method' dates back to Coullet & Spiegel (1983) https://doi.org/10.1137/0143052   with many applications over many fields in the 317 works that have cited the original.  In particular, recall your comment [p.2] "previously cited approaches ... rarely consider the cases where the fixed point, in the vicinity of which the NNMs are computed, experiences a bifurcation in the considered parameter range."  That may be for the works you cited, but it is far from the case of many of the works depending upon Coullet & Spiegel.  For some examples, see the attached Chapter 17 from my book "Model Emergent Dynamics in Complex Systems".  So regarding your [p.3] "the parametrisation method for invariant manifolds needs to be revisited to account for this major change in the dynamics":  the only revisiting that needs doing is to some of the works developed from Coullet & Spiegel.
+
+For example, on p.5 you comment "it is possible to extend the method and consider a singular matrix Ae t by treating differently the physical eigenvectors and the one associated with the bifurcation parameter."   Yes, it is possible.  Indeed it has been done so for over forty years.   Using my book again, see the attached Chapter 5 (as well as ch.17).  In particular, section 5.5 discusses the freedom that well established invariant manifold theory provides in allowing one to construct an approximation to different orders in different 'small' parameters.   
+
+Regarding your comment [p.3] "This contribution aims to elaborate further on ... systems experiencing a Hopf bifurcation".  I contend not.  A Hopf bifurcation is very specific:  at critical parameter value the spectrum MUST be a single pair of complex conjugate eigenvalues with real-part zero, and all the other eigenvalues have negative real-part---which you do not have, you have a foursome of zero real-parts.   Thus your system does not appear to have a Hopf bifurcation, and you need to adjust your terminology accordingly.
+
+p.6 you write "method assumes first that a nonlinear mapping exists".  But using other well established theory we know that a smooth nonlinear invariant-manifold mapping will exist.  And then another theorem guarantees that the asymptotic construction will systematically approximate the invariant manifold.   There is no assumption necessary.
+
+Also on p.6 "left-and" appears to be a typo.
+
+On p.11 you discuss"applicability for damped scenarios depends on the underlying conservative system at hand, in order to identify the two coalescing modes, which might not always be possible"   I contend that it is generically possible.   For example, my web service for constructing invariant manifolds for any system a user enters,  currently at https://tuck.adelaide.edu.au/gencm.php and built from research in the 1990s,  checks that the provided eigenvalues and corresponding eigenvectors are correct for the linearisation of the system.  If not, it automatically creates a homotopy (via an introduced parameter called "small") from a system for which the eigen-info is correct (small=0) to the system that the user enters (small=1).  
+
+For example, just because I was intrigued, I tried it for your system of Fig. 2(a) (and subsequently with parametric and nonlinear perturbations).   My web service does require the M matrix to be the identity, so I multiply your system by your M^{-1} (and it requires 1st order ODEs, so I expand to a system of four).   I tell the web service to use eigenvalues \pm i (twice each) and eigenvectors (0,1) and (1,0), and its output includes the following automatic adjust to suit the eigen-info:
+
+Find the linear operator is
+      [0   0   1  0]
+      [0   0   0  1]
+ll := [-1  0   0  0]
+      [2   -1  0  0]
+
+Check invariant subspace linearisation 
+WARNING: I NEED TO ADJUST LINEAR OPERATOR
+         [0  0  0  0]
+         [0  0  0  0]
+lladj := [0  0  0  0]
+         [2  0  0  0]
+
+      [0   0   1  0]
+      [0   0   0  1]
+ll := [-1  0   0  0]
+      [0   -1  0  0]
+Subsequently the web service analyses the system with the implicitly provided linear matrix L replaced by L_new+small*L_adj, and successfully solves by expanding in small.  Most other similar given L will successfully be adjusted similarly for the same given eigen-info.
+
+Which brings me to your "2.3.2. Inclusion of Jordan blocks".  The above adjustment is done by my web service is a contra-variant to your comment [p.11] "artificially impose Jordan blocks in the Jacobian matrix" in that it removes the Jordan block from the linear operator (and hence from the construction updates).   As discussed in Section 5.3.4 this Jordan form adjustment never need ruin the construction, one still constructs the invariant manifold in a finite number of steps, it is just that the number of steps may increase by no more than a factor of the multiplicity of the eigenvalue.
+
+For example, see the third attached report from my web service which sets P:=2+p for 'small' p, and constructs the model in just three iterations to errors O(small^6).   The varepsilon symbol in the attached report denotes the variable "small".  
+
+This email is long enough as is.  I hope you and colleagues find this alternative view of interest and use,
+;
+% Website: a work-around is to replace "0" with say "small^9"
+in_tex "../invariantManifold.tex"$
+on div;
+factor i,p,s;
+pp:= (p0:=2)+small*p;
+xik:=nonlin:=xim:=0; 
+% xik:=0.1; 
+% xim:=0.1; 
+% nonlin:=1; % use order 3
+rhs1:=-( (2-pp)*u1+(-1+pp)*u2 +nonlin*small*pp/6*(u1-u2)^3 
+        +small*2*xik*(2*u3-u4)+small*2*xim*(2*u3+u4) );
+rhs2:=-( -u1+u2 
+        +small*2*xik*(-u3+u4)+small*2*xim*(u3+u4) );
+invariantmanifold(
+    mat((u3, u4, rhs1-rhs2, -rhs1+2*rhs2)),
+    mat(( i,-i,i,-i )),
+    mat( (0,1,0,i),(0,1,0,-i),(1,0,i,0),(1,0,-i,0) ),
+    mat( (0,1,0,i),(0,1,0,-i),(1,0,i,0),(1,0,-i,0) ),
+    5 )$
+
+% Explore stability of model provided we compute to high
+% enough order in small.  Looks like errors O(small^5) are
+% sufficient to finalise to errors O(p^2),  and errors
+% O(small^8) are sufficient to finalise to errors O(p^3).
+% Vars s1 and s3 interact linearly, but not with s2 and s4
+if {nonlin}={0} then begin
+    ds1dt:=coeffn(gg,e_(1,1),1);
+    ds3dt:=coeffn(gg,e_(3,1),1);
+    small:=1; % sum all small terms
+    write ds1p:=(ds1dt where p^2=>0);
+    write ds3p:=(ds3dt where p^2=>0);
+    write linear_p :=
+        mat( (coeffn(ds1p,s(1),1),coeffn(ds1p,s(3),1))
+           , (coeffn(ds3p,s(1),1),coeffn(ds3p,s(3),1)) ); 
+    write linear_p_shows_instability := solve(part(
+        mateigen(linear_p,lam) ,1,1),lam);
+    % Finds eigenvalues are \pm\sqrt(p/2) -i*p/4 +O(p^1.5)
+end;
+
+end;
+

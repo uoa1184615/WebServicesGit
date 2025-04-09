@@ -1,0 +1,26 @@
+Comment: Exercise 8.2 ( heat exchanger) from MEDiCS1
+ AJR, 3 Apr 2025; 
+in_tex "../../invariantManifold.tex"$
+on div;
+factor small;
+
+%invariantmanifold( {x},
+%    mat((-diff(u1,x)+(u2-u1)
+%        ,+diff(u2,x)+(u1-u2)
+%        )),
+%    mat(( 0 )),
+%    mat( (1/2,1/2) ),
+%    mat( (1,1) ),
+%    3 )$
+
+% spatial evolution away from the left boundary
+invariantmanifold( {tau},
+    mat((-diff(u1,tau)+(u2-u1)
+        ,+diff(u2,tau)+(u2-u1)
+        )),
+    mat(( 0,0 )),
+    mat( (1/2,1/2), (1/2,-1/2) ),
+    mat( (1,0), (0,1) ),
+    5 )$
+
+;end;

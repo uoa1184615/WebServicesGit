@@ -29,7 +29,7 @@ factor s,exp;
 Execute the construction of the centre manifold for Stoleriu's system.
 But use Taylor expansions for trigonometric functions in the \ode{}s, and multiply higher-orders of nonlinearity by~\verb|small| to better (not best) count and manage nonlinearities.
 \begin{reduce}
-invariantmanifold(
+invariantmanifold({},
     mat(( u2,
         sigma*u3+u1^2/2-small*u1^4/24,
         u4,

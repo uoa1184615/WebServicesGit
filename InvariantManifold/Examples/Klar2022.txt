@@ -1,0 +1,107 @@
+% Example of Klar et al 2022, doi:10.1007/s11005-022-01611-5
+% Two critical oscillating modes at P_0=2 with generalised eigenvector.
+% AJR, 2024-12-31
+Comment  to matthias.klar@tum.de, k.matthies@bath.ac.uk, jz@ma.tum.de
+Re: Second-order asymptotic expansion and thermodynamic
+interpretation of a fast–slow Hamiltonian system  
+
+Dear Matthias, Karsten, and Johannes,
+
+I was very interested to read your 2022 article
+"Second-order asymptotic expansion and thermodynamic
+interpretation of a fast–slow Hamiltonian system" as you
+address issues that I have also considered from the
+different viewpoint of a complementary framework.   Namely I
+explore applications of dimensional reduction and
+homogenization using nonlinear coordinate transformations
+that are associated with rigorous invariant manifold theory.
+Like you [p.2] I also seek to "develop mathematical methods
+that reduce the complexity of a given large-scale ...
+microscopic [system] in a rigorous way".
+
+One difference is that I eschew "the limit epsilon->0" as I
+aim to rigorously prove properties at the finite scale
+separation, finite epsilon, of real physics.
+
+An interesting difference is in the terminology of each
+view.  On pp.3--5 you call WKB, averaging, and
+homogenization as "non-projective".   However, I would call
+all of these "projective" because the resultant macro-model
+is independent of the phase of the micro-structures.   Thus
+one is implicitly modelling the ensemble of all phase
+shifts.  I view the resulting macro-models are in essence a
+projection of this ensemble...........more on this later.
+
+Let's look at some details.   Firstly, the WKB approximation
+and its ilk.  My complementary view of these are that they
+are a nonlinear, time-dependent, coordinate transform of
+phase space.   This view is discussed in the attached
+Chapter 3 of my magnum opus "Modelling Emergent Dynamics in
+Complex Systems".   
+
+Note that there is no need for epsilons (although I often
+introduce them for convenience).  But for WKB of Sec 3.7.2 I
+contend the error is more clearly and physically expressed
+in terms of the physical time-derivatives of varying omega.
+
+Similarly, your problem (9) can similarly be analysed and
+modelled.  Indeed my web service
+https://tuck.adelaide.edu.au/gencm.php can do the following
+for anybody who enters the system.   Easiest to have a
+definite form for omega(y) so let's take it to be
+omega:=w0+w1*y.  Entering the system to my web service gives
+the 2nd attached report to order three---order three in
+what?  in some order parameter varepsilon that my web
+service introduces to be reasonably robust, set it to one
+for an approximation for (9).   See s1 and s2 are the slow
+variables corresponding to your y (my u1 & u2).   s3 and s4
+are the slowly varying modulation of the fast oscillations
+in your z (my u3 & u4).   I think this approximation is
+equivalent to what you have on p.8.
+
+With my approach, higher orders are just a matter of
+specifying higher order of error.  For example, the 3rd
+attached is to errors of 'order five'.  As you write on
+p.29, "a higher-order asymptotic expansion is of interest,
+as the scale parameter epsilon is ... in many applications
+small but finite."
+
+One big problem with all this nice asymptotics, both mine
+and yours, is the following.   The slow manifold we assume
+probably does not exist!  For a beautiful sobering example
+see Lorenz & Krishnamurthy (1987). “On the non-existence of
+a slow manifold”. In: J. Atmos. Sci. 44, pp. 2940–2950.  
+Also see the discussion in the 4th attached Chapter 13 of 
+my book (especially the backward theory conjectures).
+
+Now let's turn to homogenization like you introduced on p.4.
+The 5th attached is a paper on how analysing the ensemble
+of all phase shifts leads to a rigorous homogenization, of
+arbitrary order accuracy, of not just periodic
+micro-structure but also of general quasi-periodic
+micro-structure.   Further, the example indicates that the
+asymptotics converge down to a length-scale of just twice
+the longest micro-period---a real-physics finite epsilon!
+
+This then led me to synthesise in the 6th attached a broad
+ranging synthesis of a rigorous approach to macroscale
+modelling.
+
+This email is long enough.  I hope you and colleagues find
+this alternative complementary view of interest and use,
+;
+in_tex "../invariantManifold.tex"$
+on div;
+factor i,s;
+omega :=w_0+w_1*u1; 
+omegad:=w_1;
+invariantmanifold(
+    mat((u2, -omega*omegad*u3^2, omega*u4, -omega*u3)),
+    mat(( 0,0,w_0*i,-w_0*i )),
+    mat( (1,0,0,0),(0,1,0,0),(0,0,1/2,i/2),(0,0,1/2,-i/2) ),
+    mat( (1,0,0,0),(0,1,0,0),(0,0,1,i),(0,0,1,-i) ),
+    5 )$
+
+
+end;
+

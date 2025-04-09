@@ -26,7 +26,7 @@ factor s,exp,a,mu,nu;
 \end{reduce}
 Execute the construction of the slow manifold for this system (ignore the warning messages about \verb|u1| declared, and then already defined, as an operator).
 \begin{reduce}
-invariantmanifold(
+invariantmanifold({},
     mat(( -u1-(sqrt(2)+small*a)*u1(3*pi/4)
     +mu*u1(3*pi/4)^2 +small*nu*u1(3*pi/4)^3 )),
     mat((i,-i)),

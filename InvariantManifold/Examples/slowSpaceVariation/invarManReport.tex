@@ -1,0 +1,65 @@
+\documentclass[11pt,a5paper]{article}
+\usepackage[a5paper,margin=13mm]{geometry}
+\usepackage{parskip,time,verbatim} \def\_{_}
+\raggedright \def\eps{\varepsilon}
+\def\diff{\partial\makebox[0pt]{\ $\cdot$}}
+\title{Invariant manifold of your dynamical system}
+\author{A. J. Roberts, University of Adelaide\\
+\texttt{http://orcid.org/0000-0001-8930-1552}}
+\date{\now, \today}
+\begin{document}
+\maketitle
+Throughout and generally: the lowest order, most
+important, terms are near the end of each expression.
+\par\leftskip=2em  \parindent=-2em
+\input{invarManReportSys}
+
+off echo;
+
+\(
+\)
+\paragraph{The invariant manifold}
+These give the location of the invariant manifold in
+terms of parameters~\(s\_ j\).
+\(
+\)\par
+\(u_{1}=O\big(\varepsilon ^{4}\big)+1/2 s_{2}+1/2 s_{1}
+\)\par
+\(u_{2}=O\big(\varepsilon ^{4}\big)-1/2 s_{2}+1/2 s_{1}
+\)\par
+\(
+\)
+\paragraph{Invariant manifold ODEs}
+The system evolves on the invariant manifold such
+that the parameters evolve according to these ODEs.
+\(
+\)\par
+\(\dot s_{1}=\eps \big(-\frac{{\rm d}\,s_{2}}{{\rm d}\,z}-2 s_{2}\big)+O
+\big(\varepsilon ^{5}\big)
+\)\par
+\(\dot s_{2}=-\eps \frac{{\rm d}\,s_{1}}{{\rm d}\,z}+O\big(\varepsilon ^{5
+}\big)
+\)\par
+\(
+\)
+\paragraph{Normals to isochrons at the slow manifold}
+Use these vectors: to project initial conditions
+onto the slow manifold; to project non-autonomous
+forcing onto the slow evolution; to predict the
+consequences of modifying the original system; in
+uncertainty quantification to quantify effects on
+the model of uncertainties in the original system.
+The normal vector \(\vec z\_j:=(z\_{j1},\ldots,z\_{jn})\)
+\(
+\)\par
+\(z_{11}=O\big(\varepsilon ^{5}\big)+1
+\)\par
+\(z_{12}=O\big(\varepsilon ^{5}\big)+1
+\)\par
+\(z_{21}=O\big(\varepsilon ^{5}\big)+1
+\)\par
+\(z_{22}=O\big(\varepsilon ^{5}\big)-1
+\)\par
+\(
+\)\par
+\end{document}

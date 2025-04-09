@@ -29,7 +29,7 @@ factor small;
 \end{reduce}
 The following code makes the linear damping to be effectively small (which then makes it \verb|small| squared); consequently, also scale the smallness of the cubic nonlinearity to match.
 \begin{reduce}
-invariantmanifold(
+invariantmanifold({},
     mat(( u3,
           u4,
           -2*u1 +u2 -small*u1^3/2 +small*3/10*(-u3+u4),

@@ -12,8 +12,6 @@ tmp_(1):=coeffn(small*uu,e_(1,1),1)/small +order_(varepsilon^4);
 
 tmp_(2):=coeffn(small*uu,e_(2,1),1)/small +order_(varepsilon^4);
 
-tmp_(3):=coeffn(small*uu,e_(3,1),1)/small +order_(varepsilon^4);
-
 
 write "\)
 \paragraph{Invariant manifold ODEs}
@@ -41,12 +39,8 @@ zs_(1,1):=tmp_zz(1,1)+order_(varepsilon^5);
 
 zs_(1,2):=tmp_zz(1,2)+order_(varepsilon^5);
 
-zs_(1,3):=tmp_zz(1,3)+order_(varepsilon^5);
-
 zs_(2,1):=tmp_zz(2,1)+order_(varepsilon^5);
 
 zs_(2,2):=tmp_zz(2,2)+order_(varepsilon^5);
-
-zs_(2,3):=tmp_zz(2,3)+order_(varepsilon^5);
 
 ;end;

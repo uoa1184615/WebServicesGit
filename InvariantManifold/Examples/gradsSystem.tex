@@ -1,0 +1,109 @@
+%!TEX root = ../diverseExamples.tex
+\subsection{\texttt{gradsSystem}: spatiotemporal long-waves in Grad's system} 
+\label{gradsSystem}
+
+This is Example~B from ``Dynamically Optimal Projection onto Slow Spectral Manifolds for Linear Systems'' by Kogelbauer and Karlin (2025). The \pde{}s are apparently a classical system in kinetic theory. Variables are the pressure~\(u_1\), velocity~\(u_2\), and stress~\(u_3\). What are the \pde{}s for the long-wave pressure-velocity waves? \begin{align*}
+&\D t{u_1}=-\tfrac53\D x{u_1}\,,
+\\&\D t{u_2}=-\D x{u_1}-\D x{u_3}\,,
+\\&\D t{u_3}=-\tfrac43\D x{u_2}-u_3/\epsilon\,.
+\end{align*}
+
+The linearisation for \emph{gradual} variations in space is to then neglect the spatial derivatives: \(\D t{u_1}=\D t{u_2}=0\) and \(\D t{u_3}=-u_3/\epsilon\) which decays to quasi-equilibria quite `rapidly'.
+Simply, the pressure and velocity are slow variables.
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+\end{reduce}
+In the printed output, group terms depending upon order of spatial derivatives (which are assumed `small').
+\begin{reduce}
+factor small;
+\end{reduce}
+The following procedure call constructs the slow manifold for this system to errors~\Ord{\partial_x^5}.
+\begin{reduce}
+invariantmanifold( {x},
+    mat((-5/3*diff(u2,x)
+        ,-diff(u1,x)-diff(u3,x)
+        ,-4/3*diff(u2,x)-u3/epsilon
+        )),
+    mat(( 0,0 )),
+    mat( (1,0,0),(0,1,0) ),
+    mat( (1,0,0),(0,1,0) ),
+    5 )$
+end;
+\end{reduce}
+
+
+The procedure then actually analyses the parametrised system
+\begin{align*}&
+\D t{u_{1}}=-5/3 \eps \frac{{\rm d}\,u\_2}{{\rm d}\,x}\,,
+\\&
+\D t{u_{2}}=\eps \big(-\frac{{\rm d}\,u\_1}{{\rm d}\,x}-\frac{{\rm d}\,
+u\_3}{{\rm d}\,x}\big) ,
+\\&
+\D t{u_{3}}=-4/3 \eps \frac{{\rm d}\,u\_2}{{\rm d}\,x}-\epsilon ^{-1} 
+u\_3 \,.
+\end{align*}
+Be wary of the distinction between the system parameter~\(\epsilon\), and the procedure's artificial parameter~\(\eps\)\ that counts the number of spatial derivatives in each term.
+
+
+\paragraph{The invariant manifold} 
+The slow manifold is expressed in terms of a series in space derivatives of parameters~\(s\_ j:=u_j\)---the pressure and velocity.
+\begin{align*}&
+u_{1}={ O\big(\varepsilon ^{4}\big)+s_{1}
+}\\&
+u_{2}={ O\big(\varepsilon ^{4}\big)+s_{2}
+}\\&
+u_{3}={ -4/9 \eps^{3} \frac{{\rm d}^{3}s_{2}}{{\rm d}x^{3}} \epsilon ^{3}-
+4/3 \eps^{2} \frac{{\rm d}^{2}s_{1}}{{\rm d}x^{2}} \epsilon ^{2}-4/3 
+\eps \frac{{\rm d}\,s_{2}}{{\rm d}\,x} \epsilon +O\big(\varepsilon ^{4}
+\big)
+}\end{align*}
+
+ 
+\paragraph{Invariant manifold PDEs} 
+The system evolves according to these two \pde\ that describes the effective long-wave dynamics with higher-order wave dispersion:
+\begin{align*}&
+\D t{s_{1}}={ -5/3 \eps \frac{{\rm d}\,s_{2}}{{\rm d}\,x}+O\big(
+\varepsilon ^{5}\big),
+}\\&
+\D t{s_{1}}={ 4/9 \eps^{4} \frac{{\rm d}^{4}s_{2}}{{\rm d}x^{4}} \epsilon 
+^{3}+4/3 \eps^{3} \frac{{\rm d}^{3}s_{1}}{{\rm d}x^{3}} \epsilon ^{2}+4/
+3 \eps^{2} \frac{{\rm d}^{2}s_{2}}{{\rm d}x^{2}} \epsilon -\eps \frac{
+{\rm d}\,s_{1}}{{\rm d}\,x}+O\big(\varepsilon ^{5}\big)
+}\end{align*}
+
+
+
+\paragraph{Project initial conditions et al.}
+To project initial conditions
+onto the slow manifold, or non-autonomous
+forcing, or modifications of the original system, or to quantify uncertainty \cite[Ch.12]{Roberts89b, Roberts97b, Roberts2014a}, use the projection defined by the following two derived vectors.
+\begin{align*}&
+\zv_1=\begin{bmatrix}z_{11}\\z_{12}\\z_{13}\end{bmatrix}
+=\begin{bmatrix}
+{ -20/9 \eps^{4} \diff_{x}^{4} \epsilon ^{4}+O\big(\varepsilon ^{5}
+\big)+1
+}\\[1ex]
+{ -20/9 \eps^{3} \diff_{x}^{3} \epsilon ^{3}+O\big(\varepsilon ^{5}
+\big)
+}\\[1ex]
+{ 35/9 \eps^{4} \diff_{x}^{4} \epsilon ^{4}-5/3 \eps^{2} \diff_{x}
+^{2} \epsilon ^{2}+O\big(\varepsilon ^{5}\big)
+}
+\end{bmatrix},
+\\&
+\zv_2=\begin{bmatrix}z_{21}\\z_{22}\\z_{23}\end{bmatrix}
+=\begin{bmatrix}
+{ -4/3 \eps^{3} \diff_{x}^{3} \epsilon ^{3}+O\big(\varepsilon ^{5}
+\big)
+}\\[1ex]
+{ 8/9 \eps^{4} \diff_{x}^{4} \epsilon ^{4}-4/3 \eps^{2} \diff_{x}^{
+2} \epsilon ^{2}+O\big(\varepsilon ^{5}\big)+1
+}\\[1ex]
+{ \eps^{3} \diff_{x}^{3} \epsilon ^{3}-\eps \diff_{x} \epsilon +O
+\big(\varepsilon ^{5}\big)
+}
+\end{bmatrix}.
+\end{align*}
+

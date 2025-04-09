@@ -53,7 +53,7 @@ w:=1;
 \subsubsection{Time dependent reparametrisation of entire state space}
 Each of the three oscillators have identical frequency of one, and the  damping is numerically small, so get the procedure to treat as small by giving unperturbed eigenvalues and eigenvectors.
 \begin{reduce}
-invariantmanifold(odes,
+invariantmanifold({},    odes,
     mat(( i,-i,i,-i,i,-i)),
     mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0),
          (0,0,1,+i,0,0), (0,0,1,-i,0,0),
@@ -151,7 +151,7 @@ _{6} s_{3}^{2}-\tfrac{3}{10} s_{5}^{2} s_{4}+\tfrac{3}{5} s_{5} s_{4} s_{3}
 Here suppose damping~\(c_1\) is significantly smaller than the other damping.  Hence here consider the first oscillator as dominantly the `master' mode.  First, analyse for general frequency~\(\omega\) by `clearing'~\verb|w|.
 \begin{reduce}
 clear w;
-invariantmanifold(odes,
+invariantmanifold({},    odes,
     mat(( i,-i)),
     mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
         ),
@@ -230,7 +230,7 @@ These evolution equations only show nonlinear frequency modification and the dam
 So here, set forcing frequency back to one and re-analyse.
 \begin{reduce}
 w:=1;
-invariantmanifold(odes,
+invariantmanifold({},    odes,
     mat(( i,-i)),
     mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
         ),
@@ -264,7 +264,7 @@ let { df(a,t)=>-wd*b, df(b,t)=>wd*a, wd^3=>0 };
 \end{reduce}
 Construct the invariant manifold for detuned forcing and find little difference, just a slowly modulating forcing through~\(a(t),b(t)\).
 \begin{reduce}
-invariantmanifold(odes,
+invariantmanifold({},    odes,
     mat(( i,-i)),
     mat( (1,+i,0,0,0,0), (1,-i,0,0,0,0)
         ),

@@ -17,7 +17,7 @@ in_tex "../invariantManifold.tex"$
 Execute the construction of the slow manifold for this system.
 The explicit parameter~\verb|small|, math-name~\(\eps\), gets replaced by~\verb|small^2| in the code, so in effect \(\eps^2=\epsilon\)\,.
 \begin{reduce}
-invariantmanifold(
+invariantmanifold({},
     mat(( u2-small*u1,
          -u2+small*(u1-u2+u3),
          -u3+small*(u2-u3+u4),

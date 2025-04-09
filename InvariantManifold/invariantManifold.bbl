@@ -1,5 +1,11 @@
 \begin{thebibliography}{xx}
 
+\harvarditem{Bunder \harvardand\ Roberts}{2021}{Bunder2018a}
+Bunder, J.~E. \harvardand\ Roberts, A.~J.  \harvardyearleft
+  2021\harvardyearright , `Nonlinear emergent macroscale {PDEs}, with error
+  bound, for nonlinear microscale systems', {\em Springer Nature Applied
+  Sciences} {\bf 3}(703),~1--28.
+
 \harvarditem{Carr}{1981}{Carr81}
 Carr, J.  \harvardyearleft 1981\harvardyearright , {\em Applications of centre
   manifold theory}, Vol.~35 of {\em Applied Math. Sci.}, Springer--Verlag.
@@ -27,6 +33,11 @@ Haragus, M. \harvardand\ Iooss, G.  \harvardyearleft 2011\harvardyearright ,
   {\em Local Bifurcations, Center Manifolds, and Normal Forms in
   Infinite-Dimensional Dynamical Systems}, Springer.
 
+\harvarditem{Roberts}{1988}{Roberts88a}
+Roberts, A.~J.  \harvardyearleft 1988\harvardyearright , `The application of
+  centre manifold theory to the evolution of systems which vary slowly in
+  space', {\em J.~Austral. Math. Soc.~B} {\bf 29},~480--500.
+
 \harvarditem{Roberts}{1989{\em a}}{Roberts89b}
 Roberts, A.~J.  \harvardyearleft 1989{\em a}\harvardyearright , `Appropriate
   initial conditions for asymptotic descriptions of the long term evolution of
@@ -47,10 +58,15 @@ Roberts, A.~J.  \harvardyearleft 2000\harvardyearright , `Computer algebra
   derives correct initial conditions for low-dimensional dynamical models',
   {\em Computer Phys. Comm.} {\bf 126}(3),~187--206.
 
-\harvarditem{Roberts}{2015}{Roberts2014a}
-Roberts, A.~J.  \harvardyearleft 2015\harvardyearright , {\em Model emergent
-  dynamics in complex systems}, SIAM, Philadelphia.
-\newline\harvardurl{http://bookstore.siam.org/mm20/}
+\harvarditem{Roberts}{2015{\em a}}{Roberts2013a}
+Roberts, A.~J.  \harvardyearleft 2015{\em a}\harvardyearright , `Macroscale,
+  slowly varying, models emerge from the microscale dynamics in long thin
+  domains', {\em IMA Journal of Applied Mathematics} {\bf 80}(5),~1492--1518.
+
+\harvarditem{Roberts}{2015{\em b}}{Roberts2014a}
+Roberts, A.~J.  \harvardyearleft 2015{\em b}\harvardyearright , {\em Model
+  emergent dynamics in complex systems}, SIAM, Philadelphia.
+\newline\harvardurl{https://epubs.siam.org/doi/10.1137/1.9781611973563}
 
 \harvarditem{Roberts}{2022}{Roberts2018a}
 Roberts, A.~J.  \harvardyearleft 2022\harvardyearright , Backwards theory

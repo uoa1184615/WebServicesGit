@@ -5,7 +5,7 @@
 % is to replace "0" with say "small^9"
 in_tex "../invariantManifold.tex"$
 factor i,small;
-invariantmanifold(
+invariantmanifold({},
     mat((u2
     ,-(1/4+u3+2*u4*cos(t))*u1
     ,0,0)),

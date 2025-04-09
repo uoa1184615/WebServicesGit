@@ -39,22 +39,21 @@ Sciences, University of Adelaide, South Australia~5005,
 \begin{abstract}
 This procedure constructs a specified invariant manifold for
 a specified system of ordinary differential equations or
-delay differential equations, or partial differential
-equations where the spatial gradients are small. The
-invariant manifold may be any of a centre manifold, a slow
-manifold, an un/stable manifold, a sub-centre manifold, a
-nonlinear normal form, any spectral submanifold, or indeed a
-normal form coordinate transform of the entire state space.
-Thus the procedure may be used to analyse pitchfork
-bifurcations, or oscillatory Hopf bifurcations, or any more
-complicated superposition. In the cases when the neglected
-spectral modes all decay, the constructed invariant manifold
-supplies a faithful large time model of the dynamics of the
-differential equations. Further, in the case of a slow
-manifold, this procedure now derives vectors defining the
-projection onto the invariant manifold along the isochrons:
-this projection is needed for initial conditions, forcing,
-system modifications, and uncertainty quantification.
+delay differential equations. The invariant manifold may be
+any of a centre manifold, a slow manifold, an un/stable
+manifold, a sub-centre manifold, a nonlinear normal form,
+any spectral submanifold, or indeed a normal form coordinate
+transform of the entire state space. Thus the procedure may
+be used to analyse pitchfork bifurcations, or oscillatory
+Hopf bifurcations, or any more complicated superposition. In
+the cases when the neglected spectral modes all decay, the
+constructed invariant manifold supplies a faithful large
+time model of the dynamics of the differential equations.
+Further, in the case of a slow manifold, this procedure now
+derives vectors defining the projection onto the invariant
+manifold along the isochrons: this projection is needed for
+initial conditions, forcing, system modifications, and
+uncertainty quantification.
 \end{abstract}
 
 \tableofcontents
@@ -82,21 +81,13 @@ specific dynamical system by executing the following command
 with specific values for the input parameters.  See
 \verb|diverseExamples.pdf| for many examples.
 \begin{verbatim}
-invariantmanifold(spacex, odefns, evals, evecs, 
-    adjvecs, toosmall);
+invariantmanifold(odefns, evals, evecs, adjvecs, toosmall);
 \end{verbatim}
 
 \paragraph{Inputs}
 As in the example of the next \cref{ss:eg}, the input
 parameters to the procedure are the following:
 \begin{itemize}
-
-\item \verb|spacex|: for \textsc{ode}s provide the empty
-list~``\verb|{}|''; for \textsc{pde}s with large-scale,
-gradual, variations in some `space' variables then specify
-the list of space variables, for example \verb|{x,y}|
-denotes that there are `spatial' gradients in
-variables~\(x,y\), gradients that will be treated as small.
 
 \item \verb|odefns|, a comma separated list within
 \verb|mat((...))|, the \textsc{rhs} expressions of the
@@ -109,14 +100,6 @@ any time delayed variables in the \textsc{rhs} are coded by
 the time-delay in parenthesises after the variable, as in
 the example~\verb|u1(pi/2)| to represent~\(u_1(t-\pi/2)\) in
 the \textsc{dde}s;
-
-any `spatial' derivatives \emph{must} be specified using a
-\verb|diff()| operator (currently with at most three
-arguments)---examples are \(\verb|diff(u1,x)|=\D x{u_1}\),
-\  \(\verb|diff(u3,x,y)|=\Dx xy{u_3}\),
-\  \(\verb|diff(u2,x,4)|=\Dn x4{u_2}\).
-
-% Maybe use rlfi's pdf instead of diff?  But it does not handle pdf(x)!
 
 \item \verb|evals|, a comma separated list within
 \verb|mat((...))|, the eigenvalues of the modes to be the
@@ -202,11 +185,10 @@ developed from a coordinate-independent algorithm for
 constructing centre manifolds originally by
 \cite{Coullet83}, adapted for human-efficient computer
 algebra by \cite{Roberts96a}, extended to invariant\slash
-inertial manifolds \cite[]{Roberts89, Foias88b}, extended to
-the evolution of gradually varying patterns in space
-\cite[]{Roberts88a, Roberts2013a, Bunder2018a}; and further 
-extended to the projection of initial conditions, forcing, 
-uncertainty, etc \cite[]{Roberts89b, Roberts97b}.
+inertial manifolds \cite[]{Roberts89, Foias88b}, and further
+extended to the projection of initial conditions, forcing,
+uncertainty via the innovations of \cite{Roberts89b,
+Roberts97b}.
 
 We use the computer algebra package \emph{Reduce} 
 [\url{http://reduce-algebra.com/}] because it is both free 
@@ -225,7 +207,7 @@ is specified to be \cite[Example~2.1]{Roberts2014a}
 \end{equation*}
 \begin{reduce}
 procedure exampleslowman;  
-    invariantmanifold({},
+    invariantmanifold(
     mat((-u1+u2-u1^2,u1-u2+u2^2)),
     mat((0)),
     mat((1,1)),
@@ -297,22 +279,11 @@ delays)---currently code a max of nine variables.
 load_package rlfi; 
 operator u1,u2,u3,u4,u5,u6,u7,u8,u9;
 \end{reduce}
-Allow `space' derivatives, to be assumed small, via this
-\verb|diff| operator that has the same syntax as \verb|df()|
-but we need separate name in order to delay Reduce
-processing.
-\begin{reduce}
-operator diff;
-\end{reduce}
-Usually seems best to use the \verb|gcd| option, but
-sometimes worse, so set here in order for a user to
-optionally turn off before invoking the procedure.
+Usually seems best to use the \verb|gcd| option, but sometimes worse, so set here in order for a user to optionally turn off before invoking the procedure.
 \begin{reduce}
 on gcd,ezgcd; 
 \end{reduce}
-%Similarly, try loading LaTeX names of symbols here so that
-%a user can override.  Works to some extent, but do not know
-%how to change u() and s().
+%Similarly, try loading LaTeX names of symbols here so that a user can override.  Works to some extent, but do not know how to change u() and s().
 %\begin{reduce}
 %defid u1,name="u_1"; 
 %defid u2,name="u_2"; 
@@ -320,32 +291,15 @@ on gcd,ezgcd;
 %defid u4,name="u_4"; 
 %\end{reduce}
 
+
 Now define the procedure as an operator so we can define
 procedures internally, and may be flexible with its
-arguments. 
+arguments. \eqref{secFin} marks the end of the procedure.
 \begin{reduce}
 operator invariantmanifold;
-\end{reduce}
-Four or fewer arguments is an error.
-If just five arguments, then assume no `space' variables.
-\begin{reduce}
-IMerrorMsg:="invariantmanifold() Should Have Six Arguments"$
-for all a1,a2,a3,a4 let 
-    invariantmanifold(a1,a2,a3,a4) = <<rederr(IMerrorMsg)>>;
-for all a1,a2,a3,a4,a5 let 
-    invariantmanifold(a1,a2,a3,a4,a5) = begin 
-        write "**** Warning: ",IMerrorMsg;
-        invariantmanifold({},a1,a2,a3,a4,a5);
-        rederr(IMerrorMsg);
-    end;
-\end{reduce}
-
-Define the current procedure with six arguments. 
-\eqref{secFin} marks the end of the procedure.
-\begin{reduce}
-for all spacex, odefns, evals, evecs, adjvecs, toosmall 
-    let invariantmanifold(spacex, odefns, evals, evecs, 
-        adjvecs, toosmall) = begin 
+for all odefns, evals, evecs, adjvecs, toosmall let
+  invariantmanifold(odefns, evals, evecs, adjvecs, toosmall) 
+  = begin 
 \end{reduce}
 
 
@@ -358,12 +312,12 @@ scalars and most matrices to be declared local here.
 \begin{reduce}
 scalar ff, evalm, ee, zz, maxiter, trace, ll, uvec,
 reslin, ok, rhsjact, jacadj, resd, resde, resz, rhsfn,
-pp, est, eyem, m, diffzero;
+pp, est, eyem, m;
 \end{reduce}
 
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 9 Apr 2025)"$
+write "Construct an invariant manifold (version 17 Jun 2023)"$
 \end{reduce}
 
 
@@ -381,12 +335,13 @@ Specific problems may override this default.
 \begin{reduce}
 maxiter:=29$
 \end{reduce}
+%factor small; 
 
 For optional trace printing of test cases: comment out
 second line when not needed.
 \begin{reduce}
 trace:=0$
-%trace:=1; maxiter:=9; %%%%
+%trace:=1; maxiter:=5; 
 \end{reduce}
 
 
@@ -456,23 +411,6 @@ Need an \(m\times m\)~identity matrix for normalisation of
 the isochron projection.
 \begin{reduce}
 eyem:=for j:=1:m sum e_(j,j)$
-\end{reduce}
-
-
-
-\subsection{Define time and optional space dependencies}
-\begin{reduce}
-if trace then write "creating depends upon spacex";
-for j:=1:9 do begin
-    depend mkid(u,j),t;
-    foreach z_ in spacex do depend mkid(u,j),z_;
-end;
-\end{reduce}
-Also set rules when needed to omit \verb|diff| terms,
-currently coded up to five arguments.
-\begin{reduce}
-diffzero:={ diff(~a)=>0, diff(~a,~b)=>0, diff(~a,~b,~c)=>0
-    , diff(~a,~b,~c,~d)=>0, diff(~a,~b,~c,~d,~e)=>0 };
 \end{reduce}
 
 
@@ -584,15 +522,15 @@ For the moment limit to a maximum of nine \ode{}s.
 \begin{reduce}
 if trace then write "setting somerules";
 somerules:={}$
-somerules:=(u1(~dt)=d_(u1,t,dt)).somerules$
-somerules:=(u2(~dt)=d_(u2,t,dt)).somerules$
-somerules:=(u3(~dt)=d_(u3,t,dt)).somerules$
-somerules:=(u4(~dt)=d_(u4,t,dt)).somerules$
-somerules:=(u5(~dt)=d_(u5,t,dt)).somerules$
-somerules:=(u6(~dt)=d_(u6,t,dt)).somerules$
-somerules:=(u7(~dt)=d_(u7,t,dt)).somerules$
-somerules:=(u8(~dt)=d_(u8,t,dt)).somerules$
-somerules:=(u9(~dt)=d_(u9,t,dt)).somerules$
+depend u1,t; somerules:=(u1(~dt)=d_(u1,t,dt)).somerules$
+depend u2,t; somerules:=(u2(~dt)=d_(u2,t,dt)).somerules$
+depend u3,t; somerules:=(u3(~dt)=d_(u3,t,dt)).somerules$
+depend u4,t; somerules:=(u4(~dt)=d_(u4,t,dt)).somerules$
+depend u5,t; somerules:=(u5(~dt)=d_(u5,t,dt)).somerules$
+depend u6,t; somerules:=(u6(~dt)=d_(u6,t,dt)).somerules$
+depend u7,t; somerules:=(u7(~dt)=d_(u7,t,dt)).somerules$
+depend u8,t; somerules:=(u8(~dt)=d_(u8,t,dt)).somerules$
+depend u9,t; somerules:=(u9(~dt)=d_(u9,t,dt)).somerules$
 ff:=(ff where somerules)$
 \end{reduce}
 
@@ -613,7 +551,7 @@ uzero:=(for k:=1:n collect (mkid(u,k)=0))$
 equilibrium:=(small=0).uzero$
 for j:=1:n do for k:=1:n do begin 
   ll(j,k):=df(ff(j,1),mkid(u,k));
-  ll(j,k):=( sub(equilibrium,ll(j,k)) where diffzero );
+  ll(j,k):=sub(equilibrium,ll(j,k));
 end;
 write "Find the linear operator is";
 write ll:=ll;
@@ -638,8 +576,7 @@ for j:=1:m do for k:=1:m do aa_(j,k):=0;
 for j:=1:m do aa_(j,j):=eval_(j);
 % following maybe only for pure centre modes??
 reslin:=(ll*(ee*dexp_)-(ee*dexp_)*aa_
-    where exp(~a)*d_(1,t,~dt)
-    =>sub(t=-dt,cos(-i*a)+i*sin(-i*a))*exp(a) )$ 
+    where exp(~a)*d_(1,t,~dt)=>sub(t=-dt,cos(-i*a)+i*sin(-i*a))*exp(a) )$ 
 if trace then write reslin:=reslin;
 ok:=1$
 for j:=1:n do for k:=1:m do 
@@ -684,26 +621,26 @@ if not ok then << write
 \subsection{Ameliorate the nonlinearity}
 
 Anything not in the linear operator gets multiplied by
-\verb|small| to be treated as small in the analysis. 
+\verb|small| to be treated as small in the analysis. The
+feature of the second alternative is that when a user
+invokes~\verb|small| then the power of smallness is not then
+changed; however, causes issues in the relative scaling of
+some terms, so restore to the original version. This might
+need reconsidering.  The current \verb|if| always chooses
+the first simple alternative.
 \begin{reduce}
 somerules:=for j:=1:n collect 
   (d_(1,t,~dt)*mkid(u,j)=d_(mkid(u,j),t,dt))$
-ll0_:=(ll*uvec where somerules); 
-ffnondiff:=(ff where diffzero);
-procedure scalediff(z_);
-    (z_ where {diff(~a,~b)=>small*df(a,b) 
-        , diff(~a,~b,~n)=>small^n*df(a,b,n) when fixp(n)
-        , diff(~a,~b,~c)=>small^2*df(a,b,c) when not fixp(c)
-        });
-ffdiff:=map(scalediff(~z),ff-ffnondiff);
-ff:=small*ffnondiff
-    +(1-small)*ll0_
-    +ffdiff;
+ll0_:=(ll*uvec where somerules)$
+ff:=(if 1 then small*ff
+           else ff-(1-small)*sub(small=0,ff)) 
+    +(1-small)*ll0_$
 \end{reduce}
 
 Any constant term in the equations~\verb|ff| has to be
 multiplied by~\verb|exp(0)|.
 \begin{reduce}
+%ff0:=(ff where uzero)$ % obliterates u1,... as operators
 ff:=ff+(exp(0)-1)*sub(uzero,ff)$
 \end{reduce}
 
@@ -720,7 +657,7 @@ Also, create the algebraic form of the jacobian transpose
 using the matrix basis: take the conjugate later when used.
 \begin{reduce}
 rhsjact:=for i:=1:n sum for j:=1:n sum 
-    e_(j,i)*df(ff(i,1),mkid(u,j));
+    e_(j,i)*df(ff(i,1),mkid(u,j))$
 \end{reduce}
 
 
@@ -942,24 +879,6 @@ let { l1_inv(e_(~j,~k)*exp(~a),exp)
 \end{reduce}
 
 
-\subsection{Projection onto slow manifold for PDE case}
-Now that we have finished with \verb|diff|, repurpose 
-it for the bare differentiation operator needed for the 
-projection vectors.  This seems to work for 1-D space PDEs, 
-but needs checking.   
-\begin{reduce}
-if spacex neq {} then
-let { df(~a,~x,~b)=>diff(x) when a=b 
-    , df(~a,~x,~n,~b)=>diff(x)^n when a=b and fixp(n)
-    , df(~a,~x,~y,~b)=>diff(x)*diff(y) when a=b and not fixp(y)
-    , df(~a,~x,~n,~y,~b)=>diff(x)^n*diff(y) 
-        when a=b and fixp(n) and not fixp(y)
-    , df(~a,~x,~y,~n,~b)=>diff(x)*diff(y)^n 
-        when a=b and not fixp(y) and fixp(n)
-    , df(~a,~x,~y,~z,~b)=>diff(x)*diff(y)*diff(z) 
-        when a=b and not fixp(y) and not fixp(z)
-    }; 
-\end{reduce}
 
 
 
@@ -1021,12 +940,8 @@ defid Psi,name=Psi;
 defid Omega,name=Omega;
 \end{reduce}
 
-For the variables names I use, as operators, define how they
-appear in the \LaTeX, and also define that their arguments
-appear as subscripts.
+For the variables names I use, as operators, define how they appear in the \LaTeX, and also define that their arguments appear as subscripts.
 \begin{reduce}
-defindex diff(down);
-defid diff,name="\diff";
 defindex e_(down,down);
 defid e_,name="e";
 defindex d_(arg,down,down);
@@ -1067,12 +982,11 @@ for k:=1:m do tmp_z(k):=
 
 We have to be shifty here because \verb|rlfi| does not work
 inside a loop: so write the commands to a file, and then
-input the file.   Unclear why \verb|off echo| needed after 2021.
+input the file.
 \begin{reduce}
 out "scratchfile.red";
-write "off echo;"$ 
+write "off echo;"$  % do not understand why needed in 2021??
 write "write ""\)
-\IfFileExists{cmsys.red}{\verbatiminput{cmsys.red}}{}
 \paragraph{The specified dynamical system}
 \("";";
 for j:=1:n do write "tmp_(",j,"):=
@@ -1120,7 +1034,6 @@ similarly for \verb|uu| the constructed invariant manifold.
 \begin{reduce}
 clear gg;
 clear s; operator s; depend s,t;
-foreach z_ in spacex do depend s,z_;
 let df(s(~j),t)=>coeffn(gg,e_(j,1),1);
 \end{reduce}
 
@@ -1140,8 +1053,8 @@ evolving as they are either slow modes, or the complex
 amplitudes of oscillating modes.
 \begin{reduce}
 uu:=for j:=1:m sum s(j)*exp(eval_(j)*t)
-  *(for k:=1:n sum e_(k,1)*ee(k,j));
-gg:=0;
+  *(for k:=1:n sum e_(k,1)*ee(k,j))$
+gg:=0$
 if trace then write uu:=uu;
 \end{reduce}
 
@@ -1149,9 +1062,9 @@ For some temporary trace printing, where for simplicity
 \verb|small| is replaced by~\verb|s|.
 \begin{reduce}
 procedure matify_(a,m,n)$
-  begin matrix z_(m,n);
-    for i:=1:m do for j:=1:n do z_(i,j):=coeffn(a,e_(i,j),1);
-    return (z_ where {exp(0)=>1,small=>s}); 
+  begin matrix z(m,n);
+    for i:=1:m do for j:=1:n do z(i,j):=coeffn(a,e_(i,j),1);
+    return (z where {exp(0)=>1,small=>s}); 
     end$
 \end{reduce}
 
@@ -1423,7 +1336,7 @@ forcing onto the slow evolution; to predict the
 consequences of modifying the original system; in
 uncertainty quantification to quantify effects on
 the model of uncertainties in the original system.
-The normal vector \(\vec z_j:=(z_{j1},\ldots,z_{jn})\)
+The normal vector \(\vec z_ j:=(z_{j1},\ldots,z_{jn})\)
 \("";";
   for i:=1:m do for j:=1:n do 
   write "zs_(",i,",",j,"):=tmp_zz(",i,",",j
@@ -1439,7 +1352,6 @@ shut "scratchfile.red";
 
 Execute the scratchfile with the required commands, with
 output to the main invariant manifold LaTeX file.
-\verb|revpri| makes no difference to the \LaTeX\ output!
 \begin{reduce}
 out "invarManReport.tex"$
 on latex$
@@ -1519,9 +1431,8 @@ symbolic procedure latexon;
   !*raise:=nil;
   prin2t "\documentclass[11pt,a5paper]{article}";
   prin2t "\usepackage[a5paper,margin=13mm]{geometry}";
-  prin2t "\usepackage{parskip,time,verbatim} \def\_{_}"; 
-  prin2t "\raggedright \def\eps{\varepsilon}";
-  prin2t "\def\diff{\partial\makebox[0pt]{\ $\cdot$}}";
+  prin2t "\usepackage{parskip,time} \raggedright";
+  prin2t "\def\eps{\varepsilon} \def\_{_}";
   prin2t "\title{Invariant manifold of your dynamical system}";
   prin2t "\author{A. J. Roberts, University of Adelaide\\";
   prin2t "\texttt{http://orcid.org/0000-0001-8930-1552}}";

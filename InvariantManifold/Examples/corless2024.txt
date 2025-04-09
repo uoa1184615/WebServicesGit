@@ -1,0 +1,16 @@
+% Simple example of Robert Corless 2024 "Perturbation
+% methods using backward error" 21/5/2024  Herein 16th order
+% in epsilon=small^2 is computed in 39 seconds, whereas RC
+% took 35 minutes.
+in_tex "../invariantManifold.tex"$
+factor i,small;
+invariantmanifold(
+    mat((u2
+    ,-u1+small*u2*(1-4/3*u2^2)
+    )),
+    mat(( i,-i )),
+    mat( (1,i),(1,-i) ),
+    mat( (1,i),(1,-i) ),
+    32 )$
+end;
+

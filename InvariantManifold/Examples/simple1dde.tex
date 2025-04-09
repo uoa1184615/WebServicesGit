@@ -19,7 +19,7 @@ factor s,exp,a;
 \end{reduce}
 Execute the construction of the slow manifold for this system (ignore the warning messages about \verb|u1| declared, and then already defined, as an operator).
 \begin{reduce}
-invariantmanifold(
+invariantmanifold({},
     mat(( -(1+small*a)*(1+u1)*u1(pi/2) )),
     mat((i,-i)),
     mat((1),(1)),
