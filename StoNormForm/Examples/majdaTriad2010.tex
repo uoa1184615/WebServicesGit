@@ -1,0 +1,90 @@
+%!TEX root = ../manyExamples.tex
+\subsection{\texttt{majdaTriad2010}: Majda's triad model} 
+\label{majdaTriad2010}
+
+
+Falasca (2025) \cite{Majda2010} investigated averaging in  3D \sde\ systems.
+Let's compare with their stochastic normal form.
+
+
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../stoNormForm.tex"$
+\end{reduce}
+The system uses parameters~\(L_j\) so define
+\begin{reduce}
+operator l; defindex l(down);
+\end{reduce}
+
+The additive triad model of Falasca (2025) \cite{Majda2010} consists of three modes, 
+$x_1$, $x_2$~and~$x_3$.
+However, these now evolve in time according to
+\begin{align*}&
+	\frac{dx_1}{dt}=b_1x_2x_3\,,
+	\\&
+	\frac{dx_2}{dt}=-x_2+b_2x_1x_3+\sigma_2\dot W_2\,,
+	\\&
+	\frac{dx_3}{dt}=-x_3+b_3x_1x_2+\sigma_3\dot W_3\,,
+\end{align*}
+where $b_j$~and~$\sigma_j$ are some constants, and there is independent stochastic forcing of the second and third modes.
+Here I have already scaled the equations so that the rate of decay of \emph{both} the second and third mode is one.\footnote{In contrast, \cite{Majda02} set the two modes to have different decay rates.
+Do not expect much difference in using the same decay rate, it is just more convenient that the memory convolutions are then identical for the two modes rather than being different.
+Having the decay rates the same is also closer to my expected application to spatial problems.} Thus on long time scales we expect the second and third modes to be essentially negligible and the system to be modelled by the relatively slow evolution of the first mode.
+This section constructs the stochastic normal form of its centre manifold model as the basis for a model over long time scales with new noise processes.
+
+The procedure \verb|stonormalform| is already loaded.
+Write a message saying we are now analysing the next system.
+\begin{reduce}
+write "**** Additive Triad system of Majda (2002) ****";
+\end{reduce}
+Execute the construction of a normal form for this system using \(x_1=x_1\)\,, \(y_j=x_{j+1}\)\,.
+\begin{reduce}
+factor ii,small,sigma;
+stonormalform(
+    { l(11)*x(1)+l(12)*y(1)+l(13)*y(2) +ii*x(1)*y(1) },
+    { -y(1)-l(12)*x(1)-ii*x(1)^2+w(2),
+      -y(2)-l(13)*x(1)+w(3) },
+    {},
+    3, cman )$
+end; % finish here if not before
+\end{reduce}
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}=ii \eps x_{1} y_{1}+\eps \big(l_{13} y_{2}+l_{12} y_{1}+l_{11
+} x_{1}\big)
+\\&
+\dot y_{1}=-ii \eps x_{1}^{2}+\sigma  w_{2}-\eps l_{12} x_{1}-y_{1}
+\\&
+\dot y_{2}=\sigma  w_{3}-\eps l_{13} x_{1}-y_{2}
+\end{align*}
+Here, \eps\ counts the order of nonlinearity so that the errors~\Ord{\eps^3} are errors~\Ord{|\xv|^4+\sigma^4} (due to the noise driving fluctuations of size~\(\sigma\)).
+
+
+
+\paragraph{Time dependent centre manifold coordinates}
+\(
+\)\par
+\(y_{1}=-ii \eps X_{1}^{2}+\sigma  \ou\big(w_{2},tt,-1\big)-\eps l_{12} X_
+{1}+O\big(\varepsilon ^{2},\sigma^{2}\big)
+\)\par
+\(y_{2}=\sigma  \ou\big(w_{3},tt,-1\big)-\eps l_{13} X_{1}+O\big(
+\varepsilon ^{2},\sigma^{2}\big)
+\)\par
+\(x_{1}=-ii \sigma  \eps \ou\big(w_{2},tt,-1\big) X_{1}+\sigma  \eps \big(
+-l_{13} \ou\big(w_{3},tt,-1\big)-l_{12} \ou\big(w_{2},tt,-1\big)\big)+O
+\big(\varepsilon ^{2},\sigma^{2}\big)+X_{1}
+\)\par
+\(\)
+\paragraph{Result centre manifold DEs}
+\(
+\)\par
+\(\dot X_{1}=-ii^{2} \eps^{2} X_{1}^{3}+ii \sigma ^{2} \eps^{2} \big(-1/2 
+l_{13} \ou\big(w_{3},tt,-1\big) w_{2}+1/2 l_{13} \ou\big(w_{2},tt,-1
+\big) w_{3}\big)+ii \sigma  \eps w_{2} X_{1}-2 ii \eps^{2} l_{12} X_{1}
+^{2}+\sigma  \eps^{2} \big(-l_{13} l_{11} w_{3}-l_{12} l_{11} w_{2}\big)
++\sigma  \eps \big(l_{13} w_{3}+l_{12} w_{2}\big)+\eps^{2} \big(-l_{13}
+^{2} X_{1}-l_{12}^{2} X_{1}\big)+\eps l_{11} X_{1}+O\big(\varepsilon ^{3
+},\sigma^{3}\big)
+\)\par

@@ -1,0 +1,68 @@
+%!TEX root = ../manyExamples.tex
+% inspired by 2506.22552v1.  AJR, 8 Jul 2025
+\subsection{\texttt{majdaTriad2010}: Majda's triad model} 
+\label{majdaTriad2010}
+
+
+Falasca (2025) \cite{Majda2010} investigated averaging in  3D \sde\ systems.
+Let's compare with their stochastic normal form.
+
+
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+\end{reduce}
+The system uses parameters~\(L_j\) so define
+\begin{reduce}
+operator l; defindex l(down);
+operator gammal; defindex gamma(down);
+\end{reduce}
+
+The additive triad model of Falasca (2025) \cite{Majda2010} consists of three modes, 
+$x_1$, $x_2$~and~$x_3$.
+However, these now evolve in time according to
+\begin{align*}&
+	\frac{dx_1}{dt}=b_1x_2x_3\,,
+	\\&
+	\frac{dx_2}{dt}=-x_2+b_2x_1x_3+\sigma_2\dot W_2\,,
+	\\&
+	\frac{dx_3}{dt}=-x_3+b_3x_1x_2+\sigma_3\dot W_3\,,
+\end{align*}
+where $b_j$~and~$\sigma_j$ are some constants, and there is independent stochastic forcing of the second and third modes.
+Here I have already scaled the equations so that the rate of decay of \emph{both} the second and third mode is one.\footnote{In contrast, \cite{Majda02} set the two modes to have different decay rates.
+Do not expect much difference in using the same decay rate, it is just more convenient that the memory convolutions are then identical for the two modes rather than being different.
+Having the decay rates the same is also closer to my expected application to spatial problems.} Thus on long time scales we expect the second and third modes to be essentially negligible and the system to be modelled by the relatively slow evolution of the first mode.
+This section constructs the stochastic normal form of its centre manifold model as the basis for a model over long time scales with new noise processes.
+
+The procedure \verb|invariantmanifold| is already loaded.
+Write a message saying we are now analysing the next system.
+\begin{reduce}
+write "**** Additive Triad system of Majda (2010) ****";
+\end{reduce}
+Execute the construction of a slow manifold for this system using  \(u_j=x_{j}\)\,.
+\begin{reduce}
+factor ii,epsilon;
+invariantmanifold({},
+    mat(( small*(l(11)*u1+l(12)*u2+l(13)*u3) +ii*u1*u2 ,
+     -gamma(2)*u2/epsilon-small*l(12)*u1-ii*u1^2,
+     -gamma(3)*u3/epsilon-small*l(13)*u1 )),
+    mat(( 0 )),
+    mat( (1,0,0) ),
+    mat( (1,0,0) ),
+    4 )$
+end; % finish here if not before
+\end{reduce}
+
+The procedure reports that it analyses the following family 
+\begin{align*}&
+\dot x_{1}=??
+\\&
+\dot y_{1}=??
+\\&
+\dot y_{2}=??
+\end{align*}
+Here, \eps\ counts the order of nonlinearity so that the errors~\Ord{\eps^3} are errors~\Ord{|\xv|^4+\sigma^4} (due to the noise driving fluctuations of size~\(\sigma\)).
+
+
+

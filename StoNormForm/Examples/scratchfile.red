@@ -7,6 +7,8 @@ write "\)
 
 y_(1):=y_(1) +order_(varepsilon^2,sigma_^2);
 
+y_(2):=y_(2) +order_(varepsilon^2,sigma_^2);
+
 x_(1):=x_(1) +order_(varepsilon^2,sigma_^2);
 
 write "\)

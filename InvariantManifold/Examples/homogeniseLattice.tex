@@ -1,0 +1,88 @@
+%!TEX root = ../diverseExamples.tex
+\subsection{\texttt{homogeniseLattice}: homogenise spatial diffusion on a heterogeneous lattice} 
+\label{homogeniseLattice}
+
+A heat exchanger is simply two pipes with `fluid' flowing in opposite directions, and exchanging heat between them.  Let \(u_1(x,t)\C u_2(x,t)\) be the temperatures in the two pipes as a function of space-time.   Advecting at the same but opposite velocities, noon-dimensional \pde{}s are
+\begin{align*}
+&\D t{u_1}=-\D x{u_1}+u_2-u_1\,,
+&&\D t{u_2}=+\D x{u_1}+u_1-u_2\,.
+\end{align*}
+
+The linearisation for \emph{gradual} variations in space is to then neglect the spatial derivatives: \(\D t{u_1}=u_2-u_1\C \D t{u_2}=u_1-u_2\)\,.
+This has eigenvalues \(\lambda=0,-2\) with respective eigenvectors \((1,1)\C (1,-1)\).
+We model effective dispersion of heat in these two pipes in space-time over long times and large space scales.
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+\end{reduce}
+In the printed output, group terms depending upon order of spatial derivatives (which are assumed `small').
+\begin{reduce}
+factor small;
+\end{reduce}
+The following procedure call constructs the slow manifold for this system to errors~\Ord{\partial_x^5}.
+\begin{reduce}
+a:=c+d; b:=c-d; % optionally in terms of mean and difference variables
+factor df,diff;
+invariantmanifold( {x},
+    mat((-(a+b)*u1
+        +a*(u2-diff(u2,x)+diff(u2,x,2)/2-diff(u2,x,3)/6+diff(u2,x,4)/24)
+        +b*(u2+diff(u2,x)+diff(u2,x,2)/2+diff(u2,x,3)/6+diff(u2,x,4)/24)
+        ,-(a+b)*u2
+        +b*(u1-diff(u1,x)+diff(u1,x,2)/2-diff(u1,x,3)/6+diff(u1,x,4)/24)
+        +a*(u1+diff(u1,x)+diff(u1,x,2)/2+diff(u1,x,3)/6+diff(u1,x,4)/24)
+        )),
+    mat(( 0 )),
+    mat( (1,1) ),
+    mat( (1,1) ),
+    5 )$
+end;
+\end{reduce}
+
+
+The procedure then actually analyses the parametrised system
+\begin{align*}&
+\D t{u_{1}}=-\eps \frac{{\rm d}\,u_1}{{\rm d}\,x}-u_1+u_2\,,
+&&
+\D t{u_{2}}=\eps \frac{{\rm d}\,u_2}{{\rm d}\,x}+u_1-u_2\,.
+\end{align*}
+Consequently the procedure's artificial parameter~\(\eps\)\ counts the number of spatial derivatives in each term.
+
+
+\paragraph{The invariant manifold} 
+The slow manifold is expressed in terms of a series in space derivatives.
+\begin{align*}&
+u_{1}={ 1/16 \eps^{3} \frac{{\rm d}^{3}s_{1}}{{\rm d}x^{3}}-1/4 \eps 
+\frac{{\rm d}\,s_{1}}{{\rm d}\,x}+O\big(\varepsilon ^{4}\big)+1/2 s_{1}
+}\\&
+u_{2}={ -1/16 \eps^{3} \frac{{\rm d}^{3}s_{1}}{{\rm d}x^{3}}+1/4 \eps 
+\frac{{\rm d}\,s_{1}}{{\rm d}\,x}+O\big(\varepsilon ^{4}\big)+1/2 s_{1}
+}\end{align*}
+
+ 
+\paragraph{Invariant manifold PDEs} 
+The system evolves according to this \pde\ that describes the effective dispersion of heat in the pipes: a simple diffusion albeit with higher-order improvements:
+\begin{align*}&
+\D t{s_{1}}={ -1/8 \eps^{4} \frac{{\rm d}^{4}s_{1}}{{\rm d}x^{4}}+1/2 \eps
+^{2} \frac{{\rm d}^{2}s_{1}}{{\rm d}x^{2}}+O\big(\varepsilon ^{5}\big)
+}\end{align*}
+
+
+
+\paragraph{Project initial conditions et al.}
+To project initial conditions
+onto the slow manifold, or non-autonomous
+forcing, or modifications of the original system, or to quantify uncertainty \cite[Ch.12]{Roberts89b, Roberts97b, Roberts2014a}, use the projection defined by the following derived vector.
+\begin{align*}&
+\zv_1=\begin{bmatrix}z_{11}&z_{12}\end{bmatrix}^T
+\\&
+=\begin{bmatrix}
+{ 3/16 \eps^{4} \diff_{x}^{4}+1/4 \eps^{3} \diff_{x}^{3}-1/4 \eps^{
+2} \diff_{x}^{2}-1/2 \eps \diff_{x}+O\big(\varepsilon ^{5}\big)+1
+}\\[1ex]
+{ 3/16 \eps^{4} \diff_{x}^{4}-1/4 \eps^{3} \diff_{x}^{3}-1/4 \eps^{
+2} \diff_{x}^{2}+1/2 \eps \diff_{x}+O\big(\varepsilon ^{5}\big)+1
+}
+\end{bmatrix}.
+\end{align*}
+

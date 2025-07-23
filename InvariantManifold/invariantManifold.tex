@@ -304,11 +304,10 @@ processing.
 \begin{reduce}
 operator diff;
 \end{reduce}
-Usually seems best to use the \verb|gcd| option, but
-sometimes worse, so set here in order for a user to
-optionally turn off before invoking the procedure.
+Usually seems best to use the \verb|ezgcd| option---set here in order for a user to
+optionally turn off before invoking the procedure.  This option has mysteriously clashed fatally with \verb|gcd| in some examples (Jul 2025), so appears best without \verb|gcd|.
 \begin{reduce}
-on gcd,ezgcd; 
+on ezgcd; 
 \end{reduce}
 %Similarly, try loading LaTeX names of symbols here so that
 %a user can override.  Works to some extent, but do not know
@@ -363,7 +362,7 @@ pp, est, eyem, m, diffzero;
 
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 9 Apr 2025)"$
+write "Construct invariant manifold (version 23 Jul 2025)"$
 \end{reduce}
 
 
@@ -386,7 +385,7 @@ For optional trace printing of test cases: comment out
 second line when not needed.
 \begin{reduce}
 trace:=0$
-%trace:=1; maxiter:=9; %%%%
+%trace:=1; maxiter:=5; %%%%
 \end{reduce}
 
 
@@ -435,9 +434,9 @@ shut "invarManReport.tex";
 Extract dimension information from the parameters of the
 procedure: seek $m$D~invariant manifold of an $n$D~system.
 \begin{reduce}
-write "total no. of variables ",
+write "total number of variables ",
 n:=part(length(ee),1);
-write "no. of invariant modes ",
+write "number of invariant modes ",
 m:=part(length(ee),2);
 if {length(evals),length(zz),length(ee),length(ff)}
   ={{1,m},{n,m},{n,m},{n,1}} 
@@ -615,7 +614,7 @@ for j:=1:n do for k:=1:n do begin
   ll(j,k):=df(ff(j,1),mkid(u,k));
   ll(j,k):=( sub(equilibrium,ll(j,k)) where diffzero );
 end;
-write "Find the linear operator is";
+write "I find the linear operator is";
 write ll:=ll;
 \end{reduce}
 
@@ -656,21 +655,21 @@ not involve delays we do not need delay operator transforms
 in the product.
 \begin{reduce}
 if not ok then for iter:=1:2 do begin
-write "WARNING: I NEED TO ADJUST LINEAR OPERATOR";
-lladj:=reslin*tp map(conj_(~b),zz*cexp_);
-write
-lladj:=(lladj where {exp(0)=>1, exp(~a)=>0 when a neq 0});
-write
-ll:=ll-lladj;
-% following maybe only for pure centre modes??
-write
-reslin:=(ll*(ee*dexp_)-(ee*dexp_)*aa_
-    where exp(~a)*d_(1,t,~dt)
-    => sub(t=-dt,cos(-i*a)+i*sin(-i*a))*exp(a) ); 
-ok:=1$
-for j:=1:n do for k:=1:m do 
-    ok:=if reslin(j,k)=0 then ok else 0$
-if ok then iter:=iter+1000;
+    write "WARNING: I NEED TO ADJUST LINEAR OPERATOR";
+    lladj:=reslin*tp map(conj_(~b),zz*cexp_);
+    write
+    lladj:=(lladj where {exp(0)=>1, exp(~a)=>0 when a neq 0});
+    write
+    ll:=ll-lladj;
+    % following maybe only for pure centre modes??
+    write
+    reslin:=(ll*(ee*dexp_)-(ee*dexp_)*aa_
+        where exp(~a)*d_(1,t,~dt)
+        => sub(t=-dt,cos(-i*a)+i*sin(-i*a))*exp(a) ); 
+    ok:=1$
+    for j:=1:n do for k:=1:m do 
+        ok:=if reslin(j,k)=0 then ok else 0$
+    if ok then iter:=iter+1000;
 end;
 if not ok then << write
     "OOPS, INCONSISTENT EIGENVALUES, EIGENVECTORS AND OPERATOR.
@@ -713,7 +712,7 @@ From the matrix versions of the equations, create algebraic
 form using the matrix basis.
 \begin{reduce}
 rhsfn:=for i:=1:n sum e_(i,1)*ff(i,1)$
-if trace then write "rhsfn=",rhsfn;
+if trace then write "rhsfn= ",rhsfn;
 \end{reduce}
 
 Also, create the algebraic form of the jacobian transpose
@@ -753,7 +752,7 @@ projection. The next challenge is to get this isochron code
 working for the case of non-slow invariant manifolds.
 \begin{reduce}
 itisSlowMan_:=if eval_set={0} then 1 else 0$
-if trace then write itisSlowMan_:=itisSlowMan_;
+if trace then write "itisSlowMan_= ",itisSlowMan_;
 \end{reduce}
 
 Put in the non-singular general case as the zero entry of
@@ -847,9 +846,9 @@ the same size for all eigenvalues.
 Invert the matrix and unpack into arrays ready for use by
 the inversion operators.
 \begin{reduce}
-  if trace then write llzz_:=llzz_; 
+  if trace then write "llzz_= ",llzz_; 
   llzz_:=llzz_^(-1);
-  if trace then write llzz_:=llzz_;
+  if trace then write "llzz_= ",llzz_;
   l_invs(k_):=for i:=1:n sum for j:=1:n sum e_(i,j)*llzz_(i,j);
   g_invs(k_):=for i:=1:length(modes_(k_)) sum 
     for j:=1:n sum e_(part(modes_(k_),i),j)*llzz_(i+n,j);
@@ -892,36 +891,42 @@ these linear operators: must post-multiply by~\verb|e_|
 because the linear inverse is a premultiply.
 \begin{reduce}
 clear l_inv; operator l_inv; linear l_inv;
-let l_inv(e_(~j,~k)*exp(~a),exp)=>l_invproc(a/t)*e_(j,k);
-procedure l_invproc(a);
-  if a member eval_set
+let l_inv(e_(~j,~k)*exp(~a_),exp) => l_invproc(a_/t)*e_(j,k);
+procedure l_invproc(a_);  begin scalar tmp_;
+  if a_ member eval_set
   then << k_:=0; 
-    repeat k_:=k_+1 until a=eval_s(k_);
-    l_invs(k_)*exp(a*t) >>
-  else sub(geneval=a,l_invs(0))*exp(a*t)$
+    repeat k_:=k_+1 until a_=eval_s(k_);
+    tmp_:=l_invs(k_)*exp(a_*t) >>
+  else tmp_:=sub(geneval=a_,l_invs(0))*exp(a_*t)$
+  return tmp_;
+  end;
 \end{reduce}
 
 Second for the evolution on the invariant manifold.
 \begin{reduce}
 clear g_inv; operator g_inv; linear g_inv;
-let g_inv(e_(~j,~k)*exp(~a),exp)=>ginv_proc(a/t)*e_(j,k);
-procedure ginv_proc(a); 
-  if a member eval_set
+let g_inv(e_(~j,~k)*exp(~a_),exp)=>ginv_proc(a_/t)*e_(j,k);
+procedure ginv_proc(a_);  begin scalar tmp_;
+  if a_ member eval_set
   then << k_:=0; 
-    repeat k_:=k_+1 until a=eval_s(k_);
-    g_invs(k_) >>
-  else sub(geneval=a,g_invs(0))$
+    repeat k_:=k_+1 until a_=eval_s(k_);
+    tmp_:=g_invs(k_) >>
+  else tmp_:=sub(geneval=a_,g_invs(0))$
+  return tmp_;
+  end;
 \end{reduce}
 
 Copy and adjust the above for the projection.  But first
 define the generic procedure.  
 \begin{reduce}
-procedure inv_proc(a,invs);
-  if a member eval_set
+procedure inv_proc(a_,invs);  begin scalar tmp_;
+  if a_ member eval_set
   then << k_:=0; 
-    repeat k_:=k_+1 until a=eval_s(k_);
-    invs(k_)*exp(a*t) >>
-  else sub(geneval=a,invs(0))*exp(a*t)$
+    repeat k_:=k_+1 until a_=eval_s(k_);
+    tmp_:=invs(k_)*exp(a_*t) >>
+  else tmp_:=sub(geneval=a_,invs(0))*exp(a_*t)$
+  return tmp_;
+  end;
 \end{reduce}
 
 Then define operators that we use to update the projection.
@@ -930,14 +935,14 @@ clear l1_inv; operator l1_inv; linear l1_inv;
 clear l2_inv; operator l2_inv; linear l2_inv;
 clear g1_inv; operator g1_inv; linear g1_inv;
 clear g2_inv; operator g2_inv; linear g2_inv;
-let { l1_inv(e_(~j,~k)*exp(~a),exp)
-      => inv_proc(a/t,l1_invs)*e_(j,k)
-    , l2_inv(e_(~j,~k)*exp(~a),exp)
-      => inv_proc(a/t,l2_invs)*e_(j,k)
-    , g1_inv(e_(~j,~k)*exp(~a),exp)
-      => inv_proc(a/t,g1_invs)*e_(j,k)
-    , g2_inv(e_(~j,~k)*exp(~a),exp)
-      => inv_proc(a/t,g2_invs)*e_(j,k)
+let { l1_inv(e_(~j,~k)*exp(~a_),exp)
+      => inv_proc(a_/t,l1_invs)*e_(j,k)
+    , l2_inv(e_(~j,~k)*exp(~a_),exp)
+      => inv_proc(a_/t,l2_invs)*e_(j,k)
+    , g1_inv(e_(~j,~k)*exp(~a_),exp)
+      => inv_proc(a_/t,g1_invs)*e_(j,k)
+    , g2_inv(e_(~j,~k)*exp(~a_),exp)
+      => inv_proc(a_/t,g2_invs)*e_(j,k)
     };
 \end{reduce}
 
@@ -1236,17 +1241,18 @@ Solve for updates---all the hard work is already encoded in
 the operators.
 \begin{reduce}
 uu:=uu+l_inv(resde,exp);
+if trace then write "uu=",matify_(uu,n,1);
 gg:=gg+g_inv(resde,exp);
 if trace then write "gg=",matify_(gg,m,1);
-if trace then write "uu=",matify_(uu,n,1);
 \end{reduce}
 
 Now update the isochron projection, with normalisation.
 \begin{reduce}
 if itisSlowMan_ then begin
+if trace then write "starting zs evaluation";
 zs:=zs+l1_inv(resd,exp)-l2_inv(resz,exp);
-pp:=pp-g1_inv(resd,exp)+youshouldnotseethis*g2_inv(resz,exp);
 if trace then write "zs=",matify_(zs,n,m);
+pp:=pp-g1_inv(resd,exp)+youshouldnotseethis*g2_inv(resz,exp);
 if trace then write "pp=",matify_(pp,m,m);
 end;
 \end{reduce}

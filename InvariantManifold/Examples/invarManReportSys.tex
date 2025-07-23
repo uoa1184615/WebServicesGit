@@ -4,13 +4,18 @@
 \paragraph{The specified dynamical system}
 \(
 \)\par
-\(\dot u_{1}=-5/3 \eps \frac{{\rm d}\,u\_2}{{\rm d}\,x}
+\(\dot u_{1}=\pi  u\_2
 \)\par
-\(\dot u_{2}=\eps \big(-\frac{{\rm d}\,u\_1}{{\rm d}\,x}-\frac{{\rm d}\,
-u\_3}{{\rm d}\,x}\big)
+\(\dot u_{2}=-\pi  u\_1+\pi ^{-1} \eps u\_1 u\_5
 \)\par
-\(\dot u_{3}=-4/3 \eps \frac{{\rm d}\,u\_2}{{\rm d}\,x}-\epsilon ^{-1} 
-u\_3
+\(\dot u_{3}=\pi  u\_4
+\)\par
+\(\dot u_{4}=-\pi  u\_3+\pi ^{-1} \eps u\_3 u\_5
+\)\par
+\(\dot u_{5}=2 \pi  u\_6
+\)\par
+\(\dot u_{6}=-2 \pi  u\_5+\pi ^{-1} \big(1/2 \eps u\_1^{2}+1/2 \eps u\_3^{
+2}\big)
 \)\par
 \(\)
 \paragraph{Invariant subspace basis vectors}
@@ -18,25 +23,73 @@ u\_3
 \)\par
 \(\vec e_{1}=\left\{
 \left\{
-1 , 0 , 0
-\right\} , \exp \big(0\big)
+1 , i , 0 , 0 , 0 , 0
+\right\} , \exp \big(i \pi  t\big)
 \right\}
 \)\par
 \(\vec e_{2}=\left\{
 \left\{
-0 , 1 , 0
-\right\} , \exp \big(0\big)
+1 , -i , 0 , 0 , 0 , 0
+\right\} , \exp \big(-i \pi  t\big)
+\right\}
+\)\par
+\(\vec e_{3}=\left\{
+\left\{
+0 , 0 , 1 , i , 0 , 0
+\right\} , \exp \big(i \pi  t\big)
+\right\}
+\)\par
+\(\vec e_{4}=\left\{
+\left\{
+0 , 0 , 1 , -i , 0 , 0
+\right\} , \exp \big(-i \pi  t\big)
+\right\}
+\)\par
+\(\vec e_{5}=\left\{
+\left\{
+0 , 0 , 0 , 0 , 1 , i
+\right\} , \exp \big(2 i \pi  t\big)
+\right\}
+\)\par
+\(\vec e_{6}=\left\{
+\left\{
+0 , 0 , 0 , 0 , 1 , -i
+\right\} , \exp \big(-2 i \pi  t\big)
 \right\}
 \)\par
 \(\vec z_{1}=\left\{
 \left\{
-1 , 0 , 0
-\right\} , \exp \big(0\big)
+1/2 , 1/2 i , 0 , 0 , 0 , 0
+\right\} , \exp \big(i \pi  t\big)
 \right\}
 \)\par
 \(\vec z_{2}=\left\{
 \left\{
-0 , 1 , 0
-\right\} , \exp \big(0\big)
+1/2 , -1/2 i , 0 , 0 , 0 , 0
+\right\} , \exp \big(-i \pi  t\big)
+\right\}
+\)\par
+\(\vec z_{3}=\left\{
+\left\{
+0 , 0 , 1/2 , 1/2 i , 0 , 0
+\right\} , \exp \big(i \pi  t\big)
+\right\}
+\)\par
+\(\vec z_{4}=\left\{
+\left\{
+0 , 0 , 1/2 , -1/2 i , 0 , 0
+\right\} , \exp \big(-i \pi  t\big)
+\right\}
+\)\par
+\(\vec z_{5}=\left\{
+\left\{
+0 , 0 , 0 , 0 , 1/2 , 1/2 i
+\right\} , \exp \big(2 i \pi  t\big)
+\right\}
+\)\par
+\(\vec z_{6}=\left\{
+\left\{
+0 , 0 , 0 , 0 , 1/2 , -1/2 i
+\right\} , \exp \big(-2 i \pi  t\big)
 \right\}
 \)\par
