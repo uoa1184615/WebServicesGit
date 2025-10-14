@@ -1,0 +1,40 @@
+% Hopf bifurcation of Ning Sun et al. 
+% https://doi.org/10.1016/j.physd.2025.134959
+% AJR, 2 Oct 2025
+in_tex "../Documents/Research/WebServicesGit/InvariantManifold/invariantManifold.tex"$
+
+% check coordinate shift to equilibrium Es
+ode12:=tp mat(( a*u3-b*u1
+    , -c*u1-c*u2-u1*u2-u2^2
+    ,(1-c)*u2+u1*u2 ));
+ode3:=tp mat(( a*z-b*x, y*(1-y)-x*y, x*(y-c) ));
+odeErr := ode12 - sub({x=u1+1-c, y=u2+c, z=u3+b*(1-c)/a} , ode3);
+
+% for simplicity, consider this case of Hopf at Es
+b_0:=2;
+a_0:=10;
+c_0:=(a_0-b_0^2)/(a_0+b_0);
+w_0:=sqrt(b_0*c_0);
+matrix jac(3,3);
+for i:=1: 3 do for j:=1:3 do jac(i,j):=df(ode12(i,1),mkid(u,j));
+jj:=sub({u1=0,u2=0,u3=0,a=a_0,b=b_0,c=c_0},jac);
+if 0 then begin% given evec also seems bad
+    jac12:=mat((-b,0,a),(-c,-c,0),(0,1-c,0));
+    jac12:=sub(c=(a-b^2)/(a+b),jac12);
+    write eigen12:=mateigen(jac12,lam);
+    % finds the third eval = -a(1+b)/(a+b), here -5/2 not as given
+    write v1:=tp mat((b^2-i*b*w, -i*b*w, b-w^2));
+    write errv1:=sub(w=sqrt(b*(a-b^2)/(a+b)),jac12*v1-i*w*v1); 
+end;%if
+vv:=tp mat( ( -2*i*w_0-1, 1, -i*w_0/2),( +2*i*w_0-1, 1, +i*w_0/2) );
+errvv:=jj*vv-vv*mat((i*w_0,0),(0,-i*w_0));
+ww:=tp mat((-1/2,2-i*w_0,-5*i*w_0),(-1/2,2+i*w_0,5*i*w_0));
+errww:=(tp jj)*ww-ww*mat((-i*w_0,0),(0,+i*w_0));
+
+% perturb ode12 by small change in gamma
+tode12:=tp sub({ a=a_0, b=b_0, c=c_0+small*gamma },ode12);
+factor small,s,gamma;
+invariantmanifold({}, tode12
+    , mat(( i*w_0, -i*w_0 )), tp vv, tp ww, 3 )$
+
+end;

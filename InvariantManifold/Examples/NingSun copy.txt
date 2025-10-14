@@ -1,0 +1,55 @@
+% example of Ning Sun et al. 
+% https://doi.org/10.1007/s12346-025-01387-8
+% An example p.31 eqn.(59)
+% AJR, 11 Oct 2025
+in_tex "../invariantManifold.tex"$
+
+a:=b:=c:=1;
+factor s(3);
+odes:=mat(( 
+u5*(u1*u3*c-u2)
+,u5*(-u4+u1+u2*u3*b)
+,-u1-u3
+,-u4+u2*u1*a
+,0
+));
+evecs:=mat( (1,0,-1,0,0),(0,1,0,0,0),(0,0,0,0,1) );
+zzs:=mat( (1,0,0,0,0),(0,1,0,0,0),(0,0,0,0,1) );
+invariantmanifold({}, odes, mat((0,0,0)), evecs, zzs, 7)$
+% Have to go to order 6 in order to get cubic terms to agree in evolution
+% and to order 7 to get cubic agreement on manifold
+
+weight s(3)=1$ 
+wtlevel 3$ % truncate to this max-order
+small:=1; % omit bookkeeping
+ds1dt:=coeffn(gg,e_(1,1),1);
+ds2dt:=coeffn(gg,e_(2,1),1);
+xc:=coeffn(uu,e_(1,1),1);
+pc:=coeffn(uu,e_(2,1),1);
+yc:=coeffn(uu,e_(3,1),1);
+qc:=coeffn(uu,e_(4,1),1);
+wtlevel 2$ %%%% omit cubic hots
+z1:=tp mat((coeffn(zs,e_(1,1),1), coeffn(zs,e_(2,1),1), coeffn(zs,e_(3,1),1), coeffn(zs,e_(4,1),1)));
+z2:=tp mat((coeffn(zs,e_(1,2),1), coeffn(zs,e_(2,2),1), coeffn(zs,e_(3,2),1), coeffn(zs,e_(4,2),1)));
+end;
+
+
+Comment Result is the following
+yc :=  - s(1) + s(3)*( - s(1)  - s(2)) + s(3) *(s(1) - 3*s(1)  - 5*s(2)*s(1))
+
+             3        2          4                      2         2
+       + s(3) *(8*s(1)  - 14*s(1)  + s(2) - 35*s(2)*s(1)  - 7*s(2) )
+
+                               2              2       2
+qc := s(2)*s(1) + s(3)*( - s(1)  + 3*s(2)*s(1)  + s(2) )
+
+             2           3                             3          2
+       + s(3) *( - 6*s(1)  - 4*s(2)*s(1) + 17*s(2)*s(1)  + 13*s(2) *s(1)) + 
+
+          3        2          4               2                4         2
+      s(3) *(4*s(1)  - 46*s(1)  - 66*s(2)*s(1)  + 126*s(2)*s(1)  - 4*s(2)
+
+                        2     2          3
+              + 159*s(2) *s(1)  + 17*s(2) )
+
+;

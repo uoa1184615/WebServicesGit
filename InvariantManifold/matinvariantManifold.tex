@@ -8,21 +8,18 @@ Sciences, University of Adelaide, South Australia~5005,
 \textsc{Australia}. \url{https://profajroberts.github.io/}}}
 
 \date{Nov 2013 -- \today}
-%:ToDo: remember to change the 'version' date for each update
+%TODO: remember to change the 'version' date for each update
 
-%:ToDo: currently the web service reduce chokes on du_k/dt=0 
+%TODO: currently the web service reduce chokes on du_k/dt=0 
 % whereas my computer version does not.  The fix is to 
 % specify du_k/dt=small^9 instead.  The error arises in 
 % writing out the dynamical system to the file 
 % invarManReportSys.tex ????
 
-%:ToDo: change to matrices or arrays??
-%:ToDo: modify LaTeX beginning to reduce spurious LaTeX
-%:ToDo: use of exp clashes with 'on rounded' automatically 
-% computing things like exp(0) is 1, so pattern exp(0)
-% cannot be matched.  Maybe use exp_?
+%TODO: change to matrices or arrays??
+%TODO: modify LaTeX beginning to reduce spurious LaTeX
 
-\usepackage{url,natbib,amsmath,defns,reducecode,etocx}
+\usepackage{url,natbib,amsmath,defns,reducecode}
 \RaisedNamesfalse
 \let\harvardurl\url
 \IfFileExists{ajr.sty}{\usepackage{ajr}}{}
@@ -65,7 +62,6 @@ system modifications, and uncertainty quantification.
 
 
 \section{Introduction}
-\localtableofcontents
 
 \paragraph{Installation}
 Download and install the computer algebra package
@@ -291,9 +287,7 @@ as a way to count the order of each term.
 
 
 
-\section{Start of the procedure code}
-\localtableofcontents
-
+\subsection{Header of the procedure}
 
 Need a couple of things established before defining the
 procedure: the \verb|rlfi| package; and operator names for
@@ -310,11 +304,8 @@ processing.
 \begin{reduce}
 operator diff;
 \end{reduce}
-Usually seems best to use the \verb|ezgcd| option---set here
-in order for a user to optionally turn off before invoking
-the procedure.  This option has mysteriously clashed fatally
-with \verb|gcd| in some examples (Jul 2025), so appears best
-without \verb|gcd|.
+Usually seems best to use the \verb|ezgcd| option---set here in order for a user to
+optionally turn off before invoking the procedure.  This option has mysteriously clashed fatally with \verb|gcd| in some examples (Jul 2025), so appears best without \verb|gcd|.
 \begin{reduce}
 on ezgcd; 
 \end{reduce}
@@ -371,12 +362,7 @@ pp, est, eyem, m, diffzero;
 
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 15 Oct 2025)"$
-%write input_odefns:=odefns;
-%write input_evals:=evals;
-%write input_evecs:=evecs;
-%write input_adjvecs:=adjvecs;
-%write input_toosmall:=toosmall;
+write "Construct invariant manifold (version 23 Jul 2025)"$
 \end{reduce}
 
 
@@ -399,7 +385,7 @@ For optional trace printing of test cases: comment out
 second line when not needed.
 \begin{reduce}
 trace:=0$
-%trace:=1; maxiter:=5; %%%%
+trace:=1; maxiter:=5; %%%%
 \end{reduce}
 
 
@@ -412,23 +398,23 @@ on div; off allfac; on revpri;
 on rationalize;
 \end{reduce}
 
-Use \verb|e_| as basis vector for matrices and vectors.
-Declare it non-commutative so that multiplication does not
-commute.
-\begin{reduce}
-clear e_; operator e_; noncom e_;
-factor e_;
-let { e_(~j,~k)*e_(~l,~p)=>0 when k neq l
-    , e_(~j,~k)*e_(~l,~p)=>e_(j,p) when k=l 
-    , e_(~j,~k)^2=>0 when j neq k
-    , e_(~j,j)^2=>e_(j,j) };
-\end{reduce}
-Also need (once) a transpose operator: do complex
-conjugation explicitly when needed.
-\begin{reduce}
-clear tpe_; operator tpe_; linear tpe_;
-let tpe_(e_(~i,~j),e_)=>e_(j,i);
-\end{reduce}
+%Use \verb|e_| as basis vector for matrices and vectors.
+%Declare it non-commutative so that multiplication does not
+%commute.
+%\begin{reduce}
+%clear e_; operator e_; noncom e_;
+%factor e_;
+%let { e_(~j,~k)*e_(~l,~p)=>0 when k neq l
+%    , e_(~j,~k)*e_(~l,~p)=>e_(j,p) when k=l 
+%    , e_(~j,~k)^2=>0 when j neq k
+%    , e_(~j,j)^2=>e_(j,j) };
+%\end{reduce}
+%Also need (once) a transpose operator: do complex
+%conjugation explicitly when needed.
+%\begin{reduce}
+%clear tpe_; operator tpe_; linear tpe_;
+%let tpe_(e_(~i,~j),e_)=>e_(j,i);
+%\end{reduce}
 
 
 
@@ -468,7 +454,8 @@ if n>9 then <<write "SORRY, MAX NUMBER ODEs IS 9, I EXIT";
 Need an \(m\times m\)~identity matrix for normalisation of
 the isochron projection.
 \begin{reduce}
-eyem:=for j:=1:m sum e_(j,j)$
+matrix eyem(m,m);
+for j:=1:m do eyem(j,j):=1;
 \end{reduce}
 
 
@@ -492,8 +479,6 @@ diffzero:={ diff(~a)=>0, diff(~a,~b)=>0, diff(~a,~b,~c)=>0
 
 
 \section{Dissect the linear part}
-\localtableofcontents
-
 
 Use the exponential $\verb|exp|(u)=e^{u}$, but not with the
 myriad of inbuilt properties so clear it! Do not (yet)
@@ -510,12 +495,7 @@ Also try mapping any user supplied sinusoids into
 this \verb|exp()| so that we can handle harmonically 
 forced systems.  Only invoke on the supplied \ode{}s as 
 delay differential equations use trig functions.
-But first test to see if there are any explicit time
-dependence: whether autonomous or nonautonomous.
 \begin{reduce}
-tmp:=sub(t=t_,ff);  tmp:=df(tmp,t_);
-itisAuto_:=1;
-for j:=1:n do itisAuto_:=if tmp(j,1)=0 then itisAuto_ else 0;
 ff:=(ff where { cos(~u) => (exp(i*u)+exp(-i*u))/2
               , sin(~u) => (exp(i*u)-exp(-i*u))/(2*i) 
               } );
@@ -729,18 +709,19 @@ ff:=ff+(exp(0)-1)*sub(uzero,ff)$
 
 
 
-From the matrix versions of the equations, create algebraic
-form using the matrix basis.
-\begin{reduce}
-rhsfn:=for i:=1:n sum e_(i,1)*ff(i,1)$
-if trace then write "rhsfn= ",rhsfn;
-\end{reduce}
+%From the matrix versions of the equations, create algebraic
+%form using the matrix basis.
+%\begin{reduce}
+%rhsfn:=for i:=1:n sum e_(i,1)*ff(i,1)$
+%if trace then write "rhsfn= ",rhsfn;
+%\end{reduce}
 
-Also, create the algebraic form of the jacobian transpose
-using the matrix basis: take the conjugate later when used.
+Also, create the jacobian transpose matrix: take the 
+conjugate later when used.
 \begin{reduce}
-rhsjact:=for i:=1:n sum for j:=1:n sum 
-    e_(j,i)*df(ff(i,1),mkid(u,j));
+matrix rhsjact(n,n);
+for i:=1:n do for j:=1:n do 
+    rhsjact(j,i):=df(ff(i,1),mkid(u,j));
 \end{reduce}
 
 
@@ -772,8 +753,8 @@ eigenvalues are zero, as then we compute the isochron
 projection. The next challenge is to get this isochron code
 working for the case of non-slow invariant manifolds.
 \begin{reduce}
-itisAutoSlowMan_:=if eval_set={0} then itisAuto_ else 0$
-if trace then write "itisAutoSlowMan_= ",itisAutoSlowMan_;
+itisSlowMan_:=if eval_set={0} then 1 else 0$
+if trace then write "itisSlowMan_= ",itisSlowMan_;
 \end{reduce}
 
 Put in the non-singular general case as the zero entry of
@@ -867,12 +848,16 @@ the same size for all eigenvalues.
 Invert the matrix and unpack into arrays ready for use by
 the inversion operators.
 \begin{reduce}
+  lm_:=length(modes_(k_));
+  matrix nxn_(n,n),lmxn_(lm_,n),lmxlm_(lm_,lm_);
   if trace then write "llzz_= ",llzz_; 
   llzz_:=llzz_^(-1);
   if trace then write "llzz_= ",llzz_;
-  l_invs(k_):=for i:=1:n sum for j:=1:n sum e_(i,j)*llzz_(i,j);
-  g_invs(k_):=for i:=1:length(modes_(k_)) sum 
-    for j:=1:n sum e_(part(modes_(k_),i),j)*llzz_(i+n,j);
+  for i:=1:n do for j:=1:n do nxn_(i,j):=llzz_(i,j);
+  l_invs(k_):=nxn_;
+  for i:=1:lm_ do for j:=1:n do 
+      lmxn_(part(modes_(k_),i),j):=llzz_(i+n,j);
+  g_invs(k_):=lmxn_;
   if trace then write "finished Invert the matrix and unpack";
 \end{reduce}
 
@@ -884,21 +869,17 @@ left-eigenvectors), so we need to remember more parts of the
 inverse of the matrix.  
 %  realgeneval:={repart(geneval)=>geneval, impart(geneval)=>0}$
 \begin{reduce}
-  l1_invs(k_) := for ii:=1:n sum for j:=1:n sum 
-      e_(ii,j)*conj_(llzz_(j,ii));
+  l1_invs(k_) := conj_(tp l_invs(k_));
   if trace then write "l1_invs",k_," =",l1_invs(k_);
-  l2_invs(k_) := for ii:=1:n sum 
-      for j:=1:length(modes_(k_)) sum 
-          e_(ii,part(modes_(k_),j))*conj_(llzz_(j+n,ii));
+  l2_invs(k_) := conj_(tp g_invs(k_));
   if trace then write "l2_invs",k_," =",l2_invs(k_);
-  g1_invs(k_) := for ii:=1:length(modes_(k_)) sum 
-      for j:=1:n sum 
-          e_(part(modes_(k_),ii),j)*conj_(llzz_(j,ii+n));
+  for i:=1:lm_ do for j:=1:n do 
+      lmxn_(i,j):=conj_(llzz_(j,i+n));
+  g1_invs(k_) := lmxn_;
   if trace then write "g1_invs",k_," =",g1_invs(k_);
-  g2_invs(k_) := for ii:=1:length(modes_(k_)) sum 
-      for j:=1:length(modes_(k_)) sum 
-          e_(part(modes_(k_),ii),part(modes_(k_),j))
-          *conj_(llzz_(j+n,ii+n));
+  g2_invs(k_) := 
+  for i:=1:lm_ do for j:=1:lm_ do 
+      lmxlm_(i,j):= conj_(llzz_(j+n,i+n));
   if trace then write "g2_invs",k_," =",g2_invs(k_);
   if trace then write 
   "finished Unpack the conjugate transpose";
@@ -914,9 +895,10 @@ for the invariant manifold. But making \verb|e_|
 non-commutative means that it does not get factored out of
 these linear operators: must post-multiply by~\verb|e_|
 because the linear inverse is a premultiply.
+%: WORKING have to think of a different way of doing this.  Element by element??  matrix procedure??
 \begin{reduce}
 clear l_inv; operator l_inv; linear l_inv;
-let l_inv(e_(~j,~k)*exp(~a_),exp) => l_invproc(a_/t)*e_(j,k);
+let l_inv(exp(~a_),exp) => l_invproc(a_/t);
 procedure l_invproc(a_);  begin scalar tmp_;
   if a_ member eval_set
   then << k_:=0; 
@@ -998,7 +980,6 @@ let { df(~a,~x,~b)=>diff(x) when a=b
 
 
 \section{Initialise LaTeX output}
-\localtableofcontents
 % AJR, 21 aug 2012 -- Aug 2014 -- Nov 2021
 
 %% not needed as prinlaend/begin hardcodes it, nov 2021
@@ -1089,7 +1070,7 @@ defindex tmp_z(down);
 defid tmp_,name="\dot u";
 defid tmp_s,name="\vec e";
 defid tmp_z,name="\vec z";
-rhs_:=rhsfn$
+rhs_:=ff$
 for k:=1:m do tmp_s(k):=
     {for j:=1:n collect ee(j,k),exp(eval_(k)*t)};
 for k:=1:m do tmp_z(k):=
@@ -1227,7 +1208,7 @@ ITERATION = ",iter,"
 Compute residual vector (matrix) of the dynamical system
 \cite{Roberts96a}.
 \begin{reduce}
-resde:=-df(uu,t)+sub(manifold_(uu,n),rhsfn);
+resde:=-df(uu,t)+sub(manifold_(uu,n),ff);
 if trace then write "resde=",matify_(resde,n,1);
 \end{reduce}
 
@@ -1243,7 +1224,7 @@ Compute residual matrix for the isochron projection
 \cite{Roberts89b, Roberts97b}. But for the moment, only do
 it if the \verb|eval_set| is for slow manifolds.
 \begin{reduce}
-if itisAutoSlowMan_ then begin
+if itisSlowMan_ then begin
     jacadj:=conj_(sub(manifold_(uu,n),rhsjact));
     if trace then write "jacadj=",matify_(jacadj,n,n);
     resd:=df(zs,t)+jacadj*zs+zs*pp;
@@ -1254,8 +1235,7 @@ Compute residual of the normalisation of the projection.
 \begin{reduce}
     resz:=est*zs-eyem*exp(0);
     if trace then write "resz=",matify_(resz,m,m);
-end %if itisAutoSlowMan_
-else resd:=resz:=0; % for when not slow manifold
+end else resd:=resz:=0; % for when not slow manifold
 \end{reduce}
 
 Write lengths of residuals as a trace print (remember that
@@ -1275,13 +1255,13 @@ if trace then write "gg=",matify_(gg,m,1);
 
 Now update the isochron projection, with normalisation.
 \begin{reduce}
-if itisAutoSlowMan_ then begin
+if itisSlowMan_ then begin
 if trace then write "starting zs evaluation";
 zs:=zs+l1_inv(resd,exp)-l2_inv(resz,exp);
 if trace then write "zs=",matify_(zs,n,m);
 pp:=pp-g1_inv(resd,exp)+youshouldnotseethis*g2_inv(resz,exp);
 if trace then write "pp=",matify_(pp,m,m);
-end;%if itisAutoSlowMan_
+end;
 \end{reduce}
 
 
@@ -1291,7 +1271,6 @@ Terminate the iteration loop once residuals are zero.
 if {resde,resd,resz}={0,0,0} then write iter:=iter+10000;
 end;
 showtime;
-if not itisAutoSlowMan_ then clear zs;
 \end{reduce}
 
 Only proceed to print if terminated successfully.
@@ -1333,7 +1312,7 @@ for j:=1:m do write "ds(",j,")/dt = ",
 
 Optionally write the projection vectors.
 \begin{reduce}
-if itisAutoSlowMan_ then begin write "
+if itisSlowMan_ then begin write "
 The normals to the isochrons at the slow manifold.
 Use these vectors: to project initial conditions
 onto the slow manifold; to project non-autonomous
@@ -1357,7 +1336,7 @@ for j:=1:n do write "u",j," = ",
 write "Numerically, the evolution of the real/complex amplitudes";
 for j:=1:m do write "ds(",j,")/dt = ",
   coeffn(gg,e_(j,1),1);
-if itisAutoSlowMan_ then begin
+if itisSlowMan_ then begin
   write "Numerically, normals to isochrons at slow manifold.";
   for j:=1:m do write "z",j," = ",
     for i:=1:n collect coeffn(zs,e_(i,j),1);
@@ -1367,7 +1346,7 @@ end;
 \end{reduce}
 
 
-%: ToDo.  There is an as yet unresolved problem in the typesetting
+%There is an as yet unresolved problem in the typesetting
 %when the argument of \verb|exp| (eigenvalue) is a rational
 %number instead of integer: the numerator has an extra pair
 %of parentheses which then makes the typesetting wrong; maybe
@@ -1377,8 +1356,6 @@ end;
 
 \section{Output LaTeX version of results}
 % AJR, 24 aug 2012 -- aug 2014
-\localtableofcontents
-
 Change the printing of temporary arrays.
 \begin{reduce}
 clear tmp_zz; array tmp_zz(m,n);
@@ -1450,7 +1427,7 @@ end;
 Optionally write the commands to write the projection
 vectors on the slow manifold.
 \begin{reduce}
-if itisAutoSlowMan_ then begin
+if itisSlowMan_ then begin
   write "write ""\)
 \paragraph{Normals to isochrons at the slow manifold}
 Use these vectors: to project initial conditions
@@ -1464,7 +1441,7 @@ The normal vector \(\vec z_j:=(z_{j1},\ldots,z_{jn})\)
   for i:=1:m do for j:=1:n do 
   write "zs_(",i,",",j,"):=tmp_zz(",i,",",j
        ,")+order_(varepsilon^",toosmall,");";
-end;%if itisAutoSlowMan_	
+end;%if itisSlowMan_
 \end{reduce}
 
 Finish the scratchfile.

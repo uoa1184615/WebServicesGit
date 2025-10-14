@@ -1,0 +1,38 @@
+Comment Iteration fails to converge!! 
+'spatial' variables = 
+RHS function = ( -u1*u3 
+, -u2*u3
+,-u3+u1^2+u2^2+a*sin(w*t))
+Invariant eigenvalues = 0,0
+Invariant eigenvectors = (1,0,0),(0,1,0)
+Adjoint basis = (1,0,0),(0,1,0)
+Order of error = 3
+factor small
+AJR, 13 Oct 2025;
+
+in_tex "../invariantManifold.tex"$
+factor small,s(3);
+odes:=mat( ( -u1*u3 
+, -u2*u3+0*sin(t)
+,-u3+u1^2+u2^2+0*sin(t) ) );
+if 0 then << % full coordinate transform work beautifully, because no attempt made to construct projection vectors
+    evecs:=mat( (1,0,0),(0,1,0),(0,0,1) ); 
+    evals:=mat((0,0,-1));
+    ord:=5;
+>> else << % CM construction fails??
+    evecs:=mat( (1,0,0),(0,1,0) ); 
+    evals:=mat((0,0));
+    ord:=5; % =2 works but near trivial
+>>;
+if 1 then
+    invariantmanifold({}, odes, evals, evecs, evecs, ord)$
+end;
+
+
+% the following simpler case fails, its full-coord works
+if 1 then invariantmanifold({}, mat((-u1*u2,-c*u2+u1^2))
+    , mat((0)), mat((1,0)), mat((1,0)), 3)
+else invariantmanifold({}, mat((-u1*u2+b*cos(t),-u2+u1^2))
+    , mat((0,-1)), mat((1,0),(0,1)), mat((1,0),(0,1)), 3)$
+    
+end;

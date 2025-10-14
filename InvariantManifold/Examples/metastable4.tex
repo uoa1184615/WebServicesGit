@@ -1,8 +1,11 @@
 %!TEX root = ../diverseExamples.tex
 \subsection{\texttt{metastable4}: Metastability in a four state Markov chain} 
 \label{metastable4}
+\localtableofcontents
 
-Variable \(\epsilon\) characterises the rate of exchange between metastable states~\(u_1\) and~\(u_4\) in this system \cite[Exercise~5.1]{Roberts2014a}:
+Variable \(\epsilon\) characterises the rate of exchange
+between metastable states~\(u_1\) and~\(u_4\) in this system
+\cite[Exercise~5.1]{Roberts2014a}:
 \begin{align*}
 &\dot u_{1}=+u_{2} -\epsilon  u_{1} \,,
 \\&\dot u_{2}=-u_{2}+\epsilon  (u_{3}-u_{2}+u_{1}),
@@ -14,8 +17,10 @@ Start by loading the procedure.
 \begin{reduce}
 in_tex "../invariantManifold.tex"$
 \end{reduce}
-Execute the construction of the slow manifold for this system.
-The explicit parameter~\verb|small|, math-name~\(\eps\), gets replaced by~\verb|small^2| in the code, so in effect \(\eps^2=\epsilon\)\,.
+Execute the construction of the slow manifold for this
+system. The explicit parameter~\verb|small|,
+math-name~\(\eps\), gets replaced by~\verb|small^2| in the
+code, so in effect \(\eps^2=\epsilon\)\,.
 \begin{reduce}
 invariantmanifold({},
     mat(( u2-small*u1,
@@ -28,15 +33,26 @@ invariantmanifold({},
     6 )$
 end;
 \end{reduce}
-The matrix~\(\begin{bmat} 0&1&0&0 \\ 0&-1&0&0 \\ 0&0&-1&0 \\ 0&0&1&0 \end{bmat}\), of the linearisation about \(\eps=0\), has eigenvalues~\(0\) and~\(-1\) (both multiplicity two). 
-We seek the slow manifold so specify the two zero eigenvalues in the second parameter to the procedure.
-Corresponding eigenvectors are \(\ev_1=(1,0,0,0)\) and \(\ev_2=(0,0,0,1)\).   
-Choosing corresponding left-vector (here not an eigenvector) is \(\zv_1=(1,1,0,0)\) and \(\zv_2=(0,0,1,1)\) means that the slow manifold parameters~\(s_1,s_2\) have the physical meaning, respectively, of being the probability that the system is in states~\(\{1,2\}\) and~\(\{3,4\}\).
-The last parameter,~\(6\), specifies to construct the slow manifold to errors~\Ord{\eps^6}, that is, errors~\Ord{\epsilon^3}.
+The matrix~\(\begin{bmat} 0&1&0&0 \\ 0&-1&0&0 \\ 0&0&-1&0 \\
+0&0&1&0 \end{bmat}\), of the linearisation about \(\eps=0\),
+has eigenvalues~\(0\) and~\(-1\) (both multiplicity two). We
+seek the slow manifold so specify the two zero eigenvalues
+in the second parameter to the procedure. Corresponding
+eigenvectors are \(\ev_1=(1,0,0,0)\) and
+\(\ev_2=(0,0,0,1)\). Choosing corresponding left-vector
+(here not an eigenvector) is \(\zv_1=(1,1,0,0)\) and
+\(\zv_2=(0,0,1,1)\) means that the slow manifold
+parameters~\(s_1,s_2\) have the physical meaning,
+respectively, of being the probability that the system is in
+states~\(\{1,2\}\) and~\(\{3,4\}\). The last
+parameter,~\(6\), specifies to construct the slow manifold
+to errors~\Ord{\eps^6}, that is, errors~\Ord{\epsilon^3}.
 
 
 \paragraph{The slow manifold} 
-The constructed slow manifold is, in terms of the lumped-state probability parameters~\(s_1,s_2\) (to error~\Ord{\eps^2}, and reverse ordering!), 
+The constructed slow manifold is, in terms of the
+lumped-state probability parameters~\(s_1,s_2\) (to
+error~\Ord{\eps^2}, and reverse ordering!), 
 \begin{align*}&
 u_{1}=\eps^{4} \big(-s_{2}+2 s_{1}\big)-\eps^{2} s_{1}+s_{1}\,, &&
 u_{3}=\eps^{4} \big(-2 s_{2}+s_{1}\big)+\eps^{2} s_{2}\,, \\&
@@ -45,18 +61,24 @@ u_{4}=\eps^{4} \big(2 s_{2}-s_{1}\big)-\eps^{2} s_{2}+s_{2}\,.
 \end{align*}
 
 \paragraph{Slow manifold ODEs} 
-On this slow manifold the evolution of the lumped-state probabilities is
+On this slow manifold the evolution of the lumped-state
+probabilities is
 \begin{equation*}
 \dot s_{1}=\eps^{4} \big(s_{2}-s_{1}\big),\quad
 \dot s_{2}=\eps^{4} \big(-s_{2}+s_{1}\big).
 \end{equation*}
-Hence here the long-term evolution is that on a time-scale of~\Ord{1/\epsilon^2}, \(\Ord{1/\eps^4}\), the system equilibrates between the two lumped states, that is, between~\(\{1,2\}\) and~\(\{3,4\}\).
+Hence here the long-term evolution is that on a time-scale
+of~\Ord{1/\epsilon^2}, \(\Ord{1/\eps^4}\), the system
+equilibrates between the two lumped states, that is,
+between~\(\{1,2\}\) and~\(\{3,4\}\).
 
 
 \paragraph{Normals to isochrons at the slow manifold}
-To project initial conditions
-onto the slow manifold, or non-autonomous
-forcing, or modifications of the original system, or to quantify uncertainty \cite[]{Roberts89b, Roberts97b}, use the projection defined by the derived vector
+To project initial conditions onto the slow manifold, or
+non-autonomous forcing, or modifications of the original
+system, or to quantify uncertainty \cite[]{Roberts89b,
+Roberts97b}, use the projection defined by the derived
+vector
 \begin{equation*}
 \zv_1=\begin{bmatrix}z_{11}\\z_{12}\\z_{13}\\z_{14}\end{bmatrix}
 =\begin{bmatrix}
@@ -74,6 +96,7 @@ forcing, or modifications of the original system, or to quantify uncertainty \ci
 \end{bmatrix}
 .
 \end{equation*}
-Evaluate all these at \(\eps^2=\epsilon\) to apply to the original specified system.
+Evaluate all these at \(\eps^2=\epsilon\) to apply to the
+original specified system.
 
 
