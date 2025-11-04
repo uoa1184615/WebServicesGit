@@ -8,7 +8,9 @@ Sciences, University of Adelaide, South Australia~5005,
 \textsc{Australia}. \url{https://profajroberts.github.io/}}}
 
 \date{Nov 2013 -- \today}
-%:ToDo: remember to change the 'version' date for each update
+%:ToDo: change the 'version' date for each update, and
+% upload a copy to WWW/GENCM, and 
+% upload a zipped copy of folder to WWW/Sites,
 
 %:ToDo: currently the web service reduce chokes on du_k/dt=0 
 % whereas my computer version does not.  The fix is to 
@@ -115,12 +117,10 @@ the example~\verb|u1(pi/2)| to represent~\(u_1(t-\pi/2)\) in
 the \textsc{dde}s;
 
 any `spatial' derivatives \emph{must} be specified using a
-\verb|diff()| operator (currently with at most three
-arguments)---examples are \(\verb|diff(u1,x)|=\D x{u_1}\),
-\  \(\verb|diff(u3,x,y)|=\Dx xy{u_3}\),
-\  \(\verb|diff(u2,x,4)|=\Dn x4{u_2}\).
-
-% Maybe use rlfi's pdf instead of diff?  But it does not handle pdf(x)!
+\verb|pdf()| operator (currently with at most five
+arguments)---examples are \(\verb|pdf(u1,x)|=\D x{u_1}\),
+\  \(\verb|pdf(u3,x,y)|=\Dx xy{u_3}\),
+\  \(\verb|pdf(u2,x,4)|=\Dn x4{u_2}\).
 
 \item \verb|evals|, a comma separated list within
 \verb|mat((...))|, the eigenvalues of the modes to be the
@@ -169,7 +169,7 @@ and the dynamics by their evolution in time.
 \verb|invarManReport.tex| (and
 \verb|invarManReportSys.tex|)---the invariant manifold is
 parametrised by variables \(s_1\), \(s_2\), \ldots, and the
-dynamics by their evolution in time.  Generate a pdf version
+dynamics by their evolution in time.  Generate a pdf report
 by executing \verb|pdflatex invarManReport|\,.
 
 \item Global variable \verb|uu| gives the constructed 
@@ -304,20 +304,25 @@ load_package rlfi;
 operator u1,u2,u3,u4,u5,u6,u7,u8,u9;
 \end{reduce}
 Allow `space' derivatives, to be assumed small, via this
-\verb|diff| operator that has the same syntax as \verb|df()|
-but we need separate name in order to delay Reduce
-processing.
-\begin{reduce}
-operator diff;
-\end{reduce}
+\verb|pdf| operator that has the same syntax as \verb|df()|
+but we need to use separate name in order to delay Reduce
+processing:  \verb|pdf| defined by \verb|rlfi| package.
+%\begin{reduce}
+%operator pdf;
+%\end{reduce}
 Usually seems best to use the \verb|ezgcd| option---set here
 in order for a user to optionally turn off before invoking
 the procedure.  This option has mysteriously clashed fatally
 with \verb|gcd| in some examples (Jul 2025), so appears best
-without \verb|gcd|.
+without \verb|gcd|.  Unfortunately, \verb|ezgcd| also crashes \verb|psl| so leave it off for now (4 Nov 2025).
+%\begin{reduce}
+%on ezgcd; 
+%\end{reduce}
+If using \emph{psl}-Reduce, then let's make the algebra case sensitive (as of 2025, \emph{csl} does not seem to permit case sensitive).   Remember (currently, 2025) \verb|off latex| automatically turns \verb|raise| on.
 \begin{reduce}
-on ezgcd; 
+off raise;
 \end{reduce}
+
 %Similarly, try loading LaTeX names of symbols here so that
 %a user can override.  Works to some extent, but do not know
 %how to change u() and s().
@@ -366,12 +371,12 @@ scalars and most matrices to be declared local here.
 \begin{reduce}
 scalar ff, evalm, ee, zz, maxiter, trace, ll, uvec,
 reslin, ok, rhsjact, jacadj, resd, resde, resz, rhsfn,
-pp, est, eyem, m, diffzero;
+pp, est, eyem, m, pdfzero;
 \end{reduce}
 
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 15 Oct 2025)"$
+write "Construct invariant manifold (version 5 Nov 2025)"$
 %write input_odefns:=odefns;
 %write input_evals:=evals;
 %write input_evecs:=evecs;
@@ -481,11 +486,11 @@ for j:=1:9 do begin
     foreach z_ in spacex do depend mkid(u,j),z_;
 end;
 \end{reduce}
-Also set rules when needed to omit \verb|diff| terms,
+Also set rules when needed to omit \verb|pdf| terms,
 currently coded up to five arguments.
 \begin{reduce}
-diffzero:={ diff(~a)=>0, diff(~a,~b)=>0, diff(~a,~b,~c)=>0
-    , diff(~a,~b,~c,~d)=>0, diff(~a,~b,~c,~d,~e)=>0 };
+pdfzero:={ pdf(~a)=>0, pdf(~a,~b)=>0, pdf(~a,~b,~c)=>0
+    , pdf(~a,~b,~c,~d)=>0, pdf(~a,~b,~c,~d,~e)=>0 };
 \end{reduce}
 
 
@@ -633,7 +638,7 @@ uzero:=(for k:=1:n collect (mkid(u,k)=0))$
 equilibrium:=(small=0).uzero$
 for j:=1:n do for k:=1:n do begin 
   ll(j,k):=df(ff(j,1),mkid(u,k));
-  ll(j,k):=( sub(equilibrium,ll(j,k)) where diffzero );
+  ll(j,k):=( sub(equilibrium,ll(j,k)) where pdfzero );
 end;
 write "I find the linear operator is";
 write ll:=ll;
@@ -709,16 +714,16 @@ Anything not in the linear operator gets multiplied by
 somerules:=for j:=1:n collect 
   (d_(1,t,~dt)*mkid(u,j)=d_(mkid(u,j),t,dt))$
 ll0_:=(ll*uvec where somerules); 
-ffnondiff:=(ff where diffzero);
-procedure scalediff(z_);
-    (z_ where {diff(~a,~b)=>small*df(a,b) 
-        , diff(~a,~b,~n)=>small^n*df(a,b,n) when fixp(n)
-        , diff(~a,~b,~c)=>small^2*df(a,b,c) when not fixp(c)
+ffnonpdf:=(ff where pdfzero);
+procedure scalepdf(z_);
+    (z_ where {pdf(~a,~b)=>small*df(a,b) 
+        , pdf(~a,~b,~n)=>small^n*df(a,b,n) when fixp(n)
+        , pdf(~a,~b,~c)=>small^2*df(a,b,c) when not fixp(c)
         });
-ffdiff:=map(scalediff(~z),ff-ffnondiff);
-ff:=small*ffnondiff
+ffpdf:=map(scalepdf(~z),ff-ffnonpdf);
+ff:=small*ffnonpdf
     +(1-small)*ll0_
-    +ffdiff;
+    +ffpdf;
 \end{reduce}
 
 Any constant term in the equations~\verb|ff| has to be
@@ -973,15 +978,18 @@ let { l1_inv(e_(~j,~k)*exp(~a_),exp)
 
 
 \subsection{Projection onto slow manifold for PDE case}
-Now that we have finished with \verb|diff|, repurpose 
+Now that we have finished with \verb|pdf|, repurpose 
 it for the bare differentiation operator needed for the 
 projection vectors.  This seems to work for 1-D space PDEs, 
 but needs checking.   
+%:ToDo: check diff versus pdf
 \begin{reduce}
+operator diff;
 if spacex neq {} then
 let { df(~a,~x,~b)=>diff(x) when a=b 
     , df(~a,~x,~n,~b)=>diff(x)^n when a=b and fixp(n)
-    , df(~a,~x,~y,~b)=>diff(x)*diff(y) when a=b and not fixp(y)
+    , df(~a,~x,~y,~b)=>diff(x)*diff(y) 
+        when a=b and not fixp(y)
     , df(~a,~x,~n,~y,~b)=>diff(x)^n*diff(y) 
         when a=b and fixp(n) and not fixp(y)
     , df(~a,~x,~y,~n,~b)=>diff(x)*diff(y)^n 
@@ -1076,6 +1084,11 @@ defindex s(down);
 defid exp,name="\exp";
 defindex exp(arg);
 \end{reduce}
+Change printing of all derivatives to partials (hacked 
+from \verb|rlfi.red|).
+\begin{reduce}
+put('df,'lapop,"\partial ")$
+\end{reduce}
 
 Can we write the system? Not in matrices apparently. So
 define a dummy array \verb|tmp_| that we use to get the
@@ -1118,13 +1131,14 @@ shut "scratchfile.red";
 \end{reduce}
 
 Now print the dynamical system to the LaTeX sub-file.
+Switch \verb|raise| back off.
 \begin{reduce}
 write "Ignore the following 13 lines of LaTeX"$
 on latex$
 out "invarManReportSys.tex"$
 in "scratchfile.red"$
 shut "invarManReportSys.tex"$
-off latex$
+off latex$  off raise$
 \end{reduce}
 
 
@@ -1306,7 +1320,7 @@ if {resde,resd,resz}={0,0,0}
 
 
 
-\section{Output text version of results}
+\section{Output text report of results}
 
 Once construction is finished, simplify \verb|exp(0)|.
 \begin{reduce}
@@ -1375,7 +1389,7 @@ end;
 
 
 
-\section{Output LaTeX version of results}
+\section{Output LaTeX report of results}
 % AJR, 24 aug 2012 -- aug 2014
 \localtableofcontents
 
@@ -1390,8 +1404,8 @@ defid zs_,name="z";
 defindex zs_(down,down);
 \end{reduce}
 
+
 Gather complicated result
-%for k:=1:m do tmp_z(k):=for j:=1:n collect (1*coeffn(zs,e_(j,k),1));
 \begin{reduce}
 for k:=1:m do for j:=1:n do 
     tmp_zz(k,j):=(1*coeffn(zs,e_(j,k),1));
@@ -1476,11 +1490,12 @@ shut "scratchfile.red";
 Execute the scratchfile with the required commands, with
 output to the main invariant manifold LaTeX file.
 \verb|revpri| makes no difference to the \LaTeX\ output!
+Switch \verb|raise| back off.
 \begin{reduce}
 out "invarManReport.tex"$
 on latex$
 in "scratchfile.red"$
-off latex$
+off latex$ off raise$
 shut "invarManReport.tex"$
 \end{reduce}
 
@@ -1506,9 +1521,9 @@ end$
 Bad luck if these interfere with anything else a user might
 try to do afterwards!
 
-First define how various tokens get printed.
+First define how various tokens get printed.   Package
+\verb|rlfi| must already be loaded.
 \begin{reduce}
-%load_package rlfi; %must be loaded early
 deflist('((!( !\!b!i!g!() (!) !\!b!i!g!)) (!P!I !\!p!i! )
          (!p!i !\!p!i! ) (!E !e) (!I !i) (e !e) (i !i)),'name)$
 \end{reduce}
@@ -1546,7 +1561,7 @@ symbolic procedure prinlabegin;
 \end{reduce}
 
 Override the procedure that outputs the \LaTeX\ preamble
-upon the command \verb|on latex|. Presumably modified from
+upon the command \verb|on latex|. Modified from
 that in \verb|rlfi.red|. Use it to write a decent header
 that we use for one master file.
 \begin{reduce}
@@ -1573,6 +1588,17 @@ symbolic procedure latexon;
         prin2t "REDUCE Input:">>;
   put('tex,'rtypefn,'(lambda(x) 'tex)) >>$
 \end{reduce}
+%Override the procedure that ends \LaTeX\ output, assumes always preceded by an \verb|on latex|.
+%\begin{reduce}
+%symbolic procedure latexoff;
+%<<!*!*a2sfn:='aeval;
+%  remprop('TeX,'rtypefn);
+%  if !*verbatim then
+%      <<terpri();
+%        prin2t "\end{verbatim}" >>;
+%  prin2t "\end{document}";
+%  rmsubs() >>;
+%\end{reduce}
 
 
 

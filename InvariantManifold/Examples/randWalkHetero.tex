@@ -1,0 +1,145 @@
+%!TEX root = ../diverseExamples.tex
+\subsection{\texttt{randWalkHetero}: including spatial heterogeneity} 
+\label{randWalkHetero}
+\localtableofcontents
+
+What if the governing \pde{}s have heterogeneous coefficients?    We can still analyse such systems provided the heterogeneity is also slowly-varying in space, that is, if the underlying system has functional graduations.
+
+Here introduce the technique via a modification of the random walker in 2D of \cref{randWalkIn2D}.   Let the West walking be done a speeds that vary in \(x_1x_2\)-space, say at speed \(w(x_1,x_2)\).
+
+Let \(u_j(x_1,x_2,t)\) be the probability of the walker
+being at position~\((x_1,x_2)\) and walking in the
+\(j\)th~of the mentioned directions. Then the
+non-dimensional \pde{}s for these probabilities may be
+\begin{align*}
+&\D t{u_1}=-\D {x_1}{u_1}-\D {x_2}{u_1}-u_1+u_2\,,
+\\&\D t{u_2}=+w(x_1,x_2)\D {x_1}{u_2}+u_1-2u_2+u_3\,,
+\\&\D t{u_3}=-\D {x_1}{u_3}+\D{x_2}{u3}+u_2-u_3\,.
+\end{align*}
+We code the equivalent system obtained by defining a new variable \(u_4:=w\) such that \(\D t{u_4}=0\) so that \(u_4\)~may vary in space but not in time:
+\begin{align*}
+&\D t{u_1}=-\D {x_1}{u_1}-\D {x_2}{u_1}-u_1+u_2\,,
+\\&\D t{u_2}=+u_4\D {x_1}{u_2}+u_1-2u_2+u_3\,,
+\\&\D t{u_3}=-\D {x_1}{u_3}+\D{x_2}{u3}+u_2-u_3\,,
+\\&\D t{u_4}=0\,.
+\end{align*}
+Then in the output, \(w=u_4=s_2\).
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+\end{reduce}
+In the printed output, group terms depending upon order of
+spatial derivatives (which are assumed `small').
+\begin{reduce}
+factor small;
+\end{reduce}
+The following procedure call constructs the slow manifold
+for this system to errors~\Ord{\grad^5}.
+\begin{reduce}
+invariantmanifold( {x_1,x_2},
+    mat((-pdf(u1,x_1)-pdf(u1,x_2)+(u2-u1)
+        ,+u4*pdf(u2,x_1)         +(u1-2*u2+u3)
+        ,-pdf(u3,x_1)+pdf(u3,x_2)+(u2-u3)     
+        ,0)),
+    mat(( 0,0 )),
+    mat( (1/3,1/3,1/3,0),(0,0,0,1) ),
+    mat( (1,1,1,0),(0,0,0,1) ),
+    3 )$
+end;
+\end{reduce}
+
+
+The procedure then actually analyses the parametrised system
+\begin{align*}&
+\D t{u_{1}}=\eps \big(-\frac{\partial\,u_1}{\partial\,x_1}-\frac{\partial
+\,u_1}{\partial\,x_2}\big)-u_1+u_2\,,
+\\&
+\D t{u_{2}}=\eps u_4\frac{\partial\,u_2}{\partial\,x_1}+u_1-2 u_2+u_3\,.
+\\&
+\D t{u_{3}}=\eps \big(-\frac{\partial\,u_3}{\partial\,x_1}+\frac{\partial
+\,u_3}{\partial\,x_2}\big)+u_2-u_3\,.
+\end{align*}
+Consequently the procedure's artificial parameter~\(\eps\)\
+counts the number of spatial derivatives in each term.
+
+
+\paragraph{The invariant manifold} 
+Five iterations constructs the slow manifold model. The slow
+manifold is expressed in terms of a series in space
+derivatives.
+\begin{align*}&
+u_{1}=\ParMath{ \eps \big(-1/27 \frac{\partial \,s_{1}}{\partial \,x_1} s_{2}-1/
+27 \frac{\partial \,s_{1}}{\partial \,x_1}-1/3 \frac{\partial \,s_{1}}{
+\partial \,x_2}\big)+O\big(\varepsilon ^{2}\big)+1/3 s_{1}
+}\\&
+u_{2}=\ParMath{ \eps \big(2/27 \frac{\partial \,s_{1}}{\partial \,x_1} s_{2}+2/27
+ \frac{\partial \,s_{1}}{\partial \,x_1}\big)+O\big(\varepsilon ^{2}
+\big)+1/3 s_{1}
+}\\&
+u_{3}=\ParMath{ \eps \big(-1/27 \frac{\partial \,s_{1}}{\partial \,x_1} s_{2}-1/
+27 \frac{\partial \,s_{1}}{\partial \,x_1}+1/3 \frac{\partial \,s_{1}}{
+\partial \,x_2}\big)+O\big(\varepsilon ^{2}\big)+1/3 s_{1}
+}\\&
+u_4=\ParMath{ O\big(\varepsilon ^{2}\big)+s_{2}
+}\end{align*}
+
+ 
+\paragraph{Invariant manifold PDEs} 
+The system evolves according to this \pde\ that describes
+the effective movement of the random walker: an
+advection-diffusion \pde, with anisotropic diffusion, and
+gradients of \(w=s_2\) included:
+\begin{align*}&
+\D t{s_{1}}=\ParMath{ \eps^{2} \big(2/27 \frac{\partial \,s_{2}}{\partial \,x_1} 
+\frac{\partial \,s_{1}}{\partial \,x_1} s_{2}+2/27 \frac{\partial \,s_{
+2}}{\partial \,x_1} \frac{\partial \,s_{1}}{\partial \,x_1}+2/27 
+\frac{\partial ^{2}s_{1}}{\partial x_1^{2}} s_{2}^{2}+4/27 \frac{
+\partial ^{2}s_{1}}{\partial x_1^{2}} s_{2}+2/27 \frac{\partial ^{2}s_{
+1}}{\partial x_1^{2}}+2/3 \frac{\partial ^{2}s_{1}}{\partial x_2^{2}}
+\big)+\eps \big(1/3 \frac{\partial \,s_{1}}{\partial \,x_1} s_{2}-2/3 
+\frac{\partial \,s_{1}}{\partial \,x_1}\big)+O\big(\varepsilon ^{3}
+\big)
+}\\&
+\D t{s_2}=0
+\end{align*}
+So, if \(w=s_2<2\) then, on average, the walker will drift in the
+\(+x_1\)-direction, but with significant and growing spread
+in the \(x_1x_2\)-meadow.
+
+
+\paragraph{Project initial conditions et al.}
+To project initial conditions onto the slow manifold, or
+non-autonomous forcing, or modifications of the original
+system, or to quantify uncertainty \cite[Ch.12]{Roberts89b,
+Roberts97b, Roberts2014a}, use the projection defined by the
+following derived vector.   \emph{Warning: this needs checking.}
+%:ToDo: check projection vector in such scenario
+\begin{align*}&
+\zv_1=\begin{bmatrix}z_{11}&z_{12}&z_{13}&z_{14}\end{bmatrix}^T
+\\&
+=\begin{bmatrix}
+\ParMath{ 
+\eps^{2} \big(-1/27 \diff_{x_1}^{2} s_{2}^{2}-2/27 \diff_{x_1}
+^{2} s_{2}-1/27 \diff_{x_1}^{2}+4/9 \diff_{x_1} \diff_{x_2} s_{2}+4/9
+ \diff_{x_1} \diff_{x_2}-5/9 \diff_{x_2}^{2}\big)+\eps \big(-1/9 
+\diff_{x_1} s_{2}-1/9 \diff_{x_1}-\diff_{x_2}\big)+O\big(\varepsilon 
+^{3}\big)+1
+}\\[4ex]\ParMath{
+-8/9 \eps^{2} \diff_{x\_2}^{2}+\eps \big(2/9 \diff_{x\_1} s_{2}+2
+/9 \diff_{x\_1}\big)+O\big(\varepsilon ^{3}\big)+1 
+}\\[2ex]\ParMath{ 
+\eps^{2} \big(-1/27 \diff_{x_1}^{2} s_{2}^{2}-2/27 \diff_{x_1}
+^{2} s_{2}-1/27 \diff_{x_1}^{2}-4/9 \diff_{x_1} \diff_{x_2} s_{2}-4/9
+ \diff_{x_1} \diff_{x_2}-5/9 \diff_{x_2}^{2}\big)+\eps \big(-1/9 
+\diff_{x_1} s_{2}-1/9 \diff_{x_1}+\diff_{x_2}\big)+O\big(\varepsilon 
+^{3}\big)+1
+}\\[4ex]\ParMath{ 
+\eps^{2} \big(-2/81 \frac{\partial \,s_{1}}{\partial \,x_1} 
+\diff_{x_1} s_{2}-2/81 \frac{\partial \,s_{1}}{\partial \,x_1} \diff_{
+x_1}\big)+O\big(\varepsilon ^{3}\big)
+}\end{bmatrix}.
+\\&
+\zv_2=\begin{bmatrix}0&0&0&1\end{bmatrix}^T.
+\end{align*}
+

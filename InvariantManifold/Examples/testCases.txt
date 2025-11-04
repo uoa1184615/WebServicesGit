@@ -1,8 +1,16 @@
-% test cases
-% AJR, 15 Oct 2025
+% test cases, execute with   in "testCases.txt"$
+% AJR, 15 Oct 2025 -- 4 Nov 2025
 in_tex "../invariantManifold.tex"$
+write "
 
-% simple3d
+
+
+
+
+
+
+
+**** simple3d";
 invariantmanifold({},
     mat(( 2*u1+u2+2*u3+u2*u3,
           u1-u2+u3-u1*u3,
@@ -20,14 +28,16 @@ zsx:=e_(1,1)*(4 - 16*s(1)*small + 258*s(1)**2*small**2) + e_(2,1)*(1 -
 240*s(1)**2*small**2)$
 if not(uu=uux and gg=ggx and zs=zsx) 
 then rederr("Failed to agree with simple3d");
+write "
 
 
 
 
 
 
-% doubleHopfDDE
-off ezgcd; 
+
+
+**** doubleHopfDDE";
 invariantmanifold({},
     mat(( -4*(1+small*delta)^2*(5/8*u2 +3/8*u2(pi)),
           +u1*(1+u2) )),
@@ -189,7 +199,7 @@ e_(4,1)*s(4)*s(2)*s(1)*( - 98304*pi*small**2 - 138240*pi**3*small**2 -
 9*pi**2)$
 if not(uu=uux and gg=ggx) 
 then rederr("Failed to agree with doubleHopfDDE");
-on ezgcd;   
+write "
 
 
 
@@ -198,7 +208,7 @@ on ezgcd;
 
 
 
-% metastable4
+**** metastable4";
 invariantmanifold({},
     mat(( u2-small*u1,
          -u2+small*(u1-u2+u3),
@@ -220,6 +230,7 @@ zsx := e_(1,1)*(1 + small**4) - e_(1,2)*small**4 + e_(2,1)*(1 - small**2 +
 small**4)$
 if not(uu=uux and gg=ggx and zs=zsx) 
 then rederr("Failed to agree with metastable4");
+write "
 
 
 
@@ -228,7 +239,7 @@ then rederr("Failed to agree with metastable4");
 
 
 
-% nonlinNormModes
+**** nonlinNormModes";
 invariantmanifold({},
     mat(( u3,
           u4,
@@ -338,6 +349,7 @@ ggx := e_(1,1)*small**2*( - 3/40*s(1) + 3/8*s(2)*s(1)**2*i +
 - 3/8*s(4) - 1/4*sqrt(3)*s(4)*s(2)*s(1)*i - 1/8*sqrt(3)*s(4)**2*s(3)*i)$
 if not(uu=uux and gg=ggx) 
 then rederr("Failed to agree with nonlinNormModes");
+write "
 
 
 
@@ -346,7 +358,7 @@ then rederr("Failed to agree with nonlinNormModes");
 
 
 
-% forcedNonlinNormMode
+**** forcedNonlinNormMode";
 invariantmanifold({},
     mat(( u3, u4,
     -2*u1+u2-small*u1^3/2+small*3/10*(-u3+u4)
@@ -465,6 +477,7 @@ e_(1,1)*f_1*small**4*(3/160*i - 9/128*s(1)**2 + 9/64*s(2)*s(1)) -
 9/128*s(2)**2)$
 if not(uu=uux and gg=ggx) 
 then rederr("Failed to agree with forcedNonlinNormMode");
+write "
 
 
 
@@ -473,7 +486,7 @@ then rederr("Failed to agree with forcedNonlinNormMode");
 
 
 
-% lorenz86sm
+**** lorenz86sm";
 invariantmanifold({},
     mat(( -u2*u3+b*u2*u5,
         u1*u3-b*u1*u5,
@@ -501,13 +514,16 @@ e_(4,2)*b**3*(s(1)**3*small**3 - s(2)**2*s(1)*small**3) -
 s(2)**2*small**2)$
 if not(uu=uux and gg=ggx and zsx=zs) 
 then rederr("Failed to agree with lorenz86sm");
+write "
 
 
 
 
 
 
-% lorenz86nf
+
+
+**** lorenz86nf";
 invariantmanifold({},
     mat(( -u2*u3+b*u2*u5,
         u1*u3-b*u1*u5,
@@ -571,6 +587,7 @@ e_(4,1)*b**2*(1/2*s(4)*s(1)**2*i*small**2 - 1/2*s(4)*s(2)**2*i*small**2) +
 e_(5,1)*b**2*( - 1/2*s(5)*s(1)**2*i*small**2 + 1/2*s(5)*s(2)**2*i*small**2)$
 if not(uu=uux and gg=ggx) 
 then rederr("Failed to agree with lorenz86nf");
+write "
 
 
 
@@ -579,10 +596,10 @@ then rederr("Failed to agree with lorenz86nf");
 
 
 
-% heatX
+**** heatX";
 invariantmanifold( {x},
-    mat((-diff(u1,x)+(u2-u1)
-        ,+diff(u2,x)+(u1-u2))),
+    mat((-pdf(u1,x)+(u2-u1)
+        ,+pdf(u2,x)+(u1-u2))),
     mat(( 0 )),
     mat( (1/2,1/2) ),
     mat( (1,1) ),
