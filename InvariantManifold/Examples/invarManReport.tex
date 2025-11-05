@@ -23,13 +23,41 @@ These give the location of the invariant manifold in
 terms of parameters~\(s\_ j\).
 \(
 \)\par
-\(u_{1}=1/16 \frac{\partial ^{3}s_{1}}{\partial x^{3}} \eps^{3}-1/4 \frac{
-\partial \,s_{1}}{\partial \,x} \eps+O\big(\varepsilon ^{4}\big)+1/2 s_{
-1}
+\(u_{1}=F\_1 \eps^{2} \big(3/16 \exp \big(-i t\big) i-3/16 \exp \big(i t
+\big) i\big)+F\_2 \eps^{2} \big(4/55 \exp \big(\big(-i t\big)/2\big) s_{
+2} i-4/25 \exp \big(\big(-3 i t\big)/2\big) s_{2} i-4/55 \exp \big(\big(
+i t\big)/2\big) s_{1} i+4/25 \exp \big(\big(3 i t\big)/2\big) s_{1} i
+\big)+\eps^{2} \big(-9/16 \exp \big(-i t\big) s_{2}^{2} s_{1}+7/96 \exp 
+\big(-3 i t\big) s_{2}^{3}-9/16 \exp \big(i t\big) s_{2} s_{1}^{2}+7/96 
+\exp \big(3 i t\big) s_{1}^{3}\big)+\exp \big(-i t\big) s_{2}+\exp \big(
+i t\big) s_{1}+O\big(\varepsilon ^{4}\big)
 \)\par
-\(u_{2}=-1/16 \frac{\partial ^{3}s_{1}}{\partial x^{3}} \eps^{3}+1/4 
-\frac{\partial \,s_{1}}{\partial \,x} \eps+O\big(\varepsilon ^{4}\big)+1
-/2 s_{1}
+\(u_{2}=F\_1 \eps^{2} \big(-1/16 \exp \big(-i t\big) i+1/16 \exp \big(i t
+\big) i\big)+F\_2 \eps^{2} \big(7/55 \exp \big(\big(-i t\big)/2\big) s_{
+2} i+1/25 \exp \big(\big(-3 i t\big)/2\big) s_{2} i-7/55 \exp \big(\big(
+i t\big)/2\big) s_{1} i-1/25 \exp \big(\big(3 i t\big)/2\big) s_{1} i
+\big)+\eps^{2} \big(3/16 \exp \big(-i t\big) s_{2}^{2} s_{1}-1/96 \exp 
+\big(-3 i t\big) s_{2}^{3}+3/16 \exp \big(i t\big) s_{2} s_{1}^{2}-1/96 
+\exp \big(3 i t\big) s_{1}^{3}\big)+\exp \big(-i t\big) s_{2}+\exp \big(
+i t\big) s_{1}+O\big(\varepsilon ^{4}\big)
+\)\par
+\(u_{3}=F\_1 \eps^{2} \big(1/16 \exp \big(-i t\big)+1/16 \exp \big(i t
+\big)\big)+F\_2 \eps^{2} \big(2/55 \exp \big(\big(-i t\big)/2\big) s_{2}
+-6/25 \exp \big(\big(-3 i t\big)/2\big) s_{2}+2/55 \exp \big(\big(i t
+\big)/2\big) s_{1}-6/25 \exp \big(\big(3 i t\big)/2\big) s_{1}\big)+\eps
+^{2} \big(3/16 \exp \big(-i t\big) s_{2}^{2} s_{1} i-7/32 \exp \big(-3 i
+ t\big) s_{2}^{3} i-3/16 \exp \big(i t\big) s_{2} s_{1}^{2} i+7/32 \exp 
+\big(3 i t\big) s_{1}^{3} i\big)-\exp \big(-i t\big) s_{2} i+\exp \big(i
+ t\big) s_{1} i+O\big(\varepsilon ^{4}\big)
+\)\par
+\(u_{4}=F\_1 \eps^{2} \big(-3/16 \exp \big(-i t\big)-3/16 \exp \big(i t
+\big)\big)+F\_2 \eps^{2} \big(7/110 \exp \big(\big(-i t\big)/2\big) s_{2
+}+3/50 \exp \big(\big(-3 i t\big)/2\big) s_{2}+7/110 \exp \big(\big(i t
+\big)/2\big) s_{1}+3/50 \exp \big(\big(3 i t\big)/2\big) s_{1}\big)+\eps
+^{2} \big(-9/16 \exp \big(-i t\big) s_{2}^{2} s_{1} i+1/32 \exp \big(-3 
+i t\big) s_{2}^{3} i+9/16 \exp \big(i t\big) s_{2} s_{1}^{2} i-1/32 \exp
+ \big(3 i t\big) s_{1}^{3} i\big)-\exp \big(-i t\big) s_{2} i+\exp \big(
+i t\big) s_{1} i+O\big(\varepsilon ^{4}\big)
 \)\par
 \(
 \)
@@ -38,27 +66,15 @@ The system evolves on the invariant manifold such
 that the parameters evolve according to these ODEs.
 \(
 \)\par
-\(\dot s_{1}=-1/8 \frac{\partial ^{4}s_{1}}{\partial x^{4}} \eps^{4}+1/2 
-\frac{\partial ^{2}s_{1}}{\partial x^{2}} \eps^{2}+O\big(\varepsilon ^{5
-}\big)
+\(\dot s_{1}=F\_1 \eps^{4} \big(9/64 s_{2} s_{1}-9/128 s_{1}^{2}+3/160 i
+\big)-1/8 F\_1 \eps^{2}+93/5500 F\_2^{2} \eps^{4} s_{1} i+\eps^{4} \big(
+-155/256 s_{2}^{2} s_{1}^{3} i+9/160 s_{2} s_{1}^{2}\big)+3/8 \eps^{2} s
+_{2} s_{1}^{2} i+O\big(\varepsilon ^{5}\big)
 \)\par
-\(
-\)
-\paragraph{Normals to isochrons at the slow manifold}
-Use these vectors: to project initial conditions
-onto the slow manifold; to project non-autonomous
-forcing onto the slow evolution; to predict the
-consequences of modifying the original system; in
-uncertainty quantification to quantify effects on
-the model of uncertainties in the original system.
-The normal vector \(\vec z\_j:=(z\_{j1},\ldots,z\_{jn})\)
-\(
-\)\par
-\(z_{11}=3/16 \diff_{x}^{4} \eps^{4}+1/4 \diff_{x}^{3} \eps^{3}-1/4 \diff_
-{x}^{2} \eps^{2}-1/2 \diff_{x} \eps+O\big(\varepsilon ^{5}\big)+1
-\)\par
-\(z_{12}=3/16 \diff_{x}^{4} \eps^{4}-1/4 \diff_{x}^{3} \eps^{3}-1/4 \diff_
-{x}^{2} \eps^{2}+1/2 \diff_{x} \eps+O\big(\varepsilon ^{5}\big)+1
+\(\dot s_{2}=F\_1 \eps^{4} \big(-9/128 s_{2}^{2}+9/64 s_{2} s_{1}-3/160 i
+\big)-1/8 F\_1 \eps^{2}-93/5500 F\_2^{2} \eps^{4} s_{2} i+\eps^{4} \big(
+155/256 s_{2}^{3} s_{1}^{2} i+9/160 s_{2}^{2} s_{1}\big)-3/8 \eps^{2} s_
+{2}^{2} s_{1} i+O\big(\varepsilon ^{5}\big)
 \)\par
 \(
 \)\par

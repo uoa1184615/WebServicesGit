@@ -318,9 +318,10 @@ without \verb|gcd|.  Unfortunately, \verb|ezgcd| also crashes \verb|psl| so leav
 %\begin{reduce}
 %on ezgcd; 
 %\end{reduce}
-If using \emph{psl}-Reduce, then let's make the algebra case sensitive (as of 2025, \emph{csl} does not seem to permit case sensitive).   Remember (currently, 2025) \verb|off latex| automatically turns \verb|raise| on.
+Let's make the algebra case sensitive: for \emph{csl} we set \verb|raise|; whereas for \emph{csl} we set \verb|lower|.  
+ Remember (currently, 2025) \verb|off latex| automatically turns \verb|raise| back on (but not \verb|lower|).
 \begin{reduce}
-off raise;
+off raise;  off lower;
 \end{reduce}
 
 %Similarly, try loading LaTeX names of symbols here so that
@@ -376,7 +377,7 @@ pp, est, eyem, m, pdfzero;
 
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 5 Nov 2025)"$
+write "Construct invariant manifold (version 6 Nov 2025)"$
 %write input_odefns:=odefns;
 %write input_evals:=evals;
 %write input_evecs:=evecs;
