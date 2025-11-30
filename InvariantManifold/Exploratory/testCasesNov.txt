@@ -1,6 +1,6 @@
 % test cases, execute with   in "testCases.txt"$
-% AJR, 15 Oct 2025 -- 4 Nov 2025
-in_tex "../invariantManifold.tex"$
+% AJR, 15 Oct 2025 -- 21 Nov 2025
+in_tex "../invariantManifoldNov.tex"$
 write "
 
 

@@ -318,7 +318,7 @@ without \verb|gcd|.  Unfortunately, \verb|ezgcd| also crashes \verb|psl| so leav
 %\begin{reduce}
 %on ezgcd; 
 %\end{reduce}
-Let's make the algebra case sensitive: for \emph{psl} we set \verb|raise|; whereas for \emph{csl} we set \verb|lower|.  
+Let's make the algebra case sensitive: for \emph{csl} we set \verb|raise|; whereas for \emph{csl} we set \verb|lower|.  
  Remember (currently, 2025) \verb|off latex| automatically turns \verb|raise| back on (but not \verb|lower|).
 \begin{reduce}
 off raise;  off lower;
@@ -375,14 +375,23 @@ reslin, ok, rhsjact, jacadj, resd, resde, resz, rhsfn,
 pp, est, eyem, m, pdfzero;
 \end{reduce}
 
+For optional trace printing of test cases: comment out
+second line when not needed.
+\begin{reduce}
+trace:=0$
+trace:=1; maxiter:=5; %%%%
+\end{reduce}
+
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 6 Nov 2025)"$
-%write input_odefns:=odefns;
-%write input_evals:=evals;
-%write input_evecs:=evecs;
-%write input_adjvecs:=adjvecs;
-%write input_toosmall:=toosmall;
+write "Construct invariant manifold  EXPERIMENTAL (version 21 Nov 2025)"$
+if trace then <<
+    write input_odefns:=odefns;
+    write input_evals:=evals;
+    write input_evecs:=evecs;
+    write input_adjvecs:=adjvecs;
+    write input_toosmall:=toosmall;
+>>;
 \end{reduce}
 
 
@@ -399,13 +408,6 @@ Define default parameters for the iteration:
 Specific problems may override this default.
 \begin{reduce}
 maxiter:=29$
-\end{reduce}
-
-For optional trace printing of test cases: comment out
-second line when not needed.
-\begin{reduce}
-trace:=0$
-%trace:=1; maxiter:=5; %%%%
 \end{reduce}
 
 
@@ -492,6 +494,11 @@ currently coded up to five arguments.
 \begin{reduce}
 pdfzero:={ pdf(~a)=>0, pdf(~a,~b)=>0, pdf(~a,~b,~c)=>0
     , pdf(~a,~b,~c,~d)=>0, pdf(~a,~b,~c,~d,~e)=>0 };
+\end{reduce}
+Set \verb|pdf| to be linear so it now expands.
+Best to undo before exiting to ready for future execution.
+\begin{reduce}
+linear pdf;
 \end{reduce}
 
 
@@ -643,6 +650,14 @@ for j:=1:n do for k:=1:n do begin
 end;
 write "I find the linear operator is";
 write ll:=ll;
+%
+% remember pdfzero somewhere in here also??
+write
+uscale:=(for k:=1:n collect (mkid(u,k)=small_*mkid(u,k)));
+write
+ffs:=sub((small=small_).uscale,ff)/small_;
+write
+ffs:=sub(small_=small,ffs);
 \end{reduce}
 
 We need a vector of unknowns for a little while.
@@ -1508,7 +1523,9 @@ shut "invarManReport.tex"$
 \section{Fin}
 \label{secFin}
 That's all folks, so end the procedure. 
+Need to clear all but operator properties of pdf.
 \begin{reduce}
+clear pdf; operator pdf;
 return Finished_constructing_invariant_manifold_of_system$ 
 end$
 \end{reduce}

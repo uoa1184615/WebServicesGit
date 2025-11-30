@@ -1,0 +1,38 @@
+Comment With general parameters, iteration works!! 
+https://doi.org/10.29020/nybg.ejpam.v18i4.6749
+
+RHS function = ( (beta+u4)*(S+u2)*u1-(beta*S)*u1
+,-(mu+gamma)*u2-(beta+u4)*(S+u2)*u1-k*u1*(S+u2)+phi*u1
+, gamma*u2-mu*u3
+, small^9)
+Invariant eigenvalues = 0,0
+Invariant eigenvectors = (1
+,(-(beta+k)*S+phi)/(mu+gamma) 
+,(-(beta+k)*S+phi)/(mu+gamma)*gamma/mu 
+,0),(0,0,0,1)
+Adjoint basis = (1,0,0,0),(0,0,0,1)
+AJR, 9 Nov 2025;
+
+in_tex "../invariantManifold.tex"$
+factor small;
+
+on ezgcd;
+odes:=mat( ( (beta+u4)*(S+u2)*u1-(beta*S)*u1 
+,-(mu+gamma)*u2-(beta+u4)*(S+u2)*u1-k*u1*(S+u2)+phi*u1  
+, gamma*u2-mu*u3
+, small^9) )
+-u1*u2*u4*(1-small)*mat((1,-1,0,0)); %repairs the order of the cubic
+
+evecs:=mat( (1
+,(-(beta+k)*S+phi)/(mu+gamma) 
+,(-(beta+k)*S+phi)/(mu+gamma)*gamma/mu 
+,0),(0,0,0,1) ); 
+rvecs:= mat( (1,0,0,0),(0,0,0,1) );
+evals:=mat((0,0));
+
+ord:=4; 
+
+if ord>2 then beta:=S:=mu:=gamma:=phi:=k:=1
+    else factor s;
+invariantmanifold({}, odes, evals, evecs, rvecs, ord)$
+end;

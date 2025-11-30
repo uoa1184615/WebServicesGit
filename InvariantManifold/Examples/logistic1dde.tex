@@ -3,11 +3,15 @@
 \label{logistic1dde}
 \localtableofcontents
 
-Form a centre manifold for the delayed `logistic' system in one variable, for delay \(\tau=3\pi/4\)\,, with
+Form a centre manifold for the delayed `logistic' system in
+one variable, for delay \(\tau=3\pi/4\)\,, with
 \begin{equation*}
 \de tu=-u(t)-(\sqrt2+a)u(t-\tau)+\mu u(t-\tau)^2+\nu u(t-\tau)^3,
 \end{equation*}
-for and nonlinearity parameters \(\mu\) and~\(\nu\), and small parameter~\(a\).  Numerical computation of the spectrum indicates that the system has a Hopf bifurcation as parameter~\(a\) crosses zero.
+for and nonlinearity parameters \(\mu\) and~\(\nu\), and
+small parameter~\(a\).  Numerical computation of the
+spectrum indicates that the system has a Hopf bifurcation as
+parameter~\(a\) crosses zero.
 %\begin{verbatim}
 %ac=-sqrt(2), tau=3*pi/4
 %ce=@(z) z+1-ac*exp(-tau*z)
@@ -15,17 +19,24 @@ for and nonlinearity parameters \(\mu\) and~\(\nu\), and small parameter~\(a\). 
 %plot(real(lams),imag(lams),'o')
 %\end{verbatim}
 
-We code the parameter~\(a\) as `small', and observe it is consequently considered as `small squared' because all nonlinear terms, and already `small' terms, are multiplied by~\(\eps\) (\verb|small|).
+We code the parameter~\(a\) as `small', and observe it is
+consequently considered as `small squared' because all
+nonlinear terms, and already `small' terms, are multiplied
+by~\(\eps\) (\verb|small|).
 
 Start by loading the procedure.
 \begin{reduce}
 in_tex "../invariantManifold.tex"$
 \end{reduce}
-In the printed output, group terms with like powers of amplitudes~\(s_j\), the complex exponential, and the parameters.
+In the printed output, group terms with like powers of
+amplitudes~\(s_j\), the complex exponential, and the
+parameters.
 \begin{reduce}
 factor s,exp,a,mu,nu;
 \end{reduce}
-Execute the construction of the slow manifold for this system (ignore the warning messages about \verb|u1| declared, and then already defined, as an operator).
+Execute the construction of the slow manifold for this
+system (ignore the warning messages about \verb|u1|
+declared, and then already defined, as an operator).
 \begin{reduce}
 invariantmanifold({},
     mat(( -u1-(sqrt(2)+small*a)*u1(3*pi/4)
@@ -36,11 +47,17 @@ invariantmanifold({},
     3)$
 end;
 \end{reduce}
-The marginal modes are~\(e^{\pm it}\) so nominate the frequencies~\(\pm 1\).
-The eigenvectors are just~\(1\cdot e^{\pm it}\). 
-Because for delay differential equations the time dependence~\(e^{\pm i\omega t}\) is an integral part of the definition of the eigenvector; hence the coded eigenvectors can be the same, as here, because they are differentiated through the time dependence~\(e^{\pm i\omega t}\).
+The marginal modes are~\(\e^{\pm it}\) so nominate the
+frequencies~\(\pm 1\). The eigenvectors are just~\(1\cdot
+\e^{\pm it}\). Because for delay differential equations the
+time dependence~\(\e^{\pm i\omega t}\) is an integral part
+of the definition of the eigenvector; hence the coded
+eigenvectors can be the same, as here, because they are
+differentiated through the time dependence~\(\e^{\pm i\omega
+t}\).
 
-The procedure actually analyses the embedding system
+The procedure actually analyses the embedding system, for
+delay \(\tau=3\pi/4\),
 \begin{equation*}
 \dot u_{1}=-a \eps^{2} u_1(t-\tau)
 +\mu  \eps  u_1(t-\tau)^{2}
@@ -50,8 +67,8 @@ The procedure actually analyses the embedding system
 \end{equation*}
 
 \paragraph{The centre manifold} 
-These give the location of the invariant manifold in
-terms of parameters~\(s\sb j\).
+These give the location of the invariant manifold in terms
+of parameters~\(s\sb j\).
 \begin{align*}&
 u_{1}=\ParMath{
 \exp \big(-i t\big) s_{2}+\exp \big(-2 i t\big) s_{2}^{2} \mu  
@@ -62,8 +79,8 @@ _{2} s_{1} \mu  \eps
 \end{align*}
  
 \paragraph{Centre manifold ODEs} 
-The system evolves on the invariant manifold such
-that the parameters evolve according to these ODEs.
+The system evolves on the invariant manifold such that the
+parameters evolve according to these ODEs.
 \begin{align*}&
 \dot s_{1}=\ParMath{
 s_{2} s_{1}^{2} \mu ^{2} \eps^{2} \big(-0.1303 i-0.5209
@@ -77,5 +94,6 @@ s_{2}^{2} s_{1} \mu ^{2} \eps^{2} \big(0.1303 i-0.5209
 a \eps^{2} \big(-0.04205 i+0.2402\big)
 }
 \end{align*}
-Hence the centre manifold model predicts a supercritical Hopf bifurcation as parameter~\(a\) increases through zero.
+Hence the centre manifold model predicts a supercritical
+Hopf bifurcation as parameter~\(a\) increases through zero.
 

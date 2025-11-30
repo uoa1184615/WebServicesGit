@@ -8,7 +8,7 @@ multiscale differential equations}
 Sciences, University of Adelaide, South Australia~5005,
 \textsc{Australia}. \url{https://profajroberts.github.io/}}}
 
-\date{19 Nov 2008; last modified \today}
+\date{November 19, 2008; modified \today}
 
 
 
@@ -97,17 +97,17 @@ by~\verb|z(1)| through to~\verb|z(nz)| (or aliases
 \verb|z1|,\ldots). Each non-autonomous factor must be
 denoted by~\verb|w(.)| where the dot denotes almost any
 label you care to choose: simple numbers such as~\verb|w(1)|
-and/or~\verb|w(2)| are the usual choices (aliases exist for
-\verb|w0| to~\verb|w9|); but other labels may be used. Often
-\verb|w(.)| is a Stratonovich white noise, a derivative of a
-Stratonovich Wiener process. Analyse deterministic,
-autonomous, systems by omitting any noise term~\verb|w()| in
-the differential equations. The \sde{}s must be linearly
-diagonalised. \footnote{Although a Jordan form is also
-acceptable, there are issues in the error control.  Also,
-`small' off-diagonal terms are allowed.}  Then, as in the
-example of the next \cref{ss:eg}, the input parameters to
-the procedure are the following:
+and/or~\verb|w(2)| are the usual choices (no aliases); but
+other labels may be used. Often \verb|w(.)| is a
+Stratonovich white noise, a derivative of a Stratonovich
+Wiener process. Analyse deterministic, autonomous, systems
+by omitting any noise term~\verb|w()| in the differential
+equations. The \sde{}s must be linearly diagonalised.
+\footnote{Although a Jordan form is also acceptable, there
+are issues in the error control.  Also, `small' off-diagonal
+terms are allowed.}  Then, as in the example of the next
+\cref{ss:eg}, the input parameters to the procedure are the
+following:
 \begin{itemize}
 \item \verb|dxdt|, a comma separated list within braces,
 \(\{\ldots\}\), of the right-hand sides of the \sde{}s for
@@ -241,9 +241,9 @@ procedure \verb|examplenormform()|:
 procedure examplenormform(theman);  
     stonormalform(
     {-x1*y1},
-    {-y1+x1^2-2*y1^2+w0},
+    {-y1+x1^2-2*y1^2+w(1)},
     {},
-    5, theman )$
+    3, theman )$
 \end{reduce}
 The procedure \verb|stonormalform| automatically multiplies
 the noise factors by a parameter~\verb|sigma| so there is no
@@ -369,14 +369,6 @@ manifold\slash normal form.
 clear cman,sman,uman,csman,cuman,csuman;
 \end{reduce}
 
-Let's make the algebra case sensitive: for \emph{psl} we set
-\verb|raise|; whereas for \emph{csl} we set \verb|lower|.
-Remember (currently, 2025) \verb|off latex| automatically
-turns \verb|raise| back on (but not \verb|lower|).
-\begin{reduce}
-off raise;  off lower;
-\end{reduce}
-
 
 
 Now define the procedure as an operator so we can define
@@ -429,7 +421,7 @@ umanf := inlist(theman,{uman,cuman,csuman})$
 Write an intro message.
 \begin{reduce}
 write "Construct a stochastic ",textask
-     ," (version 30 Nov 2025)"$
+     ," (version 30 May 2023)"$
 \end{reduce}
 
 Parameter \verb|maxiter|~is the maximum number of allowed
@@ -443,8 +435,7 @@ In the printed expressions, by default, factor
 %factor small,sigma; 
 \end{reduce}
 
-The code cannot handle any cubic or higher order in noise 
-amplitude~\verb|sigma|.
+The code cannot handle any cubic or higher order in noise amplitude~\verb|sigma|.
 \begin{reduce}
 let sigma^3=>0;
 \end{reduce}
@@ -472,12 +463,6 @@ on rationalize;
 
 \subsection{Extract and scale slow equations}
 
-Define aliases \verb|wi| to map to \verb|w(i)|.
-\begin{reduce}
-for i:=0:9 do if mkid(w,i) neq w(i) 
-    then set(mkid(w,i),w(i));
-\end{reduce}
-
 The number of slow equations is the number of terms in the
 list in~\verb|dxdt|.
 \begin{reduce}
@@ -488,8 +473,7 @@ Define aliases \verb|xi| map to \verb|x(i)|, except one
 \emph{must} use the \verb|x(i)|-form \emph{within} any 
 \verb|df(,t)| on the right-hand side.
 \begin{reduce}
-for i:=1:nx do if mkid(x,i) neq x(i) 
-    then set(mkid(x,i),x(i));
+for i:=1:nx do set(mkid(x,i),x(i));
 \end{reduce}
 
 Multiply all the right-hand sides by~\verb|small| so we can
@@ -509,8 +493,8 @@ xrhs_:=(xrhs_ where w(~j)=>sigma*w(j,1)/small)$
 xrhs_:=(xrhs_ where w(~j,1)=>w(j))$
 \end{reduce}
 
-\cref{sec:dwti} writes the resulting differential equations
-for information.
+\cref{sec:dwti} writes the resulting differential
+equations for information.
 \begin{reduce}
 if trace then for i:=1:nx do 
     write "dx(",i,")/dt = ",1*part(xrhs_,i);
@@ -529,8 +513,7 @@ Define aliases \verb|yi| map to \verb|y(i)|, except one
 \emph{must} use the \verb|y(i)|-form \emph{within} any 
 \verb|df(,t)| on the right-hand side.
 \begin{reduce}
-for i:=1:ny do if mkid(y,i) neq y(i) 
-    then set(mkid(y,i),y(i));
+for i:=1:ny do set(mkid(y,i),y(i));
 \end{reduce}
 
 \paragraph{Extract decay rates}
@@ -640,8 +623,7 @@ Define aliases \verb|zi| map to \verb|z(i)|, except one
 \emph{must} use the \verb|z(i)|-form \emph{within} any 
 \verb|df(,t)| on the right-hand side.
 \begin{reduce}
-for i:=1:nz do if mkid(z,i) neq z(i) 
-    then set(mkid(z,i),z(i));
+for i:=1:nz do set(mkid(z,i),z(i));
 \end{reduce}
 
 \paragraph{Extract growth rates}
@@ -802,12 +784,12 @@ defindex w(down);
 defindex x(down);
 defindex y(down);
 defindex z(down);
-%defid xx,name="X";
-%defid yy,name="Y";
-%defid zz,name="Z";
-defindex X(down);
-defindex Y(down);
-defindex Z(down);
+defid xx,name="X";
+defid yy,name="Y";
+defid zz,name="Z";
+defindex xx(down);
+defindex yy(down);
+defindex zz(down);
 defindex hh(down);
 defindex gg(down);
 defindex ff(down);
@@ -873,14 +855,13 @@ hence does not need a header. The header here gets sent to
 the `terminal' instead. Then write to
 \verb|stoNFreportSys.tex| the expressions we stored in
 \verb|scratchfile.red| as nice \LaTeX.
-Switch \verb|raise| back off.
 \begin{reduce}
 write "Ignore the following five lines of LaTeX"$
 on latex$
 out "stoNFreportSys.tex"$
 in "scratchfile.red"$
 shut "stoNFreportSys.tex"$
-off latex$  off raise$
+off latex$
 \end{reduce}
 
 
@@ -1125,18 +1106,18 @@ array x_(nx),y_(ny),z_(nz);
 \end{reduce}
 
 Express the normal form in terms of new evolving variables
-$X_i$, $Y_i$, and~$Z_i$, denoted by operators \verb|X(i)|,
-\verb|Y(i)| and~\verb|Z(i)|, which are nonlinear
+$X_i$, $Y_i$, and~$Z_i$, denoted by operators \verb|xx(i)|,
+\verb|yy(i)| and~\verb|zz(i)|, which are nonlinear
 modifications to $x_i$, $y_i$ and~$z_i$. The expressions for
 the normal form \sde{}s are stored in~\verb|ff|, \verb|gg|
 and~\verb|hh|.
 \begin{reduce}
-clear X,Y,Z;
-operator X; operator Y; operator Z;
-depend X,t; depend Y,t; depend Z,t;
-let { df(X(~i),t)=>ff(i)*cmanf 
-    , df(Y(~i),t)=>gg(i)*smanf
-    , df(Z(~i),t)=>hh(i)*umanf };
+clear xx,yy,zz;
+operator xx; operator yy; operator zz;
+depend xx,t; depend yy,t; depend zz,t;
+let { df(xx(~i),t)=>ff(i)*cmanf 
+    , df(yy(~i),t)=>gg(i)*smanf
+    , df(zz(~i),t)=>hh(i)*umanf };
 \end{reduce}
 
 The first linear approximation is then $x_i\approx X_i$\,,
@@ -1146,12 +1127,12 @@ in~\verb|gg(i)|, and  $\dot Z_i\approx +r_iZ_i$\,,
 in~\verb|hh(i)|. Depending upon the specified manifold,
 these are multiplied by the appropriate 0-1 flags.
 \begin{reduce}
-for i:=1:nx do x_(i):=X(i)*cmanf;
-for i:=1:ny do y_(i):=Y(i)*smanf;
-for i:=1:nz do z_(i):=Z(i)*umanf;
+for i:=1:nx do x_(i):=xx(i)*cmanf;
+for i:=1:ny do y_(i):=yy(i)*smanf;
+for i:=1:nz do z_(i):=zz(i)*umanf;
 for i:=1:nx do ff(i):=0;
-for i:=1:ny do gg(i):=-rats_(i)*Y(i)*smanf;
-for i:=1:nz do hh(i):=+ratu_(i)*Z(i)*umanf;
+for i:=1:ny do gg(i):=-rats_(i)*yy(i)*smanf;
+for i:=1:nz do hh(i):=+ratu_(i)*zz(i)*umanf;
 \end{reduce}
 
 Consider updating the $Y_i$~evolution \verb|gg(i)| and the
@@ -1164,8 +1145,8 @@ number of variables $Y_i$~and~$Z_i$ in any given term,
 weighted according to their rate coefficient in the
 \text{homological equation.}
 \begin{reduce}
-y4y:=for i:=1:ny collect Y(i)=Y(i)*yz^rats_(i)$
-z4z:=for i:=1:nz collect Z(i)=Z(i)/yz^ratu_(i)$
+y4y:=for i:=1:ny collect yy(i)=yy(i)*yz^rats_(i)$
+z4z:=for i:=1:nz collect zz(i)=zz(i)/yz^ratu_(i)$
 y4y:=append(y4y,z4z)$
 \end{reduce}
 
@@ -1348,9 +1329,9 @@ Lastly print the normal form \sde{}s: first the fast, second
 the slow.
 \begin{reduce}
 write "The ",textask," S/ODEs";
-if umanf then for i:=1:nz do write "dZ(",i,")/dt = ",hh(i);
-if smanf then for i:=1:ny do write "dY(",i,")/dt = ",gg(i);
-if cmanf then for i:=1:nx do write "dX(",i,")/dt = ",ff(i);
+if umanf then for i:=1:nz do write "dzz(",i,")/dt = ",hh(i);
+if smanf then for i:=1:ny do write "dyy(",i,")/dt = ",gg(i);
+if cmanf then for i:=1:nx do write "dxx(",i,")/dt = ",ff(i);
 \end{reduce}
 
 
@@ -1456,12 +1437,11 @@ after starting to write to the file. Then write expressions
 in \verb|scratchfile.red| to \verb|stoNFreport.tex| as nice
 \LaTeX. Switch off latex, to get the end of the document,
 and finish writing.
-Switch \verb|raise| back off.
 \begin{reduce}
 out "stoNFreport.tex"$
 on latex$
 in "scratchfile.red"$
-off latex$ off raise$
+off latex$
 shut "stoNFreport.tex"$
 \end{reduce}
 
@@ -1541,15 +1521,15 @@ symbolic procedure latexon;
   put('tex,'rtypefn,'(lambda(x) 'tex)) >>$
 \end{reduce}
 
-
-
-
-
-
-End the file when read by Reduce
+End the file when input to Reduce
 \begin{reduce}
 end;
 \end{reduce}
+
+
+
+
+
 
 \bibliographystyle{agsm}
 \bibliography{ajr,bib}
