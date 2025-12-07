@@ -4,12 +4,12 @@
 including isochrons of slow manifolds}
 
 \author{A.~J. Roberts\thanks{School of Mathematical
-Sciences, Adelaide University, South Australia~5005,
+Sciences, University of Adelaide, South Australia~5005,
 \textsc{Australia}. \url{https://profajroberts.github.io/}}}
 
 \date{Nov 2013 -- \today}
-%:ToDo: change the '(version' date for each update, and
-% upload a copy to WWW/GENCM, and WWW/Reduce, and
+%:ToDo: change the 'version' date for each update, and
+% upload a copy to WWW/GENCM, and 
 % upload a zipped copy of folder to WWW/Sites,
 
 %:ToDo: currently the web service reduce chokes on du_k/dt=0 
@@ -377,7 +377,7 @@ pp, est, eyem, m, pdfzero;
 
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 7 Dec 2025)"$
+write "Construct invariant manifold (version 6 Nov 2025)"$
 %write input_odefns:=odefns;
 %write input_evals:=evals;
 %write input_evecs:=evecs;
@@ -405,7 +405,7 @@ For optional trace printing of test cases: comment out
 second line when not needed.
 \begin{reduce}
 trace:=0$
-%trace:=1; maxiter:=5; %%%%%%%%
+%trace:=1; maxiter:=5; %%%%
 \end{reduce}
 
 
@@ -592,27 +592,14 @@ zz:=zz*aa_^(-1);
 
 Introduce an operator to represent delay factors more
 conveniently for analysis.  The \verb|exp| rule probably
-only works for pure imaginary modes!??   In cases where 
-there are slow-space variations we need to commute some
-derivatives one way, and commute other derivatives the
-other way---all a bit tricksy and unclear enough factors
-coded here.  
-%: ToDo: needs checking
-Also unclear is that \verb|df()| appears to 
-order its arguments in alphabetical order (A--Z,a--z): 
-so `space' variables before t-for-time may be in the
-wrong position.   Maybe use \verb|pdf()| for space 
-derivative working throughout, instead of \verb|df|??
+only works for pure imaginary modes!?
 \begin{reduce}
 clear d_; operator d_; linear d_;
 let { d_(~a^~p,t,~dt)=>d_(a,t,dt)^p
     , d_(~a*~b,t,~dt)=>d_(a,t,dt)*d_(b,t,dt)
     , d_(exp(~a),t,~dt)=>exp(a)
         *sub(t=-dt,cos(-i*a)+i*sin(-i*a))
-    , df(d_(~a,t,~dt),~b) => d_(df(a,b),t,dt) when not(b member spacex)
-    , d_(df(~a,~b),t,~dt) => df(d_(a,t,dt),b) when (b member spacex)
-    , d_(df(~a,~b,~c),t,~dt) => df(d_(a,t,dt),b,c) when (b member spacex)
-    , d_(df(~a,~b,~c,~d),t,~dt) => df(d_(a,t,dt),b,c,d) when (b member spacex)
+    , df(d_(~a,t,~dt),~b)=>d_(df(a,b),t,dt)
     , d_(~a,t,0)=>a
     , d_(d_(~a,t,~dta),t,~dtb)=>d_(a,t,dta+dtb)
     };
@@ -1180,14 +1167,7 @@ similarly for \verb|uu| the constructed invariant manifold.
 clear gg;
 clear s; operator s; depend s,t;
 foreach z_ in spacex do depend s,z_;
-let { df(s(~j),t)=>coeffn(gg,e_(j,1),1)
-	, df(s(~j),t,~b)=> df(coeffn(gg,e_(j,1),1),b) when not fixp(b)
-	, df(s(~j),t,~b)=> df(coeffn(gg,e_(j,1),1),t,b-1) when (fixp(b) and b>1)
-	, df(s(~j),t,~b,~c)=> df(coeffn(gg,e_(j,1),1),b,c) when not fixp(b)
-	, df(s(~j),t,~b,~c)=> df(coeffn(gg,e_(j,1),1),t,b-1,c) when (fixp(b) and b>1)
-	, df(s(~j),t,~b,~c,~d)=> df(coeffn(gg,e_(j,1),1),b,c,d) when not fixp(b)
-	, df(s(~j),t,~b,~c,~d)=> df(coeffn(gg,e_(j,1),1),t,b-1,c,d) when (fixp(b) and b>1)
-	};
+let df(s(~j),t)=>coeffn(gg,e_(j,1),1);
 \end{reduce}
 
 
@@ -1217,7 +1197,7 @@ For some temporary trace printing, where for simplicity
 procedure matify_(a,m,n)$
   begin matrix z_(m,n);
     for i:=1:m do for j:=1:n do z_(i,j):=coeffn(a,e_(i,j),1);
-    return (z_ where {exp(0)=>1}); 
+    return (z_ where {exp(0)=>1,small=>s}); 
     end$
 \end{reduce}
 
@@ -1322,6 +1302,7 @@ end;%if itisAutoSlowMan_
 
 Terminate the iteration loop once residuals are zero.
 \begin{reduce}
+%showtime;
 if {resde,resd,resz}={0,0,0} then write iter:=iter+10000;
 end;
 showtime;

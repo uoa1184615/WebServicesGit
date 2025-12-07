@@ -1,0 +1,97 @@
+%!TEX root = ../diverseExamples.tex
+\subsection{\texttt{ddeHopfSpace}: DDE with Hopf bifurcation and spatial structure} 
+\label{ddeHopfSpace}
+\localtableofcontents
+
+Model a delayed `logistic' advection-diffusion \pde\ system in one variable with
+\begin{equation*}
+\de tu=-[1+u(t)]u(t-\pi/2)-A\D x{u(t)}+D\DD x{u(t)}\,,
+\end{equation*}
+for slow variations in space~\(x\).
+
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+\end{reduce}
+In the printed output, group terms with like powers of amplitudes~\(s_j\), the complex exponential, and the parameter~\(a\).
+\begin{reduce}
+factor s,exp,A,D,df,small;
+\end{reduce}
+Execute the construction of the slow manifold for this system (ignore the warning messages about \verb|u1| declared, and then already defined, as an operator).
+\begin{reduce}
+invariantmanifold({x},
+    mat(( -(1+u1)*u1(pi/2) -A*pdf(u1,x) +D*pdf(u1,x,x) )),
+    mat((i,-i)),
+    mat((1),(1)),
+    mat((1),(1)),
+    3)$
+end;
+\end{reduce}
+The marginal modes are~\(e^{\pm it}\) so nominate the frequencies~\(\pm 1\).
+The eigenvectors are just~\(1\cdot e^{\pm it}\). 
+Because for delay differential equations the time dependence~\(e^{\pm i\omega t}\) is an integral part of the definition of the eigenvector; hence the coded eigenvectors can be the same, as here, because they are differentiated through the time dependence~\(e^{\pm i\omega t}\).
+
+The code works for orders higher than three, but is slow: takes about a minute per iteration.
+
+The procedure actually analyses the embedding system
+\begin{equation*}
+\de tu=-[1+\eps u(t)]u(t-\pi/2)-A\D xu+D\DD xu\,.
+\end{equation*}
+
+\paragraph{The centre manifold} 
+These give the location of the invariant manifold in
+terms of parameters~\(s\sb j\).
+\begin{align*}&
+u_{1}=\ParMath{
+\exp \big(-i t\big) s_{2}+\exp \big(-2 i t\big) s_{2}^{2} \eps 
+\big(1/5 i+2/5\big)+\exp \big(i t\big) s_{1}+\exp \big(2 i t\big) s_{1}
+^{2} \eps \big(-1/5 i+2/5\big)+O\big(\varepsilon ^{2}\big)
+}
+\end{align*}
+ 
+\paragraph{Centre manifold ODEs} 
+The system evolves on the invariant manifold such
+that the parameters evolve according to these ODEs.
+\begin{align*}&
+\dot s_{1}=\ParMath{
+\frac{\partial ^{2}s_{1}}{\partial x^{2}} A^{2} \eps^{2} 
+\big(-6 i \pi ^{4}+8 i \pi ^{2}-\pi ^{5}+12 \pi ^{3}\big)/\big(\pi ^{6}+
+12 \pi ^{4}+48 \pi ^{2}+64\big)+\frac{\partial ^{2}s_{1}}{\partial x^{2}
+} D \eps^{2} \big(-2 i \pi +4\big)/\big(\pi ^{2}+4\big)+\frac{\partial 
+\,s_{1}}{\partial \,x} A \eps \big(2 i \pi -4\big)/\big(\pi ^{2}+4\big)+
+s_{2} s_{1}^{2} \eps^{2} \big(-2/5 i \pi ^{5}-12/5 i \pi ^{4}-16/5 i 
+\pi ^{3}-96/5 i \pi ^{2}-32/5 i \pi -192/5 i-6/5 \pi ^{5}+4/5 \pi ^{4}-
+48/5 \pi ^{3}+32/5 \pi ^{2}-96/5 \pi +64/5\big)/\big(\pi ^{6}+12 \pi ^{4
+}+48 \pi ^{2}+64\big)+O\big(\varepsilon ^{3}\big)
+}
+\\&
+\dot s_{2}=\ParMath{
+\frac{\partial ^{2}s_{2}}{\partial x^{2}} A^{2} \eps^{2} 
+\big(6 i \pi ^{4}-8 i \pi ^{2}-\pi ^{5}+12 \pi ^{3}\big)/\big(\pi ^{6}+
+12 \pi ^{4}+48 \pi ^{2}+64\big)+\frac{\partial ^{2}s_{2}}{\partial x^{2}
+} D \eps^{2} \big(2 i \pi +4\big)/\big(\pi ^{2}+4\big)+\frac{\partial \,
+s_{2}}{\partial \,x} A \eps \big(-2 i \pi -4\big)/\big(\pi ^{2}+4\big)+s
+_{2}^{2} s_{1} \eps^{2} \big(2/5 i \pi ^{5}+12/5 i \pi ^{4}+16/5 i \pi 
+^{3}+96/5 i \pi ^{2}+32/5 i \pi +192/5 i-6/5 \pi ^{5}+4/5 \pi ^{4}-48/5 
+\pi ^{3}+32/5 \pi ^{2}-96/5 \pi +64/5\big)/\big(\pi ^{6}+12 \pi ^{4}+48 
+\pi ^{2}+64\big)+O\big(\varepsilon ^{3}\big)
+}
+\\[2ex]&
+\dot s_{1}=\ParMath{
+\frac{\partial ^{2}s_{1}}{\partial x^{2}} A^{2} \eps^{2} 
+\big(-0.1895 i+0.02476\big)+\frac{\partial ^{2}s_{1}}{\partial x^{2}
+} D \eps^{2} \big(-0.453 i+0.2884\big)+\frac{\partial \,s_{1}}{
+\partial \,x} A \eps \big(0.453 i-0.2884\big)+s_{2} s_{1}^{2} \eps^{2
+} \big(-0.2636 i-0.2141\big)+O\big(\varepsilon ^{3}\big)
+}
+\\&
+\dot s_{2}=\ParMath{
+\frac{\partial ^{2}s_{2}}{\partial x^{2}} A^{2} \eps^{2} 
+\big(0.1895 i+0.02476\big)+\frac{\partial ^{2}s_{2}}{\partial x^{2}}
+ D \eps^{2} \big(0.453 i+0.2884\big)+\frac{\partial \,s_{2}}{
+\partial \,x} A \eps \big(-0.453 i-0.2884\big)+s_{2}^{2} s_{1} \eps^{
+2} \big(0.2636 i-0.2141\big)+O\big(\varepsilon ^{3}\big)
+}
+\end{align*}
+
+
