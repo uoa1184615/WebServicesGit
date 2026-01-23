@@ -529,7 +529,10 @@ ff:=(ff where { cos(~u) => (exp(i*u)+exp(-i*u))/2
 
 
 Need function~\verb|conj_| to do parsimonious complex
-conjugation.   
+conjugation.   Consequently, this procedure implicitly
+assumes that all parameter and variable names are real,
+except \(\i:=\sqrt{-1}\).
+%: ToDo: is this adequate? does pdf() also need consideration??
 \begin{reduce}
 procedure conj_(a)$ sub(i=-i,a)$
 \end{reduce}
@@ -1079,7 +1082,7 @@ appear in the \LaTeX, and also define that their arguments
 appear as subscripts.
 \begin{reduce}
 defindex diff(down);
-defid diff,name="\diff";
+defid diff,name="\diff"; %AJR, 2026-01-16: delete?  
 defindex e_(down,down);
 defid e_,name="e";
 defindex d_(arg,down,down);

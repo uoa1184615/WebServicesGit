@@ -1,0 +1,73 @@
+% inspired by 2601.06563v1    AJR, 2026-01-16
+on div,revpri; off allfac,raise,lower;
+
+in_tex "../invariantManifold.tex"$
+factor small,e,i;
+
+% example arbitrary choice of coefficients
+c_2:=0; 
+c_3:=c_4:=1; 
+% dependent coefficients
+a_0:=-(9+c_2*(5-2*c_2))/(5+2*c_2);
+b_0:=c_2-4;
+kappa:=-1/4*(5+2*c_2);
+
+% ODEs u1:=x, u3:=y; u5:=z; u7:=e, t:=f; 
+% easiest to assume a_1=b_1=0
+ODEs:=mat((
+    u2, +2*u4 +(1+2*c_2)*u1 +3/2*c_3*(2*u1^2-u3^2-u5^2) 
+        -(1+2*c_2)*u7*u1*cos(t) 
+        +1/2*(1+2*c_2)*(1+cos(2*t))*u7^2*u1*small 
+        -3/2*c_3*u7*(2*u1^2-u3^2-u5^2)*cos(t)*small 
+        +2*c_4*u1*(2*u1^2-3*u3^2-3*u5^2)*small ,
+    u4, -2*u2 +(1-c_2)*u3 -3*c_3*u1*u3 -(1-c_2)*u7*u3*cos(t)
+        +1/2*(1-c_2)*(1+cos(2*t))*u7^2*u3*small 
+        +3*c_3*u7*u1*u3*cos(t)*small
+        -3/2*c_4*u3*(4*u1^2-u3^2-u5^2)*small 
+        +(a_0+b_2*small)*u3 ,
+    u6, -c_2*u5 -2*c_3*u1*u5 -(1-c_2)*u7*u5*cos(t) 
+        +1/2*(1-c_2)*(1+cos(2*t))*u7^2*u5*small 
+        +3*c_3*u7*u1*u5*cos(t)*small
+        -3/2*c_4*u5*(4*u1^2-u3^2-u5^2)*small 
+        +(b_0+b_2*small)*u5 ,
+    0 ));
+eVals:=mat(( 2*i,-2*i, 2*i, -2*i, 0 ));
+eVecs:=mat( (1,+2*i,-i*kappa,2*kappa,0,0,0),
+    (1,-2*i,+i*kappa,2*kappa,0,0,0),
+    (0,0,0,0,1,+2*i,0),
+    (0,0,0,0,1,-2*i,0),
+    (0,0,0,0,0,0,1) );
+toosmall:=4;
+
+invariantmanifold({},ODEs,eVals,eVecs,eVecs,toosmall);
+
+
+n:=7; m:=5; % number of ODEs and model DEs
+let s(5)=>e;
+out "scratchfile.red";
+write "off echo;"$ % do not understand why needed in 2021??
+write "write ""\)
+\paragraph{The invariant manifold}
+These give the location of the invariant manifold in
+terms of parameters~\(s_ j\).
+\("";";
+for j:=1:n do write "tmp_(",j,"):=coeffn(small*uu,e_(",j,
+        ",1),1)/small +order_(varepsilon^",toosmall-1,");";
+write "write ""\)
+\paragraph{Invariant manifold ODEs}
+The system evolves on the invariant manifold such
+that the parameters evolve according to these ODEs.
+\("";";
+for j:=1:m do write "tmp_s(",j,"):=1*coeffn(gg,e_(",j
+           ,",1),1)+order_(varepsilon^",toosmall,");";
+write ";end;";
+shut "scratchfile.red";
+out "invarManReport.tex"$
+on latex$ on lower$ 
+in "scratchfile.red"$
+off latex$ off raise$
+shut "invarManReport.tex"$
+
+
+
+end;

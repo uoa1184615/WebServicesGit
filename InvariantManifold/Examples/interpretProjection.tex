@@ -1,0 +1,146 @@
+%!TEX root = ../diverseExamples.tex
+\subsection{\texttt{interpretProjection}: Interpret the fast-fibre projection vectors of slow manifolds} 
+\label{interpretProjection}
+\localtableofcontents
+
+For slow manifolds, this package computes \emph{projection vectors}~\zv.
+This example explores \emph{very simple} cases in order to introduce how one uses these vectors.
+
+
+
+
+\subsubsection{Simplest scenario}
+
+Construct the slow manifold of the 2-D system
+\begin{equation*}
+\de tu=av\,,\qquad \de tv=-v\,,
+\end{equation*}
+and seek long-time predictions from the initial condition \(u(0)=u_0\C v(0)=v_0\).
+
+Analytically we may solve this system exactly:
+\begin{equation*}
+v=v_0\e^{-t},\qquad
+u=u_0+av_0\big[1-\e^{-t}\big].
+\end{equation*}
+Since \(u=u_0+av_0+\Ord{\e^{-t}}\) we say that \(u=u_0+av_0\) is the long-time behaviour we aim to predict.
+
+Let's make such prediction via the package.
+Start by loading the procedure.
+\begin{reduce}
+in_tex "../invariantManifold.tex"$
+\end{reduce}
+Construct the slow manifold for this system using \(u_1=u\) and \(u_2=v\):
+\begin{reduce}
+invariantmanifold({},
+    mat(( a*u2, -u2 )),
+    mat((0)), mat((1,0)), mat((1,0)), 9)$
+\end{reduce}
+The output gives the very simple slow manifold is \(u=u_1=s_1\) and \(v=u_2=0\) in terms of its parameter~\(s_1\), with (non-)evolution \(\de t{s_1}=0\), and the projection vector \(\zv=(1,a)\).
+
+How do we use this projection vector?   Answer: choose initial~\(s_1(0)=s_0\) such that \(\zv\cdot[(u_0,v_0)-\uv(s_0)]=0\)\,.    
+Here this equation reduces to \((1,a)\cdot(u_0-s_0,v_0)=0\).
+That is, \(s_0:=u_0+av_0\).
+Solving the slow manifold evolution \(\de t{s_1}=0\) then gives the prediction that \(u=s_1=u_0+av_0\) for all time.
+This is the correct prediction to the exp-decaying error~\Ord{\e^{-t}}. 
+
+
+
+
+\subsubsection{Complex valued parameters}
+For simplicity I code do Reduce treats all parameters and variables as real-valued, \emph{not} complex-valued---with the exception of \(\i:=\sqrt{-1}\).   
+
+Thus, for example, let's construct the slow manifold of the 2-D complex-valued system
+\begin{equation*}
+\de tu=(a+\i b)v\,,\qquad \de tv=-v\,,
+\end{equation*}
+and seek long-time predictions from the initial condition \(u(0)=u_0\C v(0)=v_0\).
+As in the previous subsection, the long-time evolution is simply \(v=0\) and \(u=s=u_0+(a+\i b)v_0\) to errors~\Ord{\e^{-t}}.
+
+Construct the slow manifold for this system:
+\begin{reduce}
+invariantmanifold({},
+    mat(( (a+i*b)*u2, -u2 )),
+    mat((0)), mat((1,0)), mat((1,0)), 9)$
+\end{reduce}
+The output gives the very simple slow manifold is \(u=u_1=s_1\) and \(v=u_2=0\) in terms of its parameter~\(s_1\), with (non-)evolution \(\de t{s_1}=0\), and the projection vector \(\zv=(1,a-\i b)\).
+
+How do we use this projection vector to make the correct initial condition that \(s(0)=s_0=u_0+(a+\i b)v_0\)? 
+Answer:  instead of using the dot product, we invoke the complex inner product that \(\left<\zv,\uv\right>:=\zv^*\uv\) where the asterisk denotes the complex-conjugate-transpose. 
+That is, as \(a\C b\) are both real, here \(\zv^*\) is the row vector~\(\begin{bmatrix}1& a+\i b\end{bmatrix}\).
+
+Then the specified equation that we project according to the following, \(\left<\zv,(u_0,v_0)-\uv(s_0)\right>=0\)\,, becomes \(u_0+(a+\i b)v_0-s_0=0\)\,, that is, \(s_0=u_0+(a+\i b)v_0\) as required to match the long-time evolution.
+
+
+
+
+\subsubsection{Simplest slow space variation scenario}
+
+Construct the slow manifold of the \pde\ system for two fields \(u(x,t)\C v(x,t)\)
+\begin{equation*}
+\D tu=a\D xv\,,\qquad \D tv=-v\,,
+\end{equation*}
+and seek long-time predictions from the initial condition \(u(x,0)=u_0(x)\C v(x,0)=v_0(x)\).
+
+Analytically, the exactly solution (where dash denotes \(\D x{}\)) is
+\begin{equation*}
+v=v_0(x)\e^{-t},\qquad
+u=u_0(x)+av'_0(x)\big[1-\e^{-t}\big].
+\end{equation*}
+Since \(u=u_0+av'_0+\Ord{\e^{-t}}\) we say that \(u=u_0+av'_0\) is the long-time behaviour we aim to predict.
+
+Let's make such prediction via the package.
+Construct the slow manifold for this system using \(u_1=u\) and \(u_2=v\):
+\begin{reduce}
+invariantmanifold({x},
+    mat(( a*pdf(u2,x), -u2 )),
+    mat((0)), mat((1,0)), mat((1,0)), 9)$
+\end{reduce}
+The output gives the very simple slow manifold is \(u=u_1=s_1\) and \(v=u_2=0\) in terms of its parameter~\(s_1(x,t)\), with (non-)evolution \(\D t{s_1}=0\), and the projection vector \(\zv=(1,a\eps\diff_x)\).
+
+How do we use this projection vector?   Answer: first,~\eps\ is a bookkeeping parameter that counts the order of a term, so ignore~\eps\ (or equivalently set \(\eps=1\)).
+Second, choose initial~\(s_1(x,0)=s_0(x)\) such that the projection \(\left<\zv,(u_0,v_0)-\uv(s_0)\right>=0\).
+
+This inner product is \emph{not} any integral over space~\(x\); it is done keeping `\(x\)~fixed'.
+So here the projection equation reduces to \((1,a\diff_x)\cdot(u_0-s_0,v_0)=0\).
+That is, \(s_0:=u_0+av'_0\).
+Solving the slow manifold evolution \(\D t{s_1}=0\) then gives the prediction that \(u=s_1=u_0+av'_0\) for all time.
+As before, this is a correct prediction to an exp-decaying error~\Ord{\e^{-t}}. 
+
+
+
+
+
+\subsubsection{Nontrivial slow space variation}
+
+Construct the slow manifold of the \pde\ system for two fields \(u(x,t)\C v(x,t)\) where here spatial gradients of~\(u,v\) feed into the \(v,u\)~\pde{}s:
+\begin{equation*}
+\D tu=\D xv\,,\qquad \D tv=-v+\D xu\,.
+\end{equation*}
+We seek long-time predictions from the initial condition \(u(x,0)=u_0(x)\C v(x,0)=v_0(x)\).
+
+Let's predict the long-time evolution via the package.
+Construct the slow manifold for this system using \(u_1=u\) and \(u_2=v\):
+\begin{reduce}
+invariantmanifold({x},
+    mat(( pdf(u2,x), pdf(u1,x)-u2 )),
+    mat((0)), mat((1,0)), mat((1,0)), 4)$
+\end{reduce}
+The output gives the slow manifold is \(u=u_1=s_1+\Ord{\diff_x^3}\) and \(v=u_2=\D x{s_1}+\Ord{\diff_x^3}\) in terms of its parameter~\(s_1(x,t)\).
+Here the corresponding slow evolution is the non-trivial diffusion \pde\ \(\D t{s_1}=\DD x{s_1}+\Ord{\diff_x^4}\). 
+
+Lastly, the projection vector (neglecting~\eps) is \(\zv=(1 -\diff_x^2 \C \diff_x -2\diff_x^3 ) +\Ord{\diff_x^4}\).
+Hence choose initial~\(s_1(x,0)=s_0(x)\) such that the projection \(\left<\zv,(u_0,v_0)-\uv(s_0)\right>=0\).
+Here this projection equation reduces to \((1 -\diff_x^2 \C \diff_x -2\diff_x^3)\cdot(u_0-s_0,v_0)=0\).
+That is, the initial field \(s_0:=u_0+v'_0-u''_0-2v'''_0+\Ord{\diff_x^4}\).
+
+
+
+
+
+Finish.
+\begin{reduce}
+end;
+\end{reduce}
+
+
+\endinput

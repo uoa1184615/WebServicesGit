@@ -10,7 +10,7 @@
 
 
 \usepackage{url,natbib,amsmath,defns,reducecode}
-\usepackage{etocx}\setcounter{tocdepth}{2}
+\usepackage[twodeep]{etocx}%\setcounter{tocdepth}{2}
 \RaisedNamesfalse
 \let\harvardurl\url
 \IfFileExists{ajr.sty}{\usepackage{ajr}}{}
@@ -21,6 +21,7 @@
 \newcommand{\adj}[1]{#1^\dagger} % denotes cc transpose
 % for output of coordinate transform
 \def\exp\big(#1\big){\,{\rm e}^{#1}}
+\def\i{\operatorname{i}}
 \def\eps{\ensuremath{\varepsilon}}
 \def\_{_}
 \def\diff{\partial\makebox[0pt]{\ $\cdot$}}
@@ -51,7 +52,7 @@
 \atBegin{section}{\newpage}%??
 
 
-\section{Five representative examples}
+\section{Six representative examples}
 \localtableofcontents
 
 \input{Examples/simple3d}
@@ -59,6 +60,7 @@
 \input{Examples/metastable4}
 \input{Examples/nonlinNormModes}
 \input{Examples/stable3d}
+\input{Examples/interpretProjection}
 
 
 
@@ -76,7 +78,7 @@
 \section{Slow invariant manifolds}
 \localtableofcontents
 
-Also see \cref{simple3d,metastable4}.
+Also see \cref{simple3d,metastable4,interpretProjection}.
 \input{Examples/simple2d}
 \input{Examples/lorenz86sm}
 
@@ -115,6 +117,7 @@ Also see \cref{doubleHopfDDE}
 \section{Slow manifolds of spatiotemporal systems}
 \localtableofcontents
 
+Also see \cref{interpretProjection}.
 \input{Examples/heatX}
 \input{Examples/randWalkIn2D}
 \input{Examples/gradsSystem}

@@ -1,0 +1,39 @@
+% AJR, 8 Dec 2025
+in_tex "../invariantManifold.tex"$
+
+
+factor s,small,df,diff;
+k3:=k3p-1;  % k3p=k3+1
+k1:=k14-k4; % k14=k1+k4
+on ezgcd;
+invariantmanifold( {x},
+    mat((d1*pdf(u1,x,x)-k1*u1+k4*u4          +small*(-u1*u2^2+k2*u2^3)
+        ,d2*pdf(u2,x,x)            -u2+k3*u3 +small*(+u1*u2^2-k2*u2^3)
+        ,d3*pdf(u3,x,x)            +u2-k3*u3
+        ,d4*pdf(u4,x,x)+k1*u1-k4*u4
+        )),
+    mat(( 0,0 )),
+    mat( (1,0,0,k1/k4),(0,1,1/k3,0) ),
+    mat( (1,0,0,  0  ),(0,1, 0  ,0) ),
+    4 )$
+end;
+
+
+% the following is to replicate 2512.03595 analysis of (5.1)
+% cannot match the resultant Gray--Scott (2.8) model.  May
+% be something to do with perhaps analysing about a general
+% non-zero equilibrium---unclear.
+let df(s(3),x)=>0;
+invariantmanifold( {x},
+    mat((d1*pdf(u1,x,x)-u1*u2^2+u5*k2*u2^3-k1*u1+k4*u4
+        ,d2*pdf(u2,x,x)+u1*u2^2-u5*k2*u2^3            -u2+u5*k3*u3
+        ,d3*pdf(u3,x,x)                               +u2-u5*k3*u3
+        ,u5*(pdf(u4,x,x)                  +k1*u1-k4*u4)
+        ,small^5 )),
+    mat(( 0,0,0 )),
+    mat( (1,0,0,k1/k4,0),(0,0,1,0,0),(0,0,0,0,1) ),
+    mat( (1,0,0,  0  ,0),(0,1,1,0,0),(0,0,0,0,1) ),
+    5 )$
+end;
+
+
