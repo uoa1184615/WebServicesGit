@@ -65,8 +65,8 @@ invariantmanifold({},
 The output gives the very simple slow manifold is \(u=u_1=s_1\) and \(v=u_2=0\) in terms of its parameter~\(s_1\), with (non-)evolution \(\de t{s_1}=0\), and the projection vector \(\zv=(1,a-\i b)\).
 
 How do we use this projection vector to make the correct initial condition that \(s(0)=s_0=u_0+(a+\i b)v_0\)? 
-Answer:  instead of using the dot product, we invoke the complex inner product that \(\left<\zv,\uv\right>:=\zv^*\uv\) where the asterisk denotes the complex-conjugate-transpose. 
-That is, as \(a\C b\) are both real, here \(\zv^*\) is the row vector~\(\begin{bmatrix}1& a+\i b\end{bmatrix}\).
+Answer:  instead of using the dot product, we invoke the complex inner product that \(\left<\zv,\uv\right>:=\adj\zv\uv\) where the dagger denotes the complex-conjugate-transpose. 
+That is, as \(a\C b\) are both real, here \(\adj\zv\)~is the row vector~\(\begin{bmatrix}1& a+\i b\end{bmatrix}\).
 
 Then the specified equation that we project according to the following, \(\left<\zv,(u_0,v_0)-\uv(s_0)\right>=0\)\,, becomes \(u_0+(a+\i b)v_0-s_0=0\)\,, that is, \(s_0=u_0+(a+\i b)v_0\) as required to match the long-time evolution.
 

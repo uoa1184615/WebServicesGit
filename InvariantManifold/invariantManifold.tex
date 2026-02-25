@@ -296,8 +296,9 @@ as a way to count the order of each term.
 
 
 Need a couple of things established before defining the
-procedure: the \verb|rlfi| package; and operator names for
-the variables of the dynamical system (in case they have
+procedure: the \verb|rlfi| package, with override of some 
+name translations; and operator names for the variables 
+of the dynamical system (in case they have 
 delays)---currently code a max of nine variables.
 \begin{reduce}
 load_package rlfi; 
@@ -377,7 +378,7 @@ pp, est, eyem, m, pdfzero;
 
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 7 Dec 2025)"$
+write "Construct invariant manifold (version 26 Feb 2026)"$
 %write input_odefns:=odefns;
 %write input_evals:=evals;
 %write input_evecs:=evecs;
@@ -410,11 +411,12 @@ trace:=0$
 
 
 The \verb|rationalize| switch makes code much faster with
-complex numbers. The switch \verb|gcd| seems to wreck
+complex numbers.  The switch \verb|gcd| seems to wreck
 convergence for \verb|doubleHofDDE|, so leave it off.
-But seems OK for all other examples.
+Although seems OK for all other examples.
+Get case sensitive analysis by also \verb|off raise,lower;|
 \begin{reduce}
-on div; off allfac; on revpri; 
+on div,revpri; off allfac;
 on rationalize;
 \end{reduce}
 
@@ -1155,7 +1157,7 @@ on latex$
 out "invarManReportSys.tex"$
 in "scratchfile.red"$
 shut "invarManReportSys.tex"$
-off latex$  off raise$
+off latex$  off raise,lower$
 \end{reduce}
 
 
@@ -1518,7 +1520,7 @@ Switch \verb|raise| back off.
 out "invarManReport.tex"$
 on latex$
 in "scratchfile.red"$
-off latex$ off raise$
+off latex$ off raise,lower$
 shut "invarManReport.tex"$
 \end{reduce}
 
@@ -1545,10 +1547,10 @@ Bad luck if these interfere with anything else a user might
 try to do afterwards!
 
 First define how various tokens get printed.   Package
-\verb|rlfi| must already be loaded.
+\verb|rlfi| must already be loaded.  
 \begin{reduce}
-deflist('((!( !\!b!i!g!() (!) !\!b!i!g!)) (!P!I !\!p!i! )
-         (!p!i !\!p!i! ) (!E !e) (!I !i) (e !e) (i !i)),'name)$
+deflist('((!( !\!b!i!g!() (!) !\!b!i!g!))
+         (!p!i !\!p!i! ) (!E !E) (!I !I) (e !e) (i !i)),'name)$
 \end{reduce}
 
 Override the procedure that prints annoying messages about

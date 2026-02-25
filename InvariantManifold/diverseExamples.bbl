@@ -15,6 +15,12 @@ Erneux, T.  \harvardyearleft 2009\harvardyearright , {\em Applied Delay
   Differential equations}, Vol.~3 of {\em Surveys and Tutorials in the Applied
   Mathematical Sciences}, Springer.
 
+\harvarditem{Falasca}{2025}{Falasca2025}
+Falasca, F.  \harvardyearleft 2025\harvardyearright , `Probing forced responses
+  and causality in data-driven climate emulators: {Conceptual} limitations and
+  the role of reduced-order models', {\em Physical Review Research} {\bf
+  7}(043314),~1--25.
+
 \harvarditem{Lorenz}{1986}{Lorenz86}
 Lorenz, E.~N.  \harvardyearleft 1986\harvardyearright , `On the existence of a
   slow manifold', {\em J.~Atmos. Sci.} {\bf 43},~1547--1557.
@@ -45,12 +51,11 @@ Roberts, A.~J.  \harvardyearleft 2000\harvardyearright , `Computer algebra
 \harvarditem{Roberts}{2015}{Roberts2014a}
 Roberts, A.~J.  \harvardyearleft 2015\harvardyearright , {\em Model emergent
   dynamics in complex systems}, SIAM, Philadelphia.
-\newline\harvardurl{http://bookstore.siam.org/mm20/}
 
 \harvarditem{Roberts}{2022}{Roberts2018a}
 Roberts, A.~J.  \harvardyearleft 2022\harvardyearright , Backwards theory
   supports modelling via invariant manifolds for non-autonomous dynamical
-  systems, Technical report, [\url{http://arxiv.org/abs/1804.06998}].
+  systems, Technical report, [\url{http://arxiv.org/abs/1804.06998v5}].
 
 \harvarditem{Stoleriu}{2012}{Stoleriu2012}
 Stoleriu, I.  \harvardyearleft 2012\harvardyearright , Periodic orbits of a

@@ -3,15 +3,15 @@ WebServicesGit
 
 Source code for using computer algebra package Reduce to
 construct emergent models of complex dynamical systems.
+Includes over 40 examples.
 
 InvariantManifold: provides a Reduce procedure to construct
 a specified invariant manifold for a specified system of
-ordinary differential equations or delay differential
-equations. The invariant manifold may be any of a centre
-manifold, a slow manifold, an un/stable manifold, a
-sub-centre manifold, a nonlinear normal form, any spectral
-submanifold, or indeed a normal form coordinate transform of
-the entire state space.
+differential equations: ordinary, or partial, or delay. The
+invariant manifold may be any of a centre manifold, a slow
+manifold, an un/stable manifold, a sub-centre manifold, a
+nonlinear normal form, any spectral submanifold, or indeed a
+normal form coordinate transform of the entire state space.
 
 StoNormalForm: derive a stochastic/non-autonomous
 coordinate transformation that separates slow, stable and

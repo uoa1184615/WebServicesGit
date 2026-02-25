@@ -1,69 +1,185 @@
-%!TEX root = ../manyExamples.tex
-% inspired by 2506.22552v1.  AJR, 8 Jul 2025
-\subsection{\texttt{majdaTriad2010}: Majda's triad model} 
+%!TEX root = ../diverseExamples.tex
+% inspired by Falasca (2025) 2506.22552v1, section III.A and
+% appendix B.2.  AJR, 8 Jul 2025 -- 25 Feb 2026
+\subsection{\texttt{majdaTriad2010}: project stochastic
+forcing in Majda's triad model} 
 \label{majdaTriad2010}
 \localtableofcontents
 
 
-Falasca (2025) \cite{Majda2010} investigated averaging in  3D \sde\ systems.
-Let's compare with their stochastic normal form.
-
-
+\cite{Falasca2025}  investigated averaging in the 3D \sde\
+system of \cite{Majda2010}. Let's see how the deterministic
+slow manifold projection matches their heuristic stochastic
+normal form.
 
 Start by loading the procedure.
 \begin{reduce}
 in_tex "../invariantManifold.tex"$
 \end{reduce}
-The system uses parameters~\(L_j\) so define
+The system uses parameters~\(L_{1j}\) and \(\gamma_j\) so
+define the following: \verb|clear gamma| because by default
+it is the gamma function.
 \begin{reduce}
-operator l; defindex l(down);
+off raise,lower;
+operator L; 	defindex L(down);
+clear gamma;
 operator gamma; defindex gamma(down);
 \end{reduce}
 
-The additive triad model of Falasca (2025) \cite{Majda2010} consists of three modes, 
-$x_1$, $x_2$~and~$x_3$.
-However, these now evolve in time according to
+The additive triad model of \cite{Falasca2025,Majda2010}
+consists of three modes, $x_1$, $x_2$~and~$x_3$, evolving in
+time according to the stochastic \ode{}s
 \begin{align*}&
-	\frac{dx_1}{dt}=b_1x_2x_3\,,
+	\frac{dx_1}{dt'}=L_1x_1+L_2x_2+L_3x_3+Ix_2x_3\,,
 	\\&
-	\frac{dx_2}{dt}=-x_2+b_2x_1x_3+\sigma_2\dot W_2\,,
+	\frac{dx_2}{dt'}=-\gamma_2\epsilon^{-1}x_2-L_2x_1-Ix_1^2
+	+\sigma_2\epsilon^{-1/2}\dot W_2\,,
 	\\&
-	\frac{dx_3}{dt}=-x_3+b_3x_1x_2+\sigma_3\dot W_3\,,
+	\frac{dx_3}{dt'}=-\gamma_3\epsilon^{-1}x_3-L_3x_1
+	+\sigma_3\epsilon^{-1/2}\dot W_3\,,
 \end{align*}
-where $b_j$~and~$\sigma_j$ are some constants, and there is independent stochastic forcing of the second and third modes.
-Here I have already scaled the equations so that the rate of decay of \emph{both} the second and third mode is one.\footnote{In contrast, \cite{Majda02} set the two modes to have different decay rates.
-Do not expect much difference in using the same decay rate, it is just more convenient that the memory convolutions are then identical for the two modes rather than being different.
-Having the decay rates the same is also closer to my expected application to spatial problems.} Thus on long time scales we expect the second and third modes to be essentially negligible and the system to be modelled by the relatively slow evolution of the first mode.
-This section constructs the stochastic normal form of its centre manifold model as the basis for a model over long time scales with new noise processes.
+where $L_j$~and~$\sigma_j$ are some constants, and there is
+independent stochastic forcing of the second and third
+modes.
 
-The procedure \verb|invariantmanifold| is already loaded.
+With its divisions by~\(\epsilon\), the system is written in
+singular perturbation form. Unfortunately, singular
+perturbations often `sweep-under-the-carpet' key physics
+that occur at finite~\(\epsilon\). So first rescale time to
+the fast time \(t=t'/\epsilon\) and define \(\verb|small| =
+\varepsilon := \sqrt{\epsilon}\) for convenience. In terms
+of new dependent variables \(u_j:=x_j\) the above triad
+system becomes
+\begin{align*}&
+	\frac{du_1}{dt} = \varepsilon^2( L_1u_1+L_2u_2+L_3u_3+Iu_2u_3 ),
+	\\&
+	\frac{du_2}{dt} = -\gamma_2u_2 +\varepsilon^2( -L_2u_1-Iu_1^2 )
+	+\sigma_2\dot W_2\,,
+	\\&
+	\frac{du_3}{dt} = -\gamma_3u_3 -\varepsilon^2L_3u_1
+	+\sigma_3\dot W_3\,,
+\end{align*}
+
+
+Because of their decay rates~\(\gamma_2,\gamma_3\), over
+long time scales we expect the second and third modes to be
+essentially negligible and the system to be modelled by the
+relatively slow evolution of the first mode. However, the
+stochastic forcing excites these modes and we turn to the
+projection vectors to determine how they then affect the
+slow manifold model.
+
+
+The procedure \verb|invariantmanifold| is previously loaded.
 Write a message saying we are now analysing the next system.
 \begin{reduce}
 write "**** Additive Triad system of Majda (2010) ****";
 \end{reduce}
-Execute the construction of a slow manifold for this system using  \(u_j=x_{j}\)\,.
+Construct a slow manifold for the deterministic system (no
+stochastic noise): terms in \(\verb|small|=\varepsilon\) get
+multiplied by another factor of \(\verb|small|=\varepsilon\)
+before analysis, so these explicit \verb|small| factors
+become equivalent to~\(\epsilon\) factors;
 \begin{reduce}
-factor ii,epsilon;
+factor small;
 invariantmanifold({},
-    mat(( small*(l(11)*u1+l(12)*u2+l(13)*u3) +ii*u1*u2 ,
-     -gamma(2)*u2/epsilon-small*l(12)*u1-ii*u1^2,
-     -gamma(3)*u3/epsilon-small*l(13)*u1 )),
+    mat(( small*( L(1)*u1+L(2)*u2+L(3)*u3 +I*u1*u2 ),
+     -gamma(2)*u2 +small*( -L(2)*u1-I*u1^2 ),
+     -gamma(3)*u3 -small*L(3)*u1 )),
     mat(( 0 )),
     mat( (1,0,0) ),
     mat( (1,0,0) ),
-    4 )$
-end; % finish here if not before
+    6 )$
+end;
 \end{reduce}
 
 The procedure reports that it analyses the following family 
 \begin{align*}&
-\dot x_{1}=??
+\dot u_{1}=\eps^{2} \big(L_{3} u\_3+L_{2} u\_2+L_{1} u\_1+I u\_1 u\_2\big)
 \\&
-\dot y_{1}=??
+\dot u_{2}=\eps^{2} \big(-L_{2} u\_1-I u\_1^{2}\big)-\gamma _{2} u\_2
 \\&
-\dot y_{2}=??
+\dot u_{3}=-\eps^{2} L_{3} u\_1-\gamma _{3} u\_3
 \end{align*}
-Here, \eps\ counts the order of nonlinearity so that the errors~\Ord{\eps^3} are errors~\Ord{|\xv|^4+\sigma^4} (due to the noise driving fluctuations of size~\(\sigma\)).
+Here, \(\eps^2\)\ counts the order of perturbation
+in~\(\epsilon\).
 
+\paragraph{The invariant manifold}
+These give the location of the invariant manifold in terms
+of parameters~\(s\_ 1\) and \(\epsilon=\eps^2\).
+\begin{align*}&
+u_{1}=s_{1}+O\big(\varepsilon ^{5}\big)
+\\&
+u_{2}=\ParMath{ \eps^{2} \big(-L_{2} \gamma _{2}^{-1} s_{1}
+-\gamma _{2}^{-1} s_{1}^{2} I\big) +\eps^{4} \big(L_{2}
+L_{1} \gamma _{2}^{-2} s_{1} +2 L_{1} \gamma _{2}^{-2}
+s_{1}^{2} I\big) +O\big(\varepsilon ^{5}\big)
+}\\&
+u_{3}=\ParMath{ -\eps^{2} L_{3} \gamma _{3}^{-1} s_{1}
++\eps^{4} L_{3} L_{1} \gamma _{3}^{-2} s_{1}
++O\big(\varepsilon ^{5}\big)
+}
+\end{align*}
+\paragraph{Invariant manifold ODEs}
+The system evolves on the invariant manifold such that the
+parameters evolve according to this ODE.
+\begin{equation*}
+\dot s_{1}=\ParMath{ \eps^{2} L_{1} s_{1} +\eps^{4}
+\big(-L_{3}^{2} \gamma _{3}^{-1} s_{1}-L_{2}^{2} \gamma
+_{2}^{-1} s_{1}-2 L_{2} \gamma _{2}^{-1} s_{1}^{2} I-\gamma
+_{2}^{-1} s_{1}^{3} I^{2}\big) +O\big(\varepsilon ^{6}\big)
+}
+\end{equation*}
+These match the deterministic part of \cite{Falasca2025}'s
+(B2)---except of course for the quadratic noise-noise
+induced drifts in his It\^o~form.
 
+The stochastic parts of \cite{Falasca2025}'s (B2) now come
+from the projection of forcing onto the above deterministic
+slow manifold.
 
+\paragraph{Normals to isochrons at the slow manifold}
+Use these vectors: to project initial conditions onto the
+slow manifold; to project non-autonomous forcing onto the
+slow evolution; to predict the consequences of modifying the
+original system; in uncertainty quantification to quantify
+effects on the model of uncertainties in the original
+system. The normal vector 
+\begin{align*}&
+\vec z :=
+\begin{bmatrix} 
+1 +\eps^{4} \big(L_{3}^{2} \gamma _{3}^{-2} +L_{2}^{2}
+\gamma _{2}^{-2} +3 L_{2} \gamma _{2}^{-2} s_{1} I +2 \gamma
+_{2}^{-2} s_{1}^{2} I^{2}\big) +O\big(\varepsilon ^{6}\big)
+\\[1ex]
++\eps^{2} \big(L_{2} \gamma _{2}^{-1}+\gamma _{2}^{-1} s_{1}
+I\big) -\eps^{4} L_{2} L_{1} \gamma _{2}^{-2}
++O\big(\varepsilon ^{6} \big)
+\\[1ex]
++\eps^{2} L_{3} \gamma _{3}^{-1} -\eps^{4} L_{3} L_{1}
+\gamma _{3}^{-2} +O\big(\varepsilon ^{6}\big)
+\end{bmatrix}
+\\&\quad{}=
+\begin{bmatrix} 
+1+O\big(\varepsilon ^{4}\big)
+\\[1ex]
++\eps^{2} \big(L_{2} \gamma _{2}^{-1}+\gamma _{2}^{-1} s_{1}
+I\big) +O\big(\varepsilon ^{4} \big)
+\\[1ex]
++\eps^{2} L_{3} \gamma _{3}^{-1} +O\big(\varepsilon
+^{4}\big)
+\end{bmatrix}.
+\end{align*}
+Consequently, the leading effect of the stochastic forcing
+\(\vec f:=(0, \sigma_2\dot W_2, \sigma_3\dot W_3)\) is to
+add the following stochastic terms to the \(s_1\)~\ode: 
+namely, and agreeing with \cite{Falasca2025}'s (B2),
+\begin{equation*}
++\eps^{2} \big(L_{2} \gamma _{2}^{-1}+\gamma _{2}^{-1} s_{1}
+I\big)\sigma_2\dot W_2 +\eps^{2} L_{3} \gamma
+_{3}^{-1}\sigma_3\dot W_3\,.
+\end{equation*}
+
+\paragraph{Summary}  The derived projection vectors also
+determine how stochastic forcing effects are mapped onto a
+slow manifold, to linear effects in the noise.
