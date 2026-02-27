@@ -4,12 +4,14 @@
 \paragraph{The specified dynamical system}
 \(
 \)\par
-\(\dot u_{1}=\eps^{2} \big(L_{3} u\_3+L_{2} u\_2+L_{1} u\_1+I u\_1 u\_2
-\big)
+\(\dot u_{1}=u\_3
 \)\par
-\(\dot u_{2}=\eps^{2} \big(-L_{2} u\_1-I u\_1^{2}\big)-\gamma _{2} u\_2
+\(\dot u_{2}=u\_4
 \)\par
-\(\dot u_{3}=-\eps^{2} L_{3} u\_1-\gamma _{3} u\_3
+\(\dot u_{3}=F\_1 \eps^{2} \exp \big(0\big)+\eps^{2} \big(-1/2 u\_1^{3}-3/
+10 u\_3+3/10 u\_4\big)-2 u\_1+u\_2
+\)\par
+\(\dot u_{4}=F\_2 \eps^{2} \big(3/10 u\_3-3/5 u\_4\big)+u\_1-2 u\_2
 \)\par
 \(\)
 \paragraph{Invariant subspace basis vectors}
@@ -17,13 +19,25 @@
 \)\par
 \(\vec e_{1}=\left\{
 \left\{
-1 , 0 , 0
-\right\} , \exp \big(0\big)
+1 , 1 , i , i
+\right\} , \exp \big(i t\big)
+\right\}
+\)\par
+\(\vec e_{2}=\left\{
+\left\{
+1 , 1 , -i , -i
+\right\} , \exp \big(-i t\big)
 \right\}
 \)\par
 \(\vec z_{1}=\left\{
 \left\{
-1 , 0 , 0
-\right\} , \exp \big(0\big)
+1/4 , 1/4 , 1/4 i , 1/4 i
+\right\} , \exp \big(i t\big)
+\right\}
+\)\par
+\(\vec z_{2}=\left\{
+\left\{
+1/4 , 1/4 , -1/4 i , -1/4 i
+\right\} , \exp \big(-i t\big)
 \right\}
 \)\par
