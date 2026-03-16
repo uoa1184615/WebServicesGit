@@ -1,0 +1,93 @@
+Comment Regarding A codimension-two bifurcation organises the
+dynamics of the transition between multipotent and
+fate-specified cell states, Schofield et al., 26/2/2026
+https://people.bath.ac.uk/jhpd20/publications
+/schofield_et_al_preprint_version.pdf
+AJR, 10 Mar 2026;
+on div,revpri; off allfac,raise,lower;
+load_package linalg;
+
+write "** Define g1() function and its coefficients f, using
+a+eps*f(i) for linear terms to control perturbation from
+critical case";
+operator f;
+let { f(~i,~j)=>f(j,i) when j<i
+    , f(~i,~j,~k)=>f(j,i,k) when j<i
+    , f(~i,~j,~k)=>f(i,k,j) when k<j
+    }; 
+procedure g1(z1,z2,z3); begin
+    zs:={z1,z2,z3};
+    return
+    for i:=1:3 sum part(zs,i)*(a+eps*f(i)+
+    for j:=1:3 sum part(zs,j)*(f(i,j)/2+
+    for k:=1:3 sum part(zs,k)*f(i,j,k)/6));
+    end;%procedure
+
+write "** Define the ODEs, and get Jacobian at the origin";
+dx1dt:=g1(x1,x2,x3)$
+dx2dt:=g1(x2,x3,x1)$
+dx3dt:=g1(x3,x1,x2)$
+rhs:=tp mat((dx1dt,dx2dt,dx3dt))$
+vec0:=tp mat((0,0,0))$
+
+jac:=mat((df(dx1dt,x1),df(dx1dt,x2),df(dx1dt,x3))
+        ,(df(dx2dt,x1),df(dx2dt,x2),df(dx2dt,x3))
+        ,(df(dx3dt,x1),df(dx3dt,x2),df(dx3dt,x3)))$
+write jac:=sub({x1=0,x2=0,x3=0,eps=0},jac);
+
+write "** Parametrise center manifold in terms of general
+parameter names s1,s2.  Define them in terms of some chosen
+basis vectors of the center subspace.";
+depend s1,t; depend s2,t;
+let { df(s1,t)=>ds1dt, df(s2,t)=>ds2dt};
+write Vs:=tp mat((2,-1,-1),(0,-1,1)); % p.13 centre-subspace basis
+write "p.14 transform to complex z & c.c, herein called s1,s2 resp.";
+let { r3^2=>3, impart(r3)=>0, repart(r3)=>r3 }; % r3=sqrt(3)
+write Vs:=Vs*tp mat((1,-i*r3),(1,+i*r3))/2;
+
+write "** For solving homological eqn, preserving defn of s1,s2";
+write Zs:=map(conj(~q),tp Vs);
+write Jinv:= 1/matrix_stack(matrix_augment(jac,Vs)
+                , matrix_augment(Zs,mat((0,0),(0,0))) 
+                );
+
+write "** Linear approximation";
+% z counts the order of each term (except one less in d/dt)
+write x:= z*Vs*tp mat((s1,s2));
+ds1dt:=ds2dt:=0;
+
+write "** Set errors of approximation";
+factor eps,z;
+let z^4=>0;  % explore to 3=quadratic, 4=cubic, perturbations
+let eps^2=>0;% only linear effects in departure from critical
+
+write "** Iterate until ODE residuals zero to reqd error";
+for it:=1:5 do begin
+    res:=df(x,t)-sub({x1=x(1,1),x2=x(2,1),x3=x(3,1)},rhs);
+    write lengthResT:=map(length(~z),tp res);
+    update:=Jinv*matrix_stack( res,tp mat((0,0)) );
+    ds1dt:=ds1dt-update(4,1)/z;
+    ds2dt:=ds2dt-update(5,1)/z;
+    x:=x+remove_rows(update,{4,5});
+    if res=vec0 then write "Success: ",it:=it+10000;
+end;
+showtime;
+if res neq vec0 then rederr("**** Failed to converge");
+
+write "** Centre manifold evolution is the following";
+factor a,s1,s2,i,r3;
+ds1dt:=ds1dt;
+ds2dt:=ds2dt;
+
+write "** Deconstruct the cubic term";
+cubic:=sub(eps=0,coeffn(ds1dt,z,2))$
+% fix r3 division
+cubic:=r3*cubic$ cubic:=r3*cubic/3$
+p3:=coeffn(cubic,i,0); 
+p3num:=factorize(num(p3));  p3den:=den(p3);
+p3prods:=factorize(coeffn(part(p3num,1,1),a,0));
+q3:=coeffn(cubic,i,1);
+q3num:=factorize(num(q3));  q3den:=den(q3);
+q3prods:=factorize(coeffn(part(q3num,1,1),a,0));
+
+end;

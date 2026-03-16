@@ -319,10 +319,10 @@ without \verb|gcd|.  Unfortunately, \verb|ezgcd| also crashes \verb|psl| so leav
 %\begin{reduce}
 %on ezgcd; 
 %\end{reduce}
-Let's make the algebra case sensitive: for \emph{psl} we set \verb|raise|; whereas for \emph{csl} we set \verb|lower|.  
- Remember (currently, 2025) \verb|off latex| automatically turns \verb|raise| back on (but not \verb|lower|).
+Let's make the algebra case sensitive: for \emph{psl} we unset \verb|raise|; whereas for \emph{csl} we unset \verb|lower|.  
+Remember (currently, 2025) \verb|off latex| automatically turns \verb|raise| back on (but not \verb|lower|).
 \begin{reduce}
-off raise;  off lower;
+off raise,lower;
 \end{reduce}
 
 %Similarly, try loading LaTeX names of symbols here so that
@@ -378,7 +378,7 @@ pp, est, eyem, m, pdfzero;
 
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 26 Feb 2026)"$
+write "Construct invariant manifold (version 12 Mar 2026)"$
 %write input_odefns:=odefns;
 %write input_evals:=evals;
 %write input_evecs:=evecs;
@@ -392,10 +392,14 @@ Transpose the defining matrices so that vectors are columns.
 ff := tp odefns;
 ee := tp evecs;
 zz := tp adjvecs; 
+write "Input sizes: odes ",length(ff)
+    ,"; evals ",length(evals)
+    ,"; evecs ",length(ee)
+    ,"; adjvs ",length(zz);
 \end{reduce}
 
 
-Define default parameters for the iteration:
+Define default parameters for the iteration: first,
 \verb|maxiter|~is the maximum number of allowed iterations.
 Specific problems may override this default.
 \begin{reduce}

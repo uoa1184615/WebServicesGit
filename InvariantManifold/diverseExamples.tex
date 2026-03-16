@@ -9,16 +9,20 @@
 
 
 
-\usepackage{url,natbib,amsmath,defns,reducecode}
+\usepackage{url,natbib,amsmath,defns,reducecode,MnSymbol}
 \usepackage[twodeep]{etocx}%\setcounter{tocdepth}{2}
 \RaisedNamesfalse
 \let\harvardurl\url
 \IfFileExists{ajr.sty}{\usepackage{ajr}}{}
 \usepackage{mycleveref}
+\usepackage{pgfplots}\pgfplotsset{compat=newest}
+\usepgfplotslibrary{external}\tikzexternalize
 \Cal L \Cal E \Cal Z
 \Vec e\Vec z\Vec u\Vec s\Vec x
 \def\dde{\textsc{dde}}
 \newcommand{\adj}[1]{#1^\dagger} % denotes cc transpose
+\allowdisplaybreaks
+\newcounter{i}
 % for output of coordinate transform
 \def\exp\big(#1\big){\,{\rm e}^{#1}}
 \def\i{\operatorname{i}}
@@ -27,10 +31,10 @@
 \def\diff{\partial\makebox[0pt]{\ $\cdot$}}
 \newcommand{\ParMath}[1]%
     {\parbox[t]{0.9\linewidth}{\raggedright\(#1\)}}
-\allowdisplaybreaks
+
+
 
 \begin{document}
-
 \maketitle
 
 
@@ -124,6 +128,7 @@ Also see \cref{interpretProjection}.
 \input{Examples/gradsSystem}
 \input{Examples/randWalkHetero}
 \input{Examples/ddeHopfSpace}
+\input{Examples/homogeniseLattice}
 
 
 \bibliographystyle{agsm}

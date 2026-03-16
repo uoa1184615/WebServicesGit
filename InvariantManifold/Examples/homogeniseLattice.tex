@@ -1,89 +1,336 @@
 %!TEX root = ../diverseExamples.tex
-\subsection{\texttt{homogeniseLattice}: homogenise spatial diffusion on a heterogeneous lattice} 
+\subsection{\texttt{homogeniseLattice}: homogenise spatial
+diffusion on a heterogeneous lattice} 
 \label{homogeniseLattice}
 \localtableofcontents
+% version 16 Mar 2026
 
-A heat exchanger is simply two pipes with `fluid' flowing in opposite directions, and exchanging heat between them.  Let \(u_1(x,t)\C u_2(x,t)\) be the temperatures in the two pipes as a function of space-time.   Advecting at the same but opposite velocities, noon-dimensional \pde{}s are
-\begin{align*}
-&\D t{u_1}=-\D x{u_1}+u_2-u_1\,,
-&&\D t{u_2}=+\D x{u_1}+u_1-u_2\,.
+Here consider dynamics on the lattice of \cref{fig:svhld}
+\cite[]{Roberts2019a}.
+\begin{figure}\centering\small
+\caption{schematic diagram of inhomogeneous diffusion on a
+microscale lattice, spacing~\(d\), of material~$u_j(t)$,
+with two-periodic diffusivity $a$~and~$b$ between even and
+odd lattice points.}
+\label{fig:svhld}
+\setlength{\unitlength}{1ex}
+\begin{picture}(75,8)
+%\put(0,0){\framebox(75,8){}}
+\put(0,-2){\thicklines
+\put(0,5){\vector(1,0){72}$\ j$}
+\multiput(3,4)(8,0){9}{\line(0,1)2}
+\setcounter{i}{0}
+\multiput(10,2)(8,0){7}{$\arabic{i}$\stepcounter{i}}
+\multiput(2,2)(64,0){2}{$\cdots$}
+\setcounter{i}{0}
+\multiput(8.5,8)(8,0){7}{$u_{\arabic{i}}(t)$\stepcounter{i}}
+\multiput(2,8)(64,0){2}{$\cdots$}
+\multiput(6,6)(16,0)4{$a$}
+\multiput(14,6)(16,0)4{$b$}
+}
+\end{picture}
+\end{figure}%
+Suppose a microscale lattice, \(x_j=j\) as in
+\cref{fig:svhld}, has a property~\(u_j(t)\) that diffuses
+with the period-two coefficients, named~\(a,b\):
+\begin{equation}
+\dot u_j=\begin{cases}
+a[u_{j+1}-u_j]+b[u_{j-1}-u_j]&\text{odd }j,\\
+b[u_{j+1}-u_j]+a[u_{j-1}-u_j]&\text{even }j.
+\end{cases}
+\label{eq:svhld}
+\end{equation}
+That is, the `diffusion' \ode{}s have the same \emph{form}
+at every lattice point, but the coefficients of interaction
+vary: they are periodic in~$n$ with period two (alternately
+$a$~and~$b$ as shown in \cref{fig:svhld}). These \ode{}s
+model the diffusion of quantity~$u$ through a microscale
+laminate of alternating material and with alternating
+diffusivities. The alternating diffusivities lead to fields
+with a microscale jagged structure as seen in
+\cref{fig:periodiidiff}. Our challenge is to deduce the
+following effective macroscale diffusion equation for the
+`smooth' component~\(U(x,t)\) of the field~$u$ over large
+distances~$x$:
+\begin{equation*}
+\D tU \approx \frac{2ab}{a+b}\DD xU\,.
+\end{equation*}
+
+\begin{figure}
+\centering
+\caption{an example solution of diffusion
+(\eqref{homogeniseLattice}) with alternating diffusivity for
+\cref{eq:svhld}: black points, the detailed field has
+`complicated' sawtooth structure; blue or red, but sampling
+at every second point shows a smooth macroscale structure.}
+\label{fig:periodiidiff}
+\input{Examples/Figs/periodiidiff}
+\end{figure}
+
+\begin{figure*}
+\caption{\label{fig:dbl}First~(top) redraw \cref{fig:svhld}
+so that the \emph{odd} points are in the upper line and the
+\emph{even} points in the lower line.  Then the
+diffusivity~\(a\) always acts in `NW--SE' direction and the
+diffusivity~\(b\) always acts in `NE--SW' direction.
+Second~(bottom) double the number of variables by filling in
+the gaps: \(u_{1,j}(t)\)~in the upper line; and
+\(u_{2,j}\)~in the lower line.  Here the diffusivities~\(a\)
+and~\(b\) always act in the same direction---a system
+\emph{homogeneous} on the lattice!}
+\centering\small
+\setlength{\unitlength}{1ex}
+\begin{tabular}{c}
+\begin{picture}(75,12)
+%\put(0,0){\framebox(75,12){}}
+\put(0,-2){\thicklines
+\put(0,5){\vector(1,0){72}$\ x$}
+\multiput(3,4)(8,0){9}{\line(0,1)2}
+\setcounter{i}{0}
+\multiput(10,2)(8,0){7}{$\arabic{i}$\stepcounter{i}}
+\multiput(2,2)(64,0){2}{$\cdots$}
+\setcounter{i}{0}
+\multiput(8.5,8)(16,0){4}{$u_{\arabic{i}}(t)$\stepcounter{i}\stepcounter{i}}
+\setcounter{i}{1}
+\multiput(16.5,12)(16,0){4}{$u_{\arabic{i}}(t)$\stepcounter{i}\stepcounter{i}}
+\multiput(13.5,10)(16,0){4}{\large$\neswarrow$}
+\multiput(5.5,10)(16,0){5}{\large$\nwsearrow$}
+\multiput(6,6)(16,0)4{$a$}
+\multiput(14,6)(16,0)4{$b$}
+}
+\end{picture}
+\\
+\begin{picture}(75,15)
+%\put(0,0){\framebox(75,12){}}
+\put(0,-2){\thicklines
+\put(0,5){\vector(1,0){72}$\ x$}
+\multiput(3,4)(8,0){9}{\line(0,1)2}
+\setcounter{i}{0}
+\multiput(10,2)(8,0){7}{$\arabic{i}$\stepcounter{i}}
+\multiput(2,2)(64,0){2}{$\cdots$}
+\setcounter{i}{0}
+\multiput(8.5,8)(8,0){8}{$u_{2,\arabic{i}}$\stepcounter{i}}
+\setcounter{i}{0}
+\multiput(8.5,12)(8,0){8}{$u_{1,\arabic{i}}$\stepcounter{i}}
+\multiput(4.5,9)(8,0){9}{\Huge$\times$}
+\multiput(5,6)(8,0)8{$a,b$}
+}
+\end{picture}
+\end{tabular}
+\end{figure*}%
+Let's form a system that is homogeneous on the lattice.
+\cref{fig:dbl} shows how to do this by forming two decoupled
+systems that we analyse as one whole system. Usefully, the
+combined system is homogeneous on the lattice: every lattice
+point has the same equations because diffusivity~\(a\)
+always acts in the same direction, and the diffusivity~\(b\)
+always acts in the other direction. The \ode{}s are
+\begin{align*}&
+\dot u_{1,j}=a[u_{2,j+1}-u_{1,j}]+b[u_{2,j-1}-u_{1,j}],
+\\&
+\dot u_{2,j}=b[u_{1,j+1}-u_{2,j}]+a[u_{1,j-1}-u_{2,j}].
+\label{eq:}
 \end{align*}
+Writing the \ode{}s as in terms of the spatial location of
+the lattice points, \(x=j\), the differential equations for
+fields~\(u_1(x,t)\) and~\(u_2(x,t)\) are 
+\begin{subequations}\label{eqssvhdmic}%
+\begin{align}&
+\dot u_1(x)=a[u_2(x+1)-u_1(x)] +b[u_2(x-1)-u_1(x)],
+\\&
+\dot u_2(x)=b[u_1(x+1)-u_2(x)] +a[u_1(x-1)-u_2(x)].
+\end{align}
+\end{subequations}
+We analyse these to discover the homogenisation, and more.
 
-The linearisation for \emph{gradual} variations in space is to then neglect the spatial derivatives: \(\D t{u_1}=u_2-u_1\C \D t{u_2}=u_1-u_2\)\,.
-This has eigenvalues \(\lambda=0,-2\) with respective eigenvectors \((1,1)\C (1,-1)\).
-We model effective dispersion of heat in these two pipes in space-time over long times and large space scales.
+
+The linearisation for \emph{gradual} variations in space is
+to then neglect the spatial variations (\(u_j(x\pm1)\approx
+u_j(x)\): \begin{equation*}
+\D t{u_1}=(a+b)(u_2-u_1),\quad \D t{u_2}=(a+b)(u_1-u_2).
+\end{equation*}
+This pair of \ode{}s has eigenvalues \(\lambda=0,-2(a+b)\)
+with respective eigenvectors \((1,1)\C (1,-1)\). We model
+the effective `homogenised' dispersion of~\(u\) in
+space-time over long times and large space scales.
 
 Start by loading the procedure.
 \begin{reduce}
 in_tex "../invariantManifold.tex"$
 \end{reduce}
-In the printed output, group terms depending upon order of spatial derivatives (which are assumed `small').
+In the printed output, group terms depending upon order of
+spatial derivatives (which are assumed `small').
 \begin{reduce}
 factor small;
 \end{reduce}
-The following procedure call constructs the slow manifold for this system to errors~\Ord{\partial_x^5}.
+The following procedure call constructs the slow manifold
+for this system to errors~\Ord{\partial_x^5}.  The spatial
+finite differences are explicitly expanded in their
+truncated Taylor series in partial derivatives:
+\(u_j(x+h)=\sum_{n=0}^N h^n\Dn xn{u_j}/n!\).  The results
+are clearer in mean and difference coefficients
+\(c:=(a+b)/2\) and \(d:=(b-a)/2\).
 \begin{reduce}
-a:=c+d; b:=c-d; % optionally in terms of mean and difference variables
+N:=4; % highest order of d/dx
+a:=c-d; b:=c+d; % in mean and difference variables
+if 0 then << %optional test of forcing
+        depend F,x; depend f,x; let eps^2=>0; >>
+    else F:=f:=0;
+if 0 then << %optional test of uncertainty
+        a:=a+small*epsilon; let eps^2=>0; >>;
 factor df,diff;
 invariantmanifold( {x},
-    mat((-(a+b)*u1
-        +a*(u2-diff(u2,x)+diff(u2,x,2)/2-diff(u2,x,3)/6+diff(u2,x,4)/24)
-        +b*(u2+diff(u2,x)+diff(u2,x,2)/2+diff(u2,x,3)/6+diff(u2,x,4)/24)
-        ,-(a+b)*u2
-        +b*(u1-diff(u1,x)+diff(u1,x,2)/2-diff(u1,x,3)/6+diff(u1,x,4)/24)
-        +a*(u1+diff(u1,x)+diff(u1,x,2)/2+diff(u1,x,3)/6+diff(u1,x,4)/24)
+    mat((-(a+b)*u1 +small*eps*(F+f)
+        +a*(u2+ for n:=1:N sum pdf(u2,x,n)/factorial(n) )
+        +b*(u2+ for n:=1:N sum pdf(u2,x,n)/factorial(n)*(-1)^n )
+        ,-(a+b)*u2 +small*eps*(F-f)
+        +b*(u1+ for n:=1:N sum pdf(u1,x,n)/factorial(n) )
+        +a*(u1+ for n:=1:N sum pdf(u1,x,n)/factorial(n)*(-1)^n )
         )),
-    mat(( 0 )),
-    mat( (1,1) ),
-    mat( (1,1) ),
-    5 )$
+    mat(( 0 )), mat((1,1)), mat((1,1)),
+    N+1 )$
 end;
 \end{reduce}
 
 
 The procedure then actually analyses the parametrised system
 \begin{align*}&
-\D t{u_{1}}=-\eps \frac{{\rm d}\,u_1}{{\rm d}\,x}-u_1+u_2\,,
-&&
-\D t{u_{2}}=\eps \frac{{\rm d}\,u_2}{{\rm d}\,x}+u_1-u_2\,.
-\end{align*}
-Consequently the procedure's artificial parameter~\(\eps\)\ counts the number of spatial derivatives in each term.
+\D t{u_{1}}=\ParMath{
+\frac{1}{12} \frac{\partial ^{4}u\_2}{\partial x^{4}} \eps^{4} c-\frac{1}{3} 
+\frac{\partial ^{3}u\_2}{\partial x^{3}} \eps^{3} d+\frac{\partial ^{2}
+u\_2}{\partial x^{2}} \eps^{2} c-2 \frac{\partial \,u\_2}{\partial \,x} 
+\eps d-2 c u\_1+2 c u\_2\,,
+}\\&
+\D t{u_{2}}=\ParMath{
+\frac{1}{12} \frac{\partial ^{4}u\_1}{\partial x^{4}} \eps^{4} c+\frac{1}{3} 
+\frac{\partial ^{3}u\_1}{\partial x^{3}} \eps^{3} d+\frac{\partial ^{2}
+u\_1}{\partial x^{2}} \eps^{2} c+2 \frac{\partial \,u\_1}{\partial \,x} 
+\eps d+2 c u\_1-2 c u\_2\,.
+}\end{align*}
+Consequently the procedure's artificial `small'
+parameter~\(\eps\)\ counts the number of spatial derivatives
+in each term.
 
 
 \paragraph{The invariant manifold} 
-The slow manifold is expressed in terms of a series in space derivatives.
+The slow manifold is expressed in terms of a series in space
+derivatives.
 \begin{align*}&
-u_{1}={ 1/16 \eps^{3} \frac{{\rm d}^{3}s_{1}}{{\rm d}x^{3}}-1/4 \eps 
-\frac{{\rm d}\,s_{1}}{{\rm d}\,x}+O\big(\varepsilon ^{4}\big)+1/2 s_{1}
+u_{1}=\ParMath{ \frac{\partial ^{3}s_{1}}{\partial x^{3}} \eps^{3} \big(\frac{1}{6} c^{-1}
+ d-\frac{1}{8} c^{-3} d^{3}\big)-\frac{1}{2} \frac{\partial \,s_{1}}{\partial \,x} \eps 
+c^{-1} d+O\big(\varepsilon ^{4}\big)+s_{1}
 }\\&
-u_{2}={ -1/16 \eps^{3} \frac{{\rm d}^{3}s_{1}}{{\rm d}x^{3}}+1/4 \eps 
-\frac{{\rm d}\,s_{1}}{{\rm d}\,x}+O\big(\varepsilon ^{4}\big)+1/2 s_{1}
+u_{2}=\ParMath{ \frac{\partial ^{3}s_{1}}{\partial x^{3}} \eps^{3} \big(-\frac{1}{6} c^{-1
+} d+\frac{1}{8} c^{-3} d^{3}\big)+\frac{1}{2} \frac{\partial \,s_{1}}{\partial \,x} \eps
+ c^{-1} d+O\big(\varepsilon ^{4}\big)+s_{1}
 }\end{align*}
+That is, since \(u_1+u_2=s_1\)\,, \(s_1(x,t)\)~is a
+`homogenised' mean variable~\(U(x,t)\).
 
  
 \paragraph{Invariant manifold PDEs} 
-The system evolves according to this \pde\ that describes the effective dispersion of heat in the pipes: a simple diffusion albeit with higher-order improvements:
+The system evolves according to this \pde\ that describes
+the effective dispersion of heat in the pipes: a simple
+diffusion albeit with higher-order improvements:
 \begin{align*}&
-\D t{s_{1}}={ -1/8 \eps^{4} \frac{{\rm d}^{4}s_{1}}{{\rm d}x^{4}}+1/2 \eps
-^{2} \frac{{\rm d}^{2}s_{1}}{{\rm d}x^{2}}+O\big(\varepsilon ^{5}\big)
+\D t{s_{1}}=\ParMath{ \frac{\partial ^{4}s_{1}}{\partial x^{4}} \eps^{4} \big(\frac{1}{12} 
+c+\frac{1}{6} c^{-1} d^{2}-\frac{1}{4} c^{-3} d^{4}\big)+\frac{\partial ^{2}s_{1}}{
+\partial x^{2}} \eps^{2} \big(c-c^{-1} d^{2}\big)+O\big(\varepsilon ^{5}
+\big)
 }\end{align*}
+The second-order coefficient \(c-d^2/c=2ab/(a+b)\) as originally claimed.
 
 
 
 \paragraph{Project initial conditions et al.}
-To project initial conditions
-onto the slow manifold, or non-autonomous
-forcing, or modifications of the original system, or to quantify uncertainty \cite[Ch.12]{Roberts89b, Roberts97b, Roberts2014a}, use the projection defined by the following derived vector.
+To project initial conditions onto the slow manifold, or
+non-autonomous forcing, or modifications of the original
+system, or to quantify uncertainty \cite[Ch.12]{Roberts89b,
+Roberts97b, Roberts2014a}, use the projection defined by the
+following derived vector.
 \begin{align*}&
 \zv_1=\begin{bmatrix}z_{11}&z_{12}\end{bmatrix}^T
 \\&
 =\begin{bmatrix}
-{ 3/16 \eps^{4} \diff_{x}^{4}+1/4 \eps^{3} \diff_{x}^{3}-1/4 \eps^{
-2} \diff_{x}^{2}-1/2 \eps \diff_{x}+O\big(\varepsilon ^{5}\big)+1
-}\\[1ex]
-{ 3/16 \eps^{4} \diff_{x}^{4}-1/4 \eps^{3} \diff_{x}^{3}-1/4 \eps^{
-2} \diff_{x}^{2}+1/2 \eps \diff_{x}+O\big(\varepsilon ^{5}\big)+1
+\ParMath{ \diff_{x}^{4} \eps^{4} \big(-\frac{1}{12} c^{-2} d^{2}+\frac{3}{32} c^{-4} d^{4}
+\big)+\diff_{x}^{3} \eps^{3} \big(-\frac{1}{12} c^{-1} d+\frac{1}{8} c^{-3} d^{3}\big)+\frac{1}{8} \diff_{x}^{2} \eps^{2} c^{-2} d^{2}+\frac{1}{4} \diff_{x} \eps c^{-1} d+O
+\big(\varepsilon ^{5}\big)+\frac{1}{2}
+}\\[4ex]
+\ParMath{ \diff_{x}^{4} \eps^{4} \big(-\frac{1}{12} c^{-2} d^{2}+\frac{3}{32} c^{-4} d^{4}
+\big)+\diff_{x}^{3} \eps^{3} \big(\frac{1}{12} c^{-1} d-\frac{1}{8} c^{-3} d^{3}\big)+\frac{1}{8} \diff_{x}^{2} \eps^{2} c^{-2} d^{2}-\frac{1}{4} \diff_{x} \eps c^{-1} d+O\big(
+\varepsilon ^{5}\big)+\frac{1}{2}
 }
 \end{bmatrix}.
 \end{align*}
+
+
+\paragraph{Forcing}
+If we apply a forcing~\(f_1:=F(x,t)+f(x,t)\C
+f_2:=F(x,t)-f(x,t))\) to the embedded
+system~\cref{eqssvhdmic}, then the forcing is to be
+projected onto the homogenised model using~\zv.  That is,
+\begin{equation}
+\D tU= (c-d^2/c)\DD xU +F +\frac d{2c}\D xf 
++\frac{d^2}{4c^2}\DD xF +\Ord{\partial_x^3}.
+\label{EhomlatF}
+\end{equation}
+But we have only one physical strand of physical fields in
+the specified problem.  The other strand of this embedding
+is artificial.  Question: how do we distribute the forcing
+between the physical and the artificial?
+
+Tentative answer: the error~\Ord{\partial_x^3} contains
+third derivatives of the fields.  I assume this error is
+reasonably minimised by the fields in the two strands,
+physical and artificial, are almost the same.   This
+suggests we apply the same forcing to both strands,
+\(f_1=f_2\), that is, the difference \(f=0\) which
+consequently eliminates the term~\(+\frac d{2c}\D xf\) in
+the above projection~\cref{EhomlatF}.
+
+\paragraph{Uncertainty}  
+The same projection applies to uncertainty
+\cite[\S12.4]{Roberts2014a}.  Suppose the coefficients~\(a\)
+are uncertain (and similar would apply to uncertain~\(b\)). 
+Physically, \cref{fig:svhld}, the uncertain~\(a\) applies
+between~\(u_{\text{odd}}\) on left and~\(u_{\text{even}}\)
+on right.  Suppose one `smooth enough'
+function~\(\epsilon(x,t)\) characterises the uncertainty for
+both the physical field and the artificially introduced
+field (\cref{fig:dbl}).  Then the governing differential
+equations~\cref{eqssvhdmic} become
+\begin{subequations}\label{EEsvhdmic}%
+\begin{align}&
+\dot u_1(x)=(a+\epsilon)[u_2(x+1)-u_1(x)] +b[u_2(x-1)-u_1(x)],
+\\&
+\dot u_2(x)=b[u_1(x+1)-u_2(x)] +(a+\epsilon)[u_1(x-1)-u_2(x)].
+\end{align}
+\end{subequations}
+That is, the previously analysed system~\cref{eqssvhdmic}
+with perturbing `forcing' \begin{align*}&
+f_1:=\epsilon[u_2(x+1)-u_1(x)]=\epsilon[u_2-u_1+u_{2x}+u_{2xx}/2+\cdots],
+\\&
+f_2:=\epsilon[u_1(x-1)-u_2(x)]=\epsilon[u_1-u_2-u_{1x}+u_{1xx}/2+\cdots],
+\\&\implies
+F:=\epsilon\left[\tfrac12(u_{2x}-u_{1x})+\tfrac14(u_{1xx}+u_{2xx})+\cdots\right]
+\approx \tfrac12\epsilon(\tfrac dc+1) U_{xx}\,,
+\\&\qquad
+f:=\epsilon[(u_2-u_1) +\tfrac12(u_{2x}+u_{1x}) +\tfrac14(u_{2xx}-u_{1xx})+\cdots]
+\approx \epsilon(\tfrac dc+1) U_{x}\,,
+\end{align*}
+for the sum and difference, respectively. Consequently, this
+uncertainty in coefficient~\(a\) modifies the homogenised
+\pde~\cref{EhomlatF} to   
+\begin{equation}
+\D tU= (c-d^2/c)\DD xU +\tfrac12(\tfrac dc+1)\epsilon U_{xx} +\tfrac d{2c}(\tfrac dc+1)\D x{(\epsilon U_{x})} 
+ +\Ord{\partial_x^3}.
+\label{EhomlatUn}
+\end{equation}
+For constant~\(\epsilon\) this becomes
+\begin{equation*}
+\D tU= (c-d^2/c)\DD xU +\tfrac12(\tfrac dc+1)^2\epsilon U_{xx}  
+ +\Ord{\partial_x^3},
+\end{equation*}
+in agreement with direct construction obtained by the
+optional perturbation. 
 
