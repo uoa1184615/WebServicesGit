@@ -1,5 +1,5 @@
 %!TEX root = ../diverseExamples.tex
-% AJR, 26 Nov 2022;
+% AJR, 26 Nov 2022 -- 25 Mar 2026;
 \subsection{\texttt{marcusYamabe}: Discover Marcus--Yamabe instability}
 \label{marcusYamabe}
 \localtableofcontents
@@ -11,8 +11,8 @@ solutions~\(\uv(t)\) decay. Here consider the
 {Marcus--Yamabe system} \cite[p.197]{Chicone2006}
 \begin{equation}\label{eq:oscmyi}
 \de t{\uv}=L(t)\uv \quad\text{for }L:=\begin{bmatrix} 
--1+\rat32\varepsilon^2\cos^2 t & 1-\rat32\varepsilon^2\sin t\,\cos t\\
--1-\rat32\varepsilon^2\sin t\,\cos t&-1+\rat32\varepsilon^2\sin^2t
+-1+\rat32\varepsilon\cos^2 t & 1-\rat32\varepsilon\sin t\,\cos t\\
+-1-\rat32\varepsilon\sin t\,\cos t&-1+\rat32\varepsilon\sin^2t
 \end{bmatrix}.
 \end{equation}
 For example, for \(\varepsilon=1\), the eigenvalues
@@ -20,7 +20,7 @@ of~\(L(t)\) are \(\rat14(-1\pm\sqrt7i)\) (independent of
 time). Despite the eigenvalues having negative real-part,
 there are growing solutions \(\uv=(-\cos t,\sin t)e^{t/2}\).
 
-Here analyse the system with the late-2022 version of
+Here analyse the system with 
 \verb|invariantManifold.tex| that caters for sinusoidal
 non-autonomous coefficients and forcing.   
 \begin{reduce}
@@ -29,8 +29,8 @@ factor small;
 \end{reduce}
 
 Encode the system with \(\verb|small|=\varepsilon\).  We
-find instability predicted when \(\tfrac32\varepsilon^2
->1\); that is, \(|\varepsilon|>0.8165\); for example,
+find instability predicted when \(\tfrac32\varepsilon
+>1\); that is, \(|\varepsilon|>2/3\); for example,
 \(\varepsilon=1\) as commented above.  Then the induced
 growth of complex amplitudes~\(s_1\) and~\(s_2\) overcomes
 the \(e^{-t}\) decay that is in \(u_1 = e^{(-1+i)t}s_1 +
@@ -59,13 +59,13 @@ u_{2}=-\exp \big(-i t-t\big) s_{2} i+\exp \big(i t-t\big) s_{1} i+O\big(
 Then the system evolves in state space such that the
 parameters evolve according to these \ode{}s.
 \begin{align*}&
-\dot s_{1}=\eps^{2} \big(3/4 s_{2}+3/4 s_{1}\big)+O\big(\varepsilon ^{9}
+\dot s_{1}=\eps \big(3/4 s_{2}+3/4 s_{1}\big)+O\big(\varepsilon ^{9}
 \big)
 \\&
-\dot s_{2}=\eps^{2} \big(3/4 s_{2}+3/4 s_{1}\big)+O\big(\varepsilon ^{9}\big)
+\dot s_{2}=\eps \big(3/4 s_{2}+3/4 s_{1}\big)+O\big(\varepsilon ^{9}\big)
 \end{align*}
 The eigenvalues of the above system are \(\lambda =0,
-\tfrac32\varepsilon^2\).  Hence the net growth of~\uv\ is at
-rate~\(-1+\tfrac32\varepsilon^2\); for example, at the
+\tfrac32\varepsilon\).  Hence the net growth of~\uv\ is at
+rate~\(-1+\tfrac32\varepsilon\); for example, at the
 unstable rate~\(+1/2\) when \(\varepsilon=1\).
 

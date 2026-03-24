@@ -19,8 +19,7 @@ in_tex "../invariantManifold.tex"$
 \end{reduce}
 Execute the construction of the slow manifold for this
 system. The explicit parameter~\verb|small|,
-math-name~\(\eps\), gets replaced by~\verb|small^2| in the
-code, so in effect \(\eps^2=\epsilon\)\,.
+math-name~\(\eps\), effectively~\(\epsilon\)\,.
 \begin{reduce}
 invariantmanifold({},
     mat(( u2-small*u1,
@@ -46,7 +45,7 @@ parameters~\(s_1,s_2\) have the physical meaning,
 respectively, of being the probability that the system is in
 states~\(\{1,2\}\) and~\(\{3,4\}\). The last
 parameter,~\(6\), specifies to construct the slow manifold
-to errors~\Ord{\eps^6}, that is, errors~\Ord{\epsilon^3}.
+to errors~\Ord{\eps^3}, that is, errors~\Ord{\epsilon^3}.
 
 
 \paragraph{The slow manifold} 
@@ -54,18 +53,18 @@ The constructed slow manifold is, in terms of the
 lumped-state probability parameters~\(s_1,s_2\) (to
 error~\Ord{\eps^2}, and reverse ordering!), 
 \begin{align*}&
-u_{1}=\eps^{4} \big(-s_{2}+2 s_{1}\big)-\eps^{2} s_{1}+s_{1}\,, &&
-u_{3}=\eps^{4} \big(-2 s_{2}+s_{1}\big)+\eps^{2} s_{2}\,, \\&
-u_{2}=\eps^{4} \big(s_{2}-2 s_{1}\big)+\eps^{2} s_{1}\,, &&
-u_{4}=\eps^{4} \big(2 s_{2}-s_{1}\big)-\eps^{2} s_{2}+s_{2}\,.
+u_{1}=\eps^{2} \big(-s_{2}+2 s_{1}\big)-\eps  s_{1}+s_{1}\,, &&
+u_{3}=\eps^{2} \big(-2 s_{2}+s_{1}\big)+\eps  s_{2}\,, \\&
+u_{2}=\eps^{2} \big(s_{2}-2 s_{1}\big)+\eps  s_{1}\,, &&
+u_{4}=\eps^{2} \big(2 s_{2}-s_{1}\big)-\eps  s_{2}+s_{2}\,.
 \end{align*}
 
 \paragraph{Slow manifold ODEs} 
 On this slow manifold the evolution of the lumped-state
 probabilities is
 \begin{equation*}
-\dot s_{1}=\eps^{4} \big(s_{2}-s_{1}\big),\quad
-\dot s_{2}=\eps^{4} \big(-s_{2}+s_{1}\big).
+\dot s_{1}=\eps^{2} \big(s_{2}-s_{1}\big),\quad
+\dot s_{2}=\eps^{2} \big(-s_{2}+s_{1}\big).
 \end{equation*}
 Hence here the long-term evolution is that on a time-scale
 of~\Ord{1/\epsilon^2}, \(\Ord{1/\eps^4}\), the system
@@ -82,21 +81,21 @@ vector
 \begin{equation*}
 \zv_1=\begin{bmatrix}z_{11}\\z_{12}\\z_{13}\\z_{14}\end{bmatrix}
 =\begin{bmatrix}
-\eps^{4}+1\\
-4 \eps^{4}-\eps^{2}+1\\
--4 \eps^{4}+\eps^{2}\\
--\eps^{4}
+\eps^{2}+1\\
+4 \eps^{2}-\eps +1\\
+-4 \eps^{2}+\eps \\
+-\eps^{2}
 \end{bmatrix},\quad
 \zv_2=\begin{bmatrix}z_{21}\\z_{22}\\z_{23}\\z_{24}\end{bmatrix}
 =\begin{bmatrix}
--\eps^{4}\\
--4 \eps^{4}+\eps^{2}\\
-4 \eps^{4}-\eps^{2}+1\\
-\eps^{4}+1
+-\eps^{2}\\
+-4 \eps^{2}+\eps \\
+4 \eps^{2}-\eps +1\\
+\eps^{2}+1
 \end{bmatrix}
 .
 \end{equation*}
-Evaluate all these at \(\eps^2=\epsilon\) to apply to the
+Evaluate all these at \(\eps=\epsilon\) to apply to the
 original specified system.
 
 

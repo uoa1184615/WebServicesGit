@@ -91,6 +91,10 @@ with specific values for the input parameters.  See
 invariantmanifold(spacex, odefns, evals, evecs, 
     adjvecs, toosmall);
 \end{verbatim}
+Output? as well as writing the result: \verb|uu| details 
+the manifold;  \verb|gg|~details the evolution on the manifold; 
+and if reported, \verb|zs| characterises the fast-fibre 
+projection onto the manifold. 
 
 \paragraph{Inputs}
 As in the example of the next \cref{ss:eg}, the input
@@ -167,7 +171,7 @@ and the dynamics by their evolution in time.
 
 \item A \LaTeX\ source report written to the file
 \verb|invarManReport.tex| (and
-\verb|invarManReportSys.tex|)---the invariant manifold is
+\verb|invarManReportSys.tex|). The invariant manifold is
 parametrised by variables \(s_1\), \(s_2\), \ldots, and the
 dynamics by their evolution in time.  Generate a pdf report
 by executing \verb|pdflatex invarManReport|\,.
@@ -221,9 +225,11 @@ system~\cite[e.g.]{Fateman2002}.
 
 \subsection{A simple example: \texttt{exampleslowman()}} 
 \label{ss:eg}
-Execute this example by invoking the command
-\verb|exampleslowman();|\quad The example system to analyse
-is specified to be \cite[Example~2.1]{Roberts2014a}
+Execute this example by invoking two commands: first,
+\verb|in_tex "invariantManifold.tex"$| to load the procedure;
+secondly \verb|exampleslowman();| to execute the example. 
+The example system to analyse is specified to be 
+\cite[Example~2.1]{Roberts2014a}
 \begin{equation*}
 \dot u_1=-u_1+u_2-u_1^2\,, \quad \dot u_2=u_1-u_2+u_2^2\,.
 \end{equation*}
@@ -296,21 +302,91 @@ as a way to count the order of each term.
 
 
 Need a couple of things established before defining the
-procedure: the \verb|rlfi| package, with override of some 
-name translations; and operator names for the variables 
-of the dynamical system (in case they have 
-delays)---currently code a max of nine variables.
+procedure: the \verb|rlfi| package, with later override 
+of some  name translations.
 \begin{reduce}
 load_package rlfi; 
-operator u1,u2,u3,u4,u5,u6,u7,u8,u9;
 \end{reduce}
 Allow `space' derivatives, to be assumed small, via this
 \verb|pdf| operator that has the same syntax as \verb|df()|
 but we need to use separate name in order to delay Reduce
 processing:  \verb|pdf| defined by \verb|rlfi| package.
-%\begin{reduce}
-%operator pdf;
-%\end{reduce}
+Change printing of all derivatives to partials (hacked 
+from \verb|rlfi.red|).
+\begin{reduce}
+put('df,'lapop,"\partial ")$
+\end{reduce}
+Change printing of \verb|pdf()|, from \verb|rlfi.red|),
+so it also caters for operators without an explicit function.
+\begin{reduce}
+% from reduce.rlfi, version 23/05/1995
+% AJR, modified 17/3/2026
+symbolic procedure dfprla(dfex,p)$
+% Prints derivaves
+begin
+  scalar op,ord,arg,x,argup; 
+  op:=p;%AJR, dummy to remove warning msg
+  op:=get(car dfex,'lapop);
+  % AJR, added to print operator if only one argument to p/df
+  if null cddr dfex then <<         %AJR, case pdf(~x)
+    arg:=" "; dfex:=cdr dfex; >>
+  else if fixp caddr dfex then <<   %AJR, case pdf(~x,~n,...)
+    arg:=" "; dfex:=cdr dfex; >>
+  else << 
+    arg:=cadr dfex;  
+    dfex:=cddr dfex; 
+    >>;
+  x:=dfex; 
+  ord:=0;
+a:if null cdr x then
+      <<x:=cdr x; 
+        ord:=ord+1 >>
+    else if fixp cadr x then
+      <<ord:=ord+cadr x;
+        x:=cddr x >>
+    else
+      <<x:=cdr x;
+        ord:=ord+1 >>;
+  if x then go to a;
+  if atom arg or (not get(car arg,'infix) and not get(car arg,'laprifn))
+    then argup:=t;
+  prin2la "\frac{";
+  prin2la op;
+  if ord=1 then %prin2la "\,"  % AJR, N/A omit
+    else
+      <<prin2la '!^!{;
+        prin2la ord;
+        prin2la "}" >>;
+  if argup then maprintla(arg,0);
+  prin2la "}{";
+  x:=dfex;
+b:if not atom car x and cdr x and fixp cadr x then prin2la "(";
+  prin2la op;
+  if null cdr x or not fixp cadr x then
+      <<%prin2la "\,";      % AJR, N/A omit
+        maprintla(car x,0);
+        x:=cdr x >>
+    else
+      <<maprintla(car x,0);
+        if not atom car x then prin2la ")";
+        prin2la '!^!{;
+        prin2la cadr x;
+        prin2la "}";
+        x:=cddr x >>;
+  if x then go to b;
+  prin2la "}";
+  if null argup then maprintla(arg,get('quotient,'infix));
+  return arg
+end;
+\end{reduce}
+Define operator names for the variables 
+of the dynamical system (in case they have 
+delays)---currently code a max of nine variables.
+\begin{reduce}
+operator u1,u2,u3,u4,u5,u6,u7,u8,u9;
+\end{reduce}
+
+
 Usually seems best to use the \verb|ezgcd| option---set here
 in order for a user to optionally turn off before invoking
 the procedure.  This option has mysteriously clashed fatally
@@ -325,17 +401,9 @@ Remember (currently, 2025) \verb|off latex| automatically turns \verb|raise| bac
 off raise,lower;
 \end{reduce}
 
-%Similarly, try loading LaTeX names of symbols here so that
-%a user can override.  Works to some extent, but do not know
-%how to change u() and s().
-%\begin{reduce}
-%defid u1,name="u_1"; 
-%defid u2,name="u_2"; 
-%defid u3,name="u_3"; 
-%defid u4,name="u_4"; 
-%\end{reduce}
 
-Now define the procedure as an operator so we can define
+
+\subsection{Define the procedure as an operator} so we can define
 procedures internally, and may be flexible with its
 arguments. 
 \begin{reduce}
@@ -373,12 +441,13 @@ scalars and most matrices to be declared local here.
 \begin{reduce}
 scalar ff, evalm, ee, zz, maxiter, trace, ll, uvec,
 reslin, ok, rhsjact, jacadj, resd, resde, resz, rhsfn,
-pp, est, eyem, m, pdfzero;
+pp, est, eyem, m, pdfzero, ffnonpdf, ffpdf, ffnonsm,
+ffsmall;
 \end{reduce}
 
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 12 Mar 2026)"$
+write "Construct invariant manifold (version 18 Mar 2026)"$
 %write input_odefns:=odefns;
 %write input_evals:=evals;
 %write input_evecs:=evecs;
@@ -731,7 +800,8 @@ if not ok then << write
 
 \subsection{Ameliorate the nonlinearity}
 
-Anything not in the linear operator gets multiplied by
+Anything not in the linear operator, and not already 
+multiplied by~\verb|small|, gets multiplied by
 \verb|small| to be treated as small in the analysis. 
 \begin{reduce}
 somerules:=for j:=1:n collect 
@@ -744,9 +814,10 @@ procedure scalepdf(z_);
         , pdf(~a,~b,~c)=>small^2*df(a,b,c) when not fixp(c)
         });
 ffpdf:=map(scalepdf(~z),ff-ffnonpdf);
-ff:=small*ffnonpdf
-    +(1-small)*ll0_
-    +ffpdf;
+ffnonsm:=sub(small=0,ffnonpdf);
+ffsmall:=ffnonpdf-ffnonsm;
+ff:=small*ffnonsm+(1-small)*ll0_
+    +ffsmall+ffpdf;
 \end{reduce}
 
 Any constant term in the equations~\verb|ff| has to be
@@ -1005,22 +1076,36 @@ Now that we have finished with \verb|pdf|, repurpose
 it for the bare differentiation operator needed for the 
 projection vectors.  This seems to work for 1-D space PDEs, 
 but needs checking.   
-%:ToDo: check diff versus pdf
 \begin{reduce}
-operator diff;
 if spacex neq {} then
-let { df(~a,~x,~b)=>diff(x) when a=b 
-    , df(~a,~x,~n,~b)=>diff(x)^n when a=b and fixp(n)
-    , df(~a,~x,~y,~b)=>diff(x)*diff(y) 
+let { df(~a,~x,~b)=>pdf(x) when a=b 
+    , df(~a,~x,~n,~b)=>pdf(x)^n when a=b and fixp(n)
+    , df(~a,~x,~y,~b)=>pdf(x)*pdf(y) 
         when a=b and not fixp(y)
-    , df(~a,~x,~n,~y,~b)=>diff(x)^n*diff(y) 
+    , df(~a,~x,~n,~y,~b)=>pdf(x)^n*pdf(y) 
         when a=b and fixp(n) and not fixp(y)
-    , df(~a,~x,~y,~n,~b)=>diff(x)*diff(y)^n 
+    , df(~a,~x,~y,~n,~b)=>pdf(x)*pdf(y)^n 
         when a=b and not fixp(y) and fixp(n)
-    , df(~a,~x,~y,~z,~b)=>diff(x)*diff(y)*diff(z) 
+    , df(~a,~x,~y,~z,~b)=>pdf(x)*pdf(y)*pdf(z) 
         when a=b and not fixp(y) and not fixp(z)
     }; 
 \end{reduce}
+%%The following fails to simplify pdf products for some unknown reason,
+%%but it works if applied afterwards!  Why??
+%let { df(~a,~x,~b)=>pdf(x,1) when a=b 
+%    , df(~a,~x,~n,~b)=>pdf(x,n) when a=b and fixp(n)
+%    , df(~a,~x,~y,~b)=>pdf(x,1,y,1) 
+%        when a=b and not fixp(y)
+%    , df(~a,~x,~n,~y,~b)=>pdf(x,n,y,1) 
+%        when a=b and fixp(n) and not fixp(y)
+%    , df(~a,~x,~y,~n,~b)=>pdf(x,1,y,n) 
+%        when a=b and not fixp(y) and fixp(n)
+%    , df(~a,~x,~y,~z,~b)=>pdf(x,1,y,1,z,1) 
+%        when a=b and not fixp(y) and not fixp(z)
+%    , pdf(~x,~n)^~p=>pdf(x,n*p) when fixp(n)
+%    , pdf(~x,~n)*pdf(~y,~m)=>pdf(x,m+n) when x=y and fixp(n) and fixp(m)
+%    , pdf(~x,~n)*pdf(~y,~m)=>pdf(x,m,y,n) when x neq y and fixp(n) and fixp(m)
+%    }; 
 
 
 
@@ -1030,13 +1115,6 @@ let { df(~a,~x,~b)=>diff(x) when a=b
 
 \section{Initialise LaTeX output}
 \localtableofcontents
-% AJR, 21 aug 2012 -- Aug 2014 -- Nov 2021
-
-%% not needed as prinlaend/begin hardcodes it, nov 2021
-%Set the default output to be inline mathematics.
-%\begin{reduce}
-%mathstyle math; 
-%\end{reduce}
 
 Define the Greek alphabet with \verb|small| as well.
 \begin{reduce}
@@ -1087,8 +1165,6 @@ For the variables names I use, as operators, define how they
 appear in the \LaTeX, and also define that their arguments
 appear as subscripts.
 \begin{reduce}
-defindex diff(down);
-defid diff,name="\diff"; %AJR, 2026-01-16: delete?  
 defindex e_(down,down);
 defid e_,name="e";
 defindex d_(arg,down,down);
@@ -1107,11 +1183,7 @@ defindex s(down);
 defid exp,name="\exp";
 defindex exp(arg);
 \end{reduce}
-Change printing of all derivatives to partials (hacked 
-from \verb|rlfi.red|).
-\begin{reduce}
-put('df,'lapop,"\partial ")$
-\end{reduce}
+
 
 Can we write the system? Not in matrices apparently. So
 define a dummy array \verb|tmp_| that we use to get the
@@ -1329,7 +1401,8 @@ end;%if itisAutoSlowMan_
 \end{reduce}
 
 
-Terminate the iteration loop once residuals are zero.
+Terminate the iteration loop once residuals are zero,
+clearing~\verb|zs| when it is not computed.
 \begin{reduce}
 if {resde,resd,resz}={0,0,0} then write iter:=iter+10000;
 end;

@@ -1,4 +1,5 @@
 %!TEX root = ../diverseExamples.tex
+% revised AJR, 25 Mar 2026
 \subsection{\texttt{stoleriu2}: Oscillatory centre manifold among stable and unstable modes}
 \label{stoleriu2}
 \localtableofcontents
@@ -32,9 +33,9 @@ But use Taylor expansions for trigonometric functions in the \ode{}s, and multip
 \begin{reduce}
 invariantmanifold({},
     mat(( u2,
-        sigma*u3+u1^2/2-small*u1^4/24,
+        sigma*u3+small*u1^2/2-small^2*u1^4/24,
         u4,
-        (u3+1/sigma)*(u1-small*u1^3/6)
+        (u3+1/sigma)*(u1-small^2*u1^3/6)
        )),
     mat(( i,-i )),
     mat( (sigma,i*sigma,-1,-i),(sigma,-i*sigma,-1,+i) ),

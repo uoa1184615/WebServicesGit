@@ -51,8 +51,7 @@ I set \Reduce\ to be case sensitive so we can use upper-case forcing, for exampl
 factor F_1,F_2,small;
 \end{reduce}
 The following code makes the linear damping to be
-effectively small (which then makes it \verb|small|
-squared); consequently, also scale the smallness of the
+effectively small; consequently, also scale the smallness of the
 cubic nonlinearity to match.
 \begin{reduce}
 invariantmanifold({},
@@ -63,7 +62,7 @@ invariantmanifold({},
     mat(( i,-i )),
     mat( (1,1,+i,+i), (1,1,-i,-i) ),
     mat( (1,1,+i,+i), (1,1,-i,-i) ),
-    5 )$
+    3 )$
 end;
 \end{reduce}
 In the derived \ode{}s for the modulation of the
@@ -79,12 +78,12 @@ The procedure actually analyses the embedding system
 \qquad
 \dot u_{2}=u\sb4\,,
 \\&
-\dot u_{3}=F_1 \eps^{2} \big(\tfrac{1}{2} \exp \big(-i t\big) i-\tfrac{1}{2} \exp \big(i 
-t\big) i\big)+\eps^{2} \big(-\tfrac{1}{2} u\sb1^{3}-\tfrac{3}{10} u\sb3+\tfrac{3}{10} u\sb4\big)
+\dot u_{3}=F_1 \eps \big(\tfrac{1}{2} \exp \big(-i t\big) i-\tfrac{1}{2} \exp \big(i 
+t\big) i\big)+\eps \big(-\tfrac{1}{2} u\sb1^{3}-\tfrac{3}{10} u\sb3+\tfrac{3}{10} u\sb4\big)
 \\&\qquad{}
 -2 u\sb1+u\sb2\,,
 \\&
-\dot u_{4}=F_2 \eps^{2} \big(\tfrac{3}{20} \exp \big(-i t/2\big) u\sb3
+\dot u_{4}=F_2 \eps \big(\tfrac{3}{20} \exp \big(-i t/2\big) u\sb3
 -\tfrac{3}{10} \exp \big(-i t/2\big) u\sb4+\tfrac{3}{20} \exp \big(i t
 /2\big) u\sb3-\tfrac{3}{10} \exp \big(i t/2\big) u\sb4\big)
 \\&\qquad{}
@@ -99,19 +98,19 @@ space~\uv\ in terms of parameters~\(s\sb j\), via rotating
 basis vectors. Here, the coordinate transform is very
 complicated so I do not give the complexity.  The leading
 approximation is, of course, the linear,
-errors~\Ord{\eps^2},
+of errors~\Ord{\eps},
 \begin{align*}&
 u_{1}=+\exp \big(-i t\big) s_{2}+\exp \big(
-i t\big) s_{1}+O\big(\varepsilon ^{2}\big)
+i t\big) s_{1}+O\big(\varepsilon \big)
 \\&
 u_{2}=+\exp \big(-i t\big) s_{2}+\exp \big(
-i t\big) s_{1}+O\big(\varepsilon ^{2}\big)
+i t\big) s_{1}+O\big(\varepsilon \big)
 \\&
 u_{3}=-\exp \big(-i t\big) s_{2} i+\exp \big(i
- t\big) s_{1} i+O\big(\varepsilon ^{2}\big)
+ t\big) s_{1} i+O\big(\varepsilon \big)
 \\&
 u_{4}=-\exp \big(-i t\big) s_{2} i+\exp \big(
-i t\big) s_{1} i+O\big(\varepsilon ^{2}\big)
+i t\big) s_{1} i+O\big(\varepsilon \big)
 \end{align*}
 
  
@@ -120,23 +119,23 @@ The system evolves according to these ODEs that characterise
 how the modulation of the oscillations evolve in state space
 due to nonlinearity and the forcing.
 \begin{align*}&
-\dot s_{1}=F_1 \eps^{4} \big(\tfrac{9}{64} s_{2} s_{1}-\tfrac{9}{128} s_{1}^{2}+\tfrac{3}{160} i
-\big)-\tfrac{1}{8} F_1 \eps^{2}
-+\tfrac{93}{5500} F_2^{2} \eps^{4} s_{1} i
+\dot s_{1}=F_1 \eps^{2} \big(\tfrac{9}{64} s_{2} s_{1}-\tfrac{9}{128} s_{1}^{2}+\tfrac{3}{160} i
+\big)-\tfrac{1}{8} F_1 \eps
++\tfrac{93}{5500} F_2^{2} \eps^{2} s_{1} i
 \\&\qquad{}
-+\eps^{4} \big(
++\eps^{2} \big(
 -\tfrac{155}{256} s_{2}^{2} s_{1}^{3} i+\tfrac{9}{160} s_{2} s_{1}^{2}\big)
-+\tfrac{3}{8} \eps^{2} s
-_{2} s_{1}^{2} i+O\big(\varepsilon ^{5}\big)
++\tfrac{3}{8} \eps s
+_{2} s_{1}^{2} i+O\big(\varepsilon ^{3}\big)
 \\&
-\dot s_{2}=F_1 \eps^{4} \big(-\tfrac{9}{128} s_{2}^{2}+\tfrac{9}{64} s_{2} s_{1}-\tfrac{3}{160} i
-\big)-\tfrac{1}{8} F_1 \eps^{2}
--\tfrac{93}{5500} F_2^{2} \eps^{4} s_{2} i
+\dot s_{2}=F_1 \eps^{2} \big(-\tfrac{9}{128} s_{2}^{2}+\tfrac{9}{64} s_{2} s_{1}-\tfrac{3}{160} i
+\big)-\tfrac{1}{8} F_1 \eps
+-\tfrac{93}{5500} F_2^{2} \eps^{2} s_{2} i
 \\&\qquad{}
-+\eps^{4} \big(
++\eps^{2} \big(
 \tfrac{155}{256} s_{2}^{3} s_{1}^{2} i+\tfrac{9}{160} s_{2}^{2} s_{1}\big)
--\tfrac{3}{8} \eps^{2} s_
-{2}^{2} s_{1} i+O\big(\varepsilon ^{5}\big)
+-\tfrac{3}{8} \eps s_
+{2}^{2} s_{1} i+O\big(\varepsilon ^{3}\big)
 \end{align*}
 The second lines of these \ode{}s are the terms from the nonautonomous part of the system.   The first line are the terms induced by the harmonic forcing.  The parametric oscillation just induces an~\Ord{F_2^2} frequency shift.  The direct harmonic forcing induces a direct~\Ord{F_1} forcing of the amplitudes~\(s_j\).
 

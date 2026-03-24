@@ -43,13 +43,13 @@ factor s,delta,exp;
 \end{reduce}
 Execute the construction of the slow manifold for this
 system, where \verb|u2(pi)| denotes the delayed
-variable~\(u_2(t-\pi)\), and where \verb|1+small*delta|
+variable~\(u_2(t-\pi)\), and where \verb|1+small^2*delta|
 reflects that we wish to use the `small'
-parameter~\(\delta\) to explore regimes where this factor is
+parameter~\(\delta\) to explore regimes where the coefficient is
 near the value~\(1\).
 \begin{reduce}
 invariantmanifold({},
-    mat(( -4*(1+small*delta)^2*(5/8*u2 +3/8*u2(pi)),
+    mat(( -4*(1+small^2*delta)^2*(5/8*u2 +3/8*u2(pi)),
           +u1*(1+u2) )),
     mat(( i,-i,2*i,-2*i )),
     mat( (1,-i), (1,+i), (1,-i/2), (1,+i/2) ),
@@ -62,7 +62,7 @@ much slower: takes several minutes per iteration.
 
 The procedure actually analyses the embedding system
 \begin{align*}&
-\dot u_{1}=-4(1+2\eps^2\delta+\eps^3\delta^2)\big[\tfrac58u_2+\tfrac38u_2(t-\pi)\big]
+\dot u_{1}=-4(1+2\eps^2\delta+\eps^4\delta^2)\big[\tfrac58u_2+\tfrac38u_2(t-\pi)\big]
 \\&
 \dot u_{2}= u_1(1+ \eps u_2).
 \end{align*}

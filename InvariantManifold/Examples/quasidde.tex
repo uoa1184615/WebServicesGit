@@ -1,4 +1,5 @@
 %!TEX root = ../diverseExamples.tex
+% revised AJR, 25 Mar 2026
 \subsection{\texttt{quasidde}: Quasi-delay DE with Hopf bifurcation} 
 \label{quasidde}
 \localtableofcontents
@@ -13,7 +14,7 @@ Shows Hopf bifurcation as parameter~$\alpha$ crosses~$0$ to oscillations with ba
 \dot u_{3}=2 u\sb2-2 u\sb3
 \end{align*}
 for small parameter~\(\alpha\).
-We code the parameter~\(\alpha\) as `small', and observe it is consequently considered as `small squared' because all nonlinear terms and already `small' terms, are multiplied by another~\verb|small|.
+We count order of nonlinearity using \(\verb|small|=\eps\), and count the parameter~\(\alpha\) as `small-squared' as is usual for Hopf bifurcations.
 
 Start by loading the procedure.
 \begin{reduce}
@@ -26,7 +27,7 @@ factor s,exp,alpha;
 Execute the construction of the slow manifold for this system (ignore the warning messages about \verb|u1| declared, and then already defined, as an operator).
 \begin{reduce}
 invariantmanifold({},
-    mat(( -4*u3-small*alpha*u3-2*u1^2-small*u1^3,
+    mat(( -4*u3-small^2*alpha*u3-small*2*u1^2-small^2*u1^3,
         2*u1-2*u2,
         2*u2-2*u3 )),
     mat((2*i,-2*i)),

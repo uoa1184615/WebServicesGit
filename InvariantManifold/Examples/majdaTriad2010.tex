@@ -1,6 +1,6 @@
 %!TEX root = ../diverseExamples.tex
 % inspired by Falasca (2025) 2506.22552v1, section III.A and
-% appendix B.2.  AJR, 8 Jul 2025 -- 25 Feb 2026
+% appendix B.2.  AJR, 8 Jul 2025 -- 25 Mar 2026
 \subsection{\texttt{majdaTriad2010}: project stochastic
 forcing in Majda's triad model} 
 \label{majdaTriad2010}
@@ -48,16 +48,16 @@ singular perturbation form. Unfortunately, singular
 perturbations often `sweep-under-the-carpet' key physics
 that occur at finite~\(\epsilon\). So first rescale time to
 the fast time \(t=t'/\epsilon\) and define \(\verb|small| =
-\varepsilon := \sqrt{\epsilon}\) for convenience. In terms
+\varepsilon := {\epsilon}\) for convenience. In terms
 of new dependent variables \(u_j:=x_j\) the above triad
 system becomes
 \begin{align*}&
-	\frac{du_1}{dt} = \varepsilon^2( L_1u_1+L_2u_2+L_3u_3+Iu_2u_3 ),
+	\frac{du_1}{dt} = \varepsilon( L_1u_1+L_2u_2+L_3u_3+Iu_2u_3 ),
 	\\&
-	\frac{du_2}{dt} = -\gamma_2u_2 +\varepsilon^2( -L_2u_1-Iu_1^2 )
+	\frac{du_2}{dt} = -\gamma_2u_2 +\varepsilon( -L_2u_1-Iu_1^2 )
 	+\sigma_2\dot W_2\,,
 	\\&
-	\frac{du_3}{dt} = -\gamma_3u_3 -\varepsilon^2L_3u_1
+	\frac{du_3}{dt} = -\gamma_3u_3 -\varepsilon L_3u_1
 	+\sigma_3\dot W_3\,,
 \end{align*}
 
@@ -77,10 +77,8 @@ Write a message saying we are now analysing the next system.
 write "**** Additive Triad system of Majda (2010) ****";
 \end{reduce}
 Construct a slow manifold for the deterministic system (no
-stochastic noise): terms in \(\verb|small|=\varepsilon\) get
-multiplied by another factor of \(\verb|small|=\varepsilon\)
-before analysis, so these explicit \verb|small| factors
-become equivalent to~\(\epsilon\) factors;
+stochastic noise): these explicit \verb|small| factors
+encode~\(\epsilon\) factors;
 \begin{reduce}
 factor small;
 invariantmanifold({},
@@ -90,45 +88,45 @@ invariantmanifold({},
     mat(( 0 )),
     mat( (1,0,0) ),
     mat( (1,0,0) ),
-    6 )$
+    3 )$
 end;
 \end{reduce}
 
 The procedure reports that it analyses the following family 
 \begin{align*}&
-\dot u_{1}=\eps^{2} \big(L_{3} u\_3+L_{2} u\_2+L_{1} u\_1+I u\_1 u\_2\big)
+\dot u_{1}=\eps \big(L_{3} u\_3+L_{2} u\_2+L_{1} u\_1+I u\_1 u\_2\big)
 \\&
-\dot u_{2}=\eps^{2} \big(-L_{2} u\_1-I u\_1^{2}\big)-\gamma _{2} u\_2
+\dot u_{2}=\eps \big(-L_{2} u\_1-I u\_1^{2}\big)-\gamma _{2} u\_2
 \\&
-\dot u_{3}=-\eps^{2} L_{3} u\_1-\gamma _{3} u\_3
+\dot u_{3}=-\eps L_{3} u\_1-\gamma _{3} u\_3
 \end{align*}
-Here, \(\eps^2\)\ counts the order of perturbation
+Here, \(\eps\)\ counts the order of perturbation
 in~\(\epsilon\).
 
 \paragraph{The invariant manifold}
 These give the location of the invariant manifold in terms
 of parameters~\(s\_ 1\) and \(\epsilon=\eps^2\).
 \begin{align*}&
-u_{1}=s_{1}+O\big(\varepsilon ^{5}\big)
+u_{1}=s_{1}+O\big(\varepsilon ^{3}\big)
 \\&
-u_{2}=\ParMath{ \eps^{2} \big(-L_{2} \gamma _{2}^{-1} s_{1}
--\gamma _{2}^{-1} s_{1}^{2} I\big) +\eps^{4} \big(L_{2}
+u_{2}=\ParMath{ \eps \big(-L_{2} \gamma _{2}^{-1} s_{1}
+-\gamma _{2}^{-1} s_{1}^{2} I\big) +\eps^{2} \big(L_{2}
 L_{1} \gamma _{2}^{-2} s_{1} +2 L_{1} \gamma _{2}^{-2}
-s_{1}^{2} I\big) +O\big(\varepsilon ^{5}\big)
+s_{1}^{2} I\big) +O\big(\varepsilon ^{3}\big)
 }\\&
-u_{3}=\ParMath{ -\eps^{2} L_{3} \gamma _{3}^{-1} s_{1}
-+\eps^{4} L_{3} L_{1} \gamma _{3}^{-2} s_{1}
-+O\big(\varepsilon ^{5}\big)
+u_{3}=\ParMath{ -\eps L_{3} \gamma _{3}^{-1} s_{1}
++\eps^{2} L_{3} L_{1} \gamma _{3}^{-2} s_{1}
++O\big(\varepsilon ^{3}\big)
 }
 \end{align*}
 \paragraph{Invariant manifold ODEs}
 The system evolves on the invariant manifold such that the
 parameters evolve according to this ODE.
 \begin{equation*}
-\dot s_{1}=\ParMath{ \eps^{2} L_{1} s_{1} +\eps^{4}
+\dot s_{1}=\ParMath{ \eps L_{1} s_{1} +\eps^{2}
 \big(-L_{3}^{2} \gamma _{3}^{-1} s_{1}-L_{2}^{2} \gamma
 _{2}^{-1} s_{1}-2 L_{2} \gamma _{2}^{-1} s_{1}^{2} I-\gamma
-_{2}^{-1} s_{1}^{3} I^{2}\big) +O\big(\varepsilon ^{6}\big)
+_{2}^{-1} s_{1}^{3} I^{2}\big) +O\big(\varepsilon ^{3}\big)
 }
 \end{equation*}
 These match the deterministic part of \cite{Falasca2025}'s
@@ -149,26 +147,26 @@ system. The normal vector
 \begin{align*}&
 \vec z :=
 \begin{bmatrix} 
-1 +\eps^{4} \big(L_{3}^{2} \gamma _{3}^{-2} +L_{2}^{2}
+1 +\eps^{2} \big(L_{3}^{2} \gamma _{3}^{-2} +L_{2}^{2}
 \gamma _{2}^{-2} +3 L_{2} \gamma _{2}^{-2} s_{1} I +2 \gamma
-_{2}^{-2} s_{1}^{2} I^{2}\big) +O\big(\varepsilon ^{6}\big)
+_{2}^{-2} s_{1}^{2} I^{2}\big) +O\big(\varepsilon ^{3}\big)
 \\[1ex]
-+\eps^{2} \big(L_{2} \gamma _{2}^{-1}+\gamma _{2}^{-1} s_{1}
-I\big) -\eps^{4} L_{2} L_{1} \gamma _{2}^{-2}
++\eps \big(L_{2} \gamma _{2}^{-1}+\gamma _{2}^{-1} s_{1}
+I\big) -\eps^{2} L_{2} L_{1} \gamma _{2}^{-2}
 +O\big(\varepsilon ^{6} \big)
 \\[1ex]
-+\eps^{2} L_{3} \gamma _{3}^{-1} -\eps^{4} L_{3} L_{1}
-\gamma _{3}^{-2} +O\big(\varepsilon ^{6}\big)
++\eps L_{3} \gamma _{3}^{-1} -\eps^{2} L_{3} L_{1}
+\gamma _{3}^{-2} +O\big(\varepsilon ^{3}\big)
 \end{bmatrix}
 \\&\quad{}=
 \begin{bmatrix} 
-1+O\big(\varepsilon ^{4}\big)
+1+O\big(\varepsilon ^{2}\big)
 \\[1ex]
-+\eps^{2} \big(L_{2} \gamma _{2}^{-1}+\gamma _{2}^{-1} s_{1}
-I\big) +O\big(\varepsilon ^{4} \big)
++\eps \big(L_{2} \gamma _{2}^{-1}+\gamma _{2}^{-1} s_{1}
+I\big) +O\big(\varepsilon ^{2} \big)
 \\[1ex]
-+\eps^{2} L_{3} \gamma _{3}^{-1} +O\big(\varepsilon
-^{4}\big)
++\eps L_{3} \gamma _{3}^{-1} +O\big(\varepsilon
+^{2}\big)
 \end{bmatrix}.
 \end{align*}
 Consequently, the leading effect of the stochastic forcing
@@ -176,8 +174,8 @@ Consequently, the leading effect of the stochastic forcing
 add the following stochastic terms to the \(s_1\)~\ode: 
 namely, and agreeing with \cite{Falasca2025}'s (B2),
 \begin{equation*}
-+\eps^{2} \big(L_{2} \gamma _{2}^{-1}+\gamma _{2}^{-1} s_{1}
-I\big)\sigma_2\dot W_2 +\eps^{2} L_{3} \gamma
++\eps \big(L_{2} \gamma _{2}^{-1}+\gamma _{2}^{-1} s_{1}
+I\big)\sigma_2\dot W_2 +\eps L_{3} \gamma
 _{3}^{-1}\sigma_3\dot W_3\,.
 \end{equation*}
 

@@ -1,0 +1,57 @@
+Comment Regarding Parametric Spectral Submanifolds across
+Hopf Bifurcations with Applications to Fluid Dynamics, King
+et al., 24/3/2026, arxiv:2603.19079 AJR, 24 Mar 2026;
+on div,revpri; off allfac,raise,lower;
+
+in_tex "../invariantManifold.tex"$
+on ezgcd; % essential for simplicity
+factor small,s;
+
+if 0 then begin % Takes 4 iterations in 7 secs
+invariantmanifold({}, 
+    mat((mu*u1-u2+u1*(u1^2+u2^2)
+        ,u1+mu*u2-u2*(u1^2+u2^2)
+        ,sigma*u3+u1^2+u2^2)),
+    mat(( mu+i,mu-i )),  
+    mat((1,-i,0),(1,+i,0)),  
+    mat((1,-i,0),(1,+i,0)),
+    4 )$
+end else begin % in r,theta,z space 
+invariantmanifold({}, 
+    mat((mu*u1-u1^3
+        ,sigma*u2+u1^2)),
+    mat(( mu )),  
+    mat((1,0)),  
+    mat((1,0)),
+    9 )$
+end;
+
+end;
+
+The first gives 2: factorize(den(uu));
+{{3,1},
+            2                      2
+ {16 + sigma  - 12*mu*sigma + 36*mu ,1},
+           2                     2
+ {4 + sigma  - 8*mu*sigma + 16*mu ,1},
+          2
+ {1 + 9*mu ,1},
+ { - sigma + 6*mu,1},
+ { - sigma + 2*mu,1},
+ {mu,1},
+        2
+ {1 + mu ,3}}
+
+The 2nd gives {{32768,1},
+ { - sigma + 16*mu,1},
+ { - sigma + 14*mu,1},
+ { - sigma + 12*mu,1},
+ { - sigma + 10*mu,1},
+ { - sigma + 8*mu,1},
+ { - sigma + 6*mu,1},
+ { - sigma + 4*mu,1},
+ { - sigma + 2*mu,1},
+ {mu,8}}
+
+The divisions by my indicate non-uniform as mu crosses zero,
+because its evolution could be just  du1dt = mu*u1-u1^3  

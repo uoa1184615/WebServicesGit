@@ -19,10 +19,9 @@ parameter~\(a\) crosses zero.
 %plot(real(lams),imag(lams),'o')
 %\end{verbatim}
 
-We code the parameter~\(a\) as `small', and observe it is
-consequently considered as `small squared' because all
-nonlinear terms, and already `small' terms, are multiplied
-by~\(\eps\) (\verb|small|).
+We count order of nonlinearity explicitly with 
+parameter \(\verb|small|=\eps\), and count the 
+parameter~\(a\) as `small-squared'.
 
 Start by loading the procedure.
 \begin{reduce}
@@ -39,8 +38,8 @@ system (ignore the warning messages about \verb|u1|
 declared, and then already defined, as an operator).
 \begin{reduce}
 invariantmanifold({},
-    mat(( -u1-(sqrt(2)+small*a)*u1(3*pi/4)
-    +mu*u1(3*pi/4)^2 +small*nu*u1(3*pi/4)^3 )),
+    mat(( -u1-(sqrt(2)+small^2*a)*u1(3*pi/4)
+    +small*mu*u1(3*pi/4)^2 +small^2*nu*u1(3*pi/4)^3 )),
     mat((i,-i)),
     mat((1),(1)),
     mat((1),(1)),

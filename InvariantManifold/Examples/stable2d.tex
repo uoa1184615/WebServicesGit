@@ -1,4 +1,5 @@
 %!TEX root = ../diverseExamples.tex
+% revised AJR, 25 Mar 2026
 \subsection{\texttt{stable2d}: Stable manifold of a 2D system} 
 \label{stable2d}
 \localtableofcontents
@@ -17,8 +18,8 @@ in_tex "../invariantManifold.tex"$
 Execute the construction of the stable manifold for this system.
 \begin{reduce}
 invariantmanifold({},
-    mat(( -u1/2-u2-small*u1^2*u2,
-        -u1-2*u2+small*epsilon*u2-u2^2 )),
+    mat(( -u1/2-u2-small^2*u1^2*u2,
+        -u1-2*u2+small^2*epsilon*u2-small*u2^2 )),
     mat(( -5/2 )),
     mat( (1,2) ),
     mat( (1,2) ),
@@ -32,7 +33,7 @@ The last parameter,~\(5\), specifies to construct the stable manifold to errors~
 
 To consistently count the orders of the nonlinearities we multiply the cubic term by \verb|small|.
 To treat parameter~\(\epsilon\) as small, we also multiply it by~\verb|small| so it becomes effectively a second-order order-parameter (useful for pitchfork bifurcations).
-So, the procedure actually analyses the embedding system
+So, the procedure analyses the embedding system
 \begin{align*}&
 \dot u_1=-\eps^{2} u_1^{2} u_2-1/2 u_1-u_2\,, \\& 
 \dot u_2=\eps^{2} \epsilon  u_2-\eps u_2^{2}-u_1-2 u_2 \,.
