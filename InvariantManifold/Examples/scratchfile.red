@@ -21,7 +21,7 @@ The system evolves on the invariant manifold such
 that the parameters evolve according to these ODEs.
 \(";
 
-tmp_s(1):=1*coeffn(gg,e_(1,1),1)+order_(varepsilon^3);
+tmp_s(1):=1*coeffn(dsdt,e_(1,1),1)+order_(varepsilon^3);
 
 
 write "\)

@@ -91,10 +91,10 @@ with specific values for the input parameters.  See
 invariantmanifold(spacex, odefns, evals, evecs, 
     adjvecs, toosmall);
 \end{verbatim}
-Output? as well as writing the result: \verb|uu| details the
-manifold;  \verb|dsdt|~details the evolution on the
-manifold; and if reported, \verb|zs| characterises the
-fast-fibre projection onto the manifold. 
+Output? as well as writing the result: \verb|uu| details 
+the manifold;  \verb|gg|~details the evolution on the manifold; 
+and if reported, \verb|zs| characterises the fast-fibre 
+projection onto the manifold. 
 
 \paragraph{Inputs}
 As in the example of the next \cref{ss:eg}, the input
@@ -181,8 +181,8 @@ invariant manifold such that \verb|coeffn(uu,e_(i,1),1)|
 gives the \(i\)th~coordinate, \verb|ui|, of the invariant 
 manifold as a function of~\verb|s(j)|,~\(s_j\).
 
-\item Global variable \verb|dsdt| gives the evolution on the 
-invariant manifold, such that \verb|coeffn(dsdt,e_(j,1),1)| 
+\item Global variable \verb|gg| gives the evolution on the 
+invariant manifold, such that \verb|coeffn(gg,e_(j,1),1)| 
 gives the time derivative of~\verb|s(j)|,~\(\dot s_j\).
 
 \item Global variable \verb|zs| (optional): in the case of 
@@ -212,8 +212,8 @@ constructing centre manifolds originally by
 algebra by \cite{Roberts96a}, extended to invariant\slash
 inertial manifolds \cite[]{Roberts89, Foias88b}, extended to
 the evolution of gradually varying patterns in space
-\cite[]{Roberts88a, Roberts2013a, Bunder2018a}; and further
-extended to the projection of initial conditions, forcing,
+\cite[]{Roberts88a, Roberts2013a, Bunder2018a}; and further 
+extended to the projection of initial conditions, forcing, 
 uncertainty, etc \cite[]{Roberts89b, Roberts97b}.
 
 We use the computer algebra package \emph{Reduce} 
@@ -307,27 +307,86 @@ of some  name translations.
 \begin{reduce}
 load_package rlfi; 
 \end{reduce}
-Allow `space' derivatives, to be assumed small, via a
+Allow `space' derivatives, to be assumed small, via this
 \verb|pdf| operator that has the same syntax as \verb|df()|
 but we need to use separate name in order to delay Reduce
 processing:  \verb|pdf| defined by \verb|rlfi| package.
-
-Define operator names for the variables of the dynamical
-system (in case they have delays)---currently code a max of
-nine variables.
+Change printing of all derivatives to partials (hacked 
+from \verb|rlfi.red|).
+\begin{reduce}
+put('df,'lapop,"\partial ")$
+\end{reduce}
+Change printing of \verb|pdf()|, from \verb|rlfi.red|),
+so it also caters for operators without an explicit function.
+\begin{reduce}
+% from reduce.rlfi, dated 23/05/1995
+% AJR, this proc modified 17/3/2026
+symbolic procedure dfprla(dfex,p)$
+% Prints derivaves
+begin
+  scalar op,ord,arg,x,argup; 
+  op:=p;%AJR, dummy to remove warning msg
+  op:=get(car dfex,'lapop);
+  % AJR, added to print operator if only one argument to p/df
+  if null cddr dfex then <<         %AJR, case pdf(~x)
+    arg:=" "; dfex:=cdr dfex; >>
+  else if fixp caddr dfex then <<   %AJR, case pdf(~x,~n,...)
+    arg:=" "; dfex:=cdr dfex; >>
+  else << 
+    arg:=cadr dfex;  
+    dfex:=cddr dfex; 
+    >>;
+  x:=dfex; 
+  ord:=0;
+a:if null cdr x then
+      <<x:=cdr x; 
+        ord:=ord+1 >>
+    else if fixp cadr x then
+      <<ord:=ord+cadr x;
+        x:=cddr x >>
+    else
+      <<x:=cdr x;
+        ord:=ord+1 >>;
+  if x then go to a;
+  if atom arg or (not get(car arg,'infix) and not get(car arg,'laprifn))
+    then argup:=t;
+  prin2la "\frac{";
+  prin2la op;
+  if ord=1 then %prin2la "\,"  % AJR, N/A omit
+    else
+      <<prin2la '!^!{;
+        prin2la ord;
+        prin2la "}" >>;
+  if argup then maprintla(arg,0);
+  prin2la "}{";
+  x:=dfex;
+b:if not atom car x and cdr x and fixp cadr x then prin2la "(";
+  prin2la op;
+  if null cdr x or not fixp cadr x then
+      <<%prin2la "\,";      % AJR, N/A omit
+        maprintla(car x,0);
+        x:=cdr x >>
+    else
+      <<maprintla(car x,0);
+        if not atom car x then prin2la ")";
+        prin2la '!^!{;
+        prin2la cadr x;
+        prin2la "}";
+        x:=cddr x >>;
+  if x then go to b;
+  prin2la "}";
+  if null argup then maprintla(arg,get('quotient,'infix));
+  return arg
+end;
+\end{reduce}
+Define operator names for the variables 
+of the dynamical system (in case they have 
+delays)---currently code a max of nine variables.
 \begin{reduce}
 operator u1,u2,u3,u4,u5,u6,u7,u8,u9;
 \end{reduce}
 
 
-Let's make the algebra case sensitive: for \emph{psl} we
-unset \verb|raise|; whereas for \emph{csl} we unset
-\verb|lower|. Remember (currently, 2025) \verb|off latex|
-automatically turns \verb|raise| back on (but not
-\verb|lower|).
-\begin{reduce}
-off raise,lower;
-\end{reduce}
 Usually seems best to use the \verb|ezgcd| option---set here
 in order for a user to optionally turn off before invoking
 the procedure.  This option has mysteriously clashed fatally
@@ -337,17 +396,22 @@ some \verb|psl| so only use \verb|csl| (Apr 2026).
 \begin{reduce}
 on ezgcd; 
 \end{reduce}
+Let's make the algebra case sensitive: for \emph{psl} we unset \verb|raise|; whereas for \emph{csl} we unset \verb|lower|.  
+Remember (currently, 2025) \verb|off latex| automatically turns \verb|raise| back on (but not \verb|lower|).
+\begin{reduce}
+off raise,lower;
+\end{reduce}
 
 
 
-\subsection{Define the procedure as an operator} so we can
-define procedures internally, and may be flexible with its
+\subsection{Define the procedure as an operator} so we can define
+procedures internally, and may be flexible with its
 arguments. 
 \begin{reduce}
 operator invariantmanifold;
 \end{reduce}
-Four or fewer arguments is an error. If just five arguments,
-then assume no `space' variables.
+Four or fewer arguments is an error.
+If just five arguments, then assume no `space' variables.
 \begin{reduce}
 IMerrorMsg:="invariantmanifold() Should Have Six Arguments"$
 for all a1,a2,a3,a4 let 
@@ -375,21 +439,16 @@ variables and matrices local, except for matrices that need
 to be declared \verb|matrix|.  So, move to implement all
 arrays and operators to have underscores, and almost all
 scalars and most matrices to be declared local here.
-%Hmmmm: \verb|eval_set| being scalar is a mistake: why?  
-%Possibly because used inside sub-procedures. Use as global.
-% It appears that any variables in this list 
-% cannot be used in pattern matching.
 \begin{reduce}
-scalar ee, est, evalm, eyem, ff, ffnonpdf, ffnonsm, ffpdf,
-ffsmall, jacadj, lengthRes, ll, lladj, m, maxiter, n, neval,
-ok, pdfzero, pp, resd, resde, reslin, resz, rhsfn, rhsjact,
-somerules, tmp, trace, uvec, uvec, zz;
+scalar ff, evalm, ee, zz, maxiter, trace, ll, uvec,
+reslin, ok, rhsjact, jacadj, resd, resde, resz, rhsfn,
+pp, est, eyem, m, pdfzero, ffnonpdf, ffpdf, ffnonsm,
+ffsmall;
 \end{reduce}
-% for i,j,k,iter,ii,jj
 
 Write an intro message.
 \begin{reduce}
-write "Construct invariant manifold (version 29 Apr 2026)"$
+write "Construct invariant manifold (version 28 Apr 2026)"$
 %write input_odefns:=odefns;
 %write input_evals:=evals;
 %write input_evecs:=evecs;
@@ -403,7 +462,7 @@ Transpose the defining matrices so that vectors are columns.
 ff := tp odefns;
 ee := tp evecs;
 zz := tp adjvecs; 
-write "Input dimensions: odes ",length(ff)
+write "Input sizes: odes ",length(ff)
     ,"; evals ",length(evals)
     ,"; evecs ",length(ee)
     ,"; adjvs ",length(zz);
@@ -428,8 +487,8 @@ trace:=0$
 The \verb|rationalize| switch makes code much faster with
 complex numbers.  The switch \verb|gcd| seems to wreck
 convergence for \verb|doubleHofDDE|, so leave it off.
-Although seems OK for all other examples. Get case sensitive
-analysis by also \verb|off raise,lower;|
+Although seems OK for all other examples.
+Get case sensitive analysis by also \verb|off raise,lower;|
 \begin{reduce}
 on div,revpri; off allfac;
 on rationalize;
@@ -505,11 +564,10 @@ for j:=1:9 do begin
 end;
 \end{reduce}
 Also set rules when needed to omit \verb|pdf| terms,
-currently coded up to six arguments.
+currently coded up to five arguments.
 \begin{reduce}
 pdfzero:={ pdf(~a)=>0, pdf(~a,~b)=>0, pdf(~a,~b,~c)=>0
-    , pdf(~a,~b,~c,~d)=>0, pdf(~a,~b,~c,~d,~e)=>0
-    , pdf(~a,~b,~c,~d,~e,~f)=>0 };
+    , pdf(~a,~b,~c,~d)=>0, pdf(~a,~b,~c,~d,~e)=>0 };
 \end{reduce}
 
 
@@ -530,12 +588,12 @@ let { df(exp(~u),t) => df(u,t)*exp(u)
     , exp(~u)^~p => exp(p*u)
     };
 \end{reduce}
-Also try mapping any user supplied sinusoids into this
-\verb|exp()| so that we can handle harmonically forced
-systems.  Only invoke on the supplied \ode{}s as delay
-differential equations use trig functions. But first test to
-see if there are any explicit time dependence: whether
-autonomous or nonautonomous.
+Also try mapping any user supplied sinusoids into 
+this \verb|exp()| so that we can handle harmonically 
+forced systems.  Only invoke on the supplied \ode{}s as 
+delay differential equations use trig functions.
+But first test to see if there are any explicit time
+dependence: whether autonomous or nonautonomous.
 \begin{reduce}
 tmp:=sub(t=t_,ff);  tmp:=df(tmp,t_);
 itisAuto_:=1;
@@ -570,12 +628,12 @@ for j:=1:m do eval_(j):=sub(small=0,evals(1,j));
 \subsection{Normalise the adjoint eigenvectors}
 When we include delay differential equations, then we need
 to account for the history of the eigenvector as well. Hence
-multiply each eigenvector by its oscillating factor,
-\(e^{i\omega t}, e^{\lambda t}\), and then take the mean.
-This multiplication by its oscillating factor should not
-make any difference for non-delay equations by the natural
-orthogonality of left and right eigenvectors of different
-eigenvalues. 
+multiply each eigenvector by its oscillating
+factor,~\(e^{i\omega t}, e^{\lambda t}\), and then take the
+mean. This multiplication by its oscillating factor should
+not make any difference for non-delay equations by the
+natural orthogonality of left and right eigenvectors of
+different eigenvalues. 
 %Reduce implements \verb|conj| via \verb|repart|
 %and \verb|impart|, so let \verb|repart| do the conjugation
 %of the exp factors.
@@ -619,11 +677,11 @@ derivatives one way, and commute other derivatives the
 other way---all a bit tricksy and unclear enough factors
 coded here.  
 %: ToDo: needs checking
-Also unclear is that \verb|df()| appears to order its
-arguments in alphabetical order (A--Z,a--z): so `space'
-variables before t-for-time may be in the wrong position.   
-%Maybe, or not, use \verb|pdf()| for space 
-%derivative working throughout, instead of \verb|df|??
+Also unclear is that \verb|df()| appears to 
+order its arguments in alphabetical order (A--Z,a--z): 
+so `space' variables before t-for-time may be in the
+wrong position.   Maybe use \verb|pdf()| for space 
+derivative working throughout, instead of \verb|df|??
 \begin{reduce}
 clear d_; operator d_; linear d_;
 let { d_(~a^~p,t,~dt)=>d_(a,t,dt)^p
@@ -743,9 +801,9 @@ if not ok then << write
 
 \subsection{Ameliorate the nonlinearity}
 
-Anything not in the linear operator, and not already
-multiplied by~\verb|small|, gets multiplied by \verb|small|
-to be treated as small in the analysis. 
+Anything not in the linear operator, and not already 
+multiplied by~\verb|small|, gets multiplied by
+\verb|small| to be treated as small in the analysis. 
 \begin{reduce}
 somerules:=for j:=1:n collect 
   (d_(1,t,~dt)*mkid(u,j)=d_(mkid(u,j),t,dt))$
@@ -753,10 +811,10 @@ ll0_:=(ll*uvec where somerules);
 ffnonpdf:=(ff where pdfzero);
 procedure scalepdf(z_);
     (z_ where {pdf(~a,~b)=>small*df(a,b) 
-        , pdf(~a,~b,~c)=>small^c*df(a,b,c) when fixp(c)
+        , pdf(~a,~b,~n)=>small^n*df(a,b,n) when fixp(n)
         , pdf(~a,~b,~c)=>small^2*df(a,b,c) when not fixp(c)
         });
-ffpdf:=map(scalepdf(~aa),ff-ffnonpdf);
+ffpdf:=map(scalepdf(~z),ff-ffnonpdf);
 ffnonsm:=sub(small=0,ffnonpdf);
 ffsmall:=ffnonpdf-ffnonsm;
 ff:=small*ffnonsm+(1-small)*ll0_
@@ -799,11 +857,11 @@ indices of all the modes of a given eigenvalue.
 \begin{reduce}
 clear eval_s,modes_;
 array eval_s(m),modes_(m); 
-neval:=0$ eval_set_:={}$ 
-for j:=1:m do if not(eval_(j) member eval_set_) then begin
+neval:=0$ eval_set:={}$ 
+for j:=1:m do if not(eval_(j) member eval_set) then begin
   neval:=neval+1; 
   eval_s(neval):=eval_(j);
-  eval_set_:=eval_(j).eval_set_;
+  eval_set:=eval_(j).eval_set;
   modes_(neval):=for k:=j:m join 
     if eval_(j)=eval_(k) then {k} else {};
 end;
@@ -814,7 +872,7 @@ eigenvalues are zero, as then we compute the isochron
 projection. The next challenge is to get this isochron code
 working for the case of non-slow invariant manifolds.
 \begin{reduce}
-itisAutoSlowMan_:=if eval_set_={0} then itisAuto_ else 0$
+itisAutoSlowMan_:=if eval_set={0} then itisAuto_ else 0$
 if trace then write "itisAutoSlowMan_= ",itisAutoSlowMan_;
 \end{reduce}
 
@@ -847,8 +905,8 @@ clear l_invs,g_invs,l1_invs,g1_invs,l2_invs,g2_invs;
 array l_invs(neval), g_invs(neval), l1_invs(neval), 
      g1_invs(neval), l2_invs(neval), g2_invs(neval);
 clear sp_; operator sp_; linear sp_;
-for k:=0:neval do begin
-  if trace then write "ITERATION ",k; 
+for k_:=0:neval do begin
+  if trace then write "ITERATION ",k_; 
 \end{reduce}
 
 Code the operator \(\cL\hat v\) where the delay is to only
@@ -856,13 +914,13 @@ act on the oscillation part.
 \begin{reduce}
   for ii:=1:n do for jj:=1:n do llzz_(ii,jj):=(
       -sub(small=0,ll(ii,jj)) where d_(1,t,~dt)
-      => cos(i*eval_s(k)*dt)+i*sin(i*eval_s(k)*dt));
+      => cos(i*eval_s(k_)*dt)+i*sin(i*eval_s(k_)*dt));
 \end{reduce}
 
 Code the operator \(\D t{\hat v}\) where it only acts on the
 oscillation part.
 \begin{reduce}
-  for j:=1:n do llzz_(j,j):=eval_s(k)+llzz_(j,j);
+  for j:=1:n do llzz_(j,j):=eval_s(k_)+llzz_(j,j);
 \end{reduce}
 
 Now code the part leading to the solvability condition which
@@ -870,35 +928,35 @@ arises from allowing the (oscillation) amplitude to evolve.
 Use operator \verb|sp_| to extract the delay parts that
 subtly affect the updates of the evolution.
 \begin{reduce}
-  for j:=1:length(modes_(k)) do 
-    for ii:=1:n do llzz_(ii,n+j):=ee(ii,part(modes_(k),j))
+  for j:=1:length(modes_(k_)) do 
+    for ii:=1:n do llzz_(ii,n+j):=ee(ii,part(modes_(k_),j))
      +(for jj:=1:n sum 
-       sp_(ll(ii,jj)*ee(jj,part(modes_(k),j)),d_)
+       sp_(ll(ii,jj)*ee(jj,part(modes_(k_),j)),d_)
        where { sp_(1,d_)=>0
              , sp_(d_(1,t,~dt),d_)=>dt*(
-               cos(i*eval_s(k)*dt)+i*sin(i*eval_s(k)*dt))
+               cos(i*eval_s(k_)*dt)+i*sin(i*eval_s(k_)*dt))
              });
 \end{reduce}
 
 Force the updates to be orthogonal to the left-eigenvectors
 in the complex conjugate transpose adjoint.
 \begin{reduce}
-  for ii:=1:length(modes_(k)) do for j:=1:n do 
-      llzz_(n+ii,j):=conj_(zz(j,part(modes_(k),ii)));
+  for ii:=1:length(modes_(k_)) do for j:=1:n do 
+      llzz_(n+ii,j):=conj_(zz(j,part(modes_(k_),ii)));
   if trace then write 
   "finished Force the updates to be orthogonal";
 \end{reduce}
 
 Set the bottom-right corner of the matrix to zero.
 \begin{reduce}
-  for i:=1:length(modes_(k)) do 
+  for i:=1:length(modes_(k_)) do 
     for j:=1:m do llzz_(n+i,n+j):=0;
 \end{reduce}
 
 Add some trivial rows and columns to make the matrix up to
 the same size for all eigenvalues.
 \begin{reduce}
-  for i:=length(modes_(k))+1:m do begin 
+  for i:=length(modes_(k_))+1:m do begin 
     for j:=1:n+i-1 do llzz_(n+i,j):=llzz_(j,n+i):=0;
     llzz_(n+i,n+i):=1;
   end;
@@ -912,9 +970,9 @@ the inversion operators.
   if trace then write "llzz_= ",llzz_; 
   llzz_:=llzz_^(-1);
   if trace then write "llzz_= ",llzz_;
-  l_invs(k):=for i:=1:n sum for j:=1:n sum e_(i,j)*llzz_(i,j);
-  g_invs(k):=for i:=1:length(modes_(k)) sum 
-    for j:=1:n sum e_(part(modes_(k),i),j)*llzz_(i+n,j);
+  l_invs(k_):=for i:=1:n sum for j:=1:n sum e_(i,j)*llzz_(i,j);
+  g_invs(k_):=for i:=1:length(modes_(k_)) sum 
+    for j:=1:n sum e_(part(modes_(k_),i),j)*llzz_(i+n,j);
   if trace then write "finished Invert the matrix and unpack";
 \end{reduce}
 
@@ -926,25 +984,25 @@ left-eigenvectors), so we need to remember more parts of the
 inverse of the matrix.  
 %  realgeneval:={repart(geneval)=>geneval, impart(geneval)=>0}$
 \begin{reduce}
-  l1_invs(k) := for ii:=1:n sum for j:=1:n sum 
+  l1_invs(k_) := for ii:=1:n sum for j:=1:n sum 
       e_(ii,j)*conj_(llzz_(j,ii));
-  if trace then write "l1_invs",k," =",l1_invs(k);
-  l2_invs(k) := for ii:=1:n sum 
-      for j:=1:length(modes_(k)) sum 
-          e_(ii,part(modes_(k),j))*conj_(llzz_(j+n,ii));
-  if trace then write "l2_invs",k," =",l2_invs(k);
-  g1_invs(k) := for ii:=1:length(modes_(k)) sum 
+  if trace then write "l1_invs",k_," =",l1_invs(k_);
+  l2_invs(k_) := for ii:=1:n sum 
+      for j:=1:length(modes_(k_)) sum 
+          e_(ii,part(modes_(k_),j))*conj_(llzz_(j+n,ii));
+  if trace then write "l2_invs",k_," =",l2_invs(k_);
+  g1_invs(k_) := for ii:=1:length(modes_(k_)) sum 
       for j:=1:n sum 
-          e_(part(modes_(k),ii),j)*conj_(llzz_(j,ii+n));
-  if trace then write "g1_invs",k," =",g1_invs(k);
-  g2_invs(k) := for ii:=1:length(modes_(k)) sum 
-      for j:=1:length(modes_(k)) sum 
-          e_(part(modes_(k),ii),part(modes_(k),j))
+          e_(part(modes_(k_),ii),j)*conj_(llzz_(j,ii+n));
+  if trace then write "g1_invs",k_," =",g1_invs(k_);
+  g2_invs(k_) := for ii:=1:length(modes_(k_)) sum 
+      for j:=1:length(modes_(k_)) sum 
+          e_(part(modes_(k_),ii),part(modes_(k_),j))
           *conj_(llzz_(j+n,ii+n));
-  if trace then write "g2_invs",k," =",g2_invs(k);
+  if trace then write "g2_invs",k_," =",g2_invs(k_);
   if trace then write 
   "finished Unpack the conjugate transpose";
-end;%for k
+end;
 \end{reduce}
 
 
@@ -959,11 +1017,11 @@ because the linear inverse is a premultiply.
 \begin{reduce}
 clear l_inv; operator l_inv; linear l_inv;
 let l_inv(e_(~j,~k)*exp(~a_),exp) => l_invproc(a_/t)*e_(j,k);
-procedure l_invproc(a_);  begin scalar tmp_,k;
-  if a_ member eval_set_
-  then << k:=0; 
-    repeat k:=k+1 until a_=eval_s(k);
-    tmp_:=l_invs(k)*exp(a_*t) >>
+procedure l_invproc(a_);  begin scalar tmp_;
+  if a_ member eval_set
+  then << k_:=0; 
+    repeat k_:=k_+1 until a_=eval_s(k_);
+    tmp_:=l_invs(k_)*exp(a_*t) >>
   else tmp_:=sub(geneval=a_,l_invs(0))*exp(a_*t)$
   return tmp_;
   end;
@@ -973,11 +1031,11 @@ Second for the evolution on the invariant manifold.
 \begin{reduce}
 clear g_inv; operator g_inv; linear g_inv;
 let g_inv(e_(~j,~k)*exp(~a_),exp)=>ginv_proc(a_/t)*e_(j,k);
-procedure ginv_proc(a_);  begin scalar tmp_,k;
-  if a_ member eval_set_
-  then << k:=0; 
-    repeat k:=k+1 until a_=eval_s(k);
-    tmp_:=g_invs(k) >>
+procedure ginv_proc(a_);  begin scalar tmp_;
+  if a_ member eval_set
+  then << k_:=0; 
+    repeat k_:=k_+1 until a_=eval_s(k_);
+    tmp_:=g_invs(k_) >>
   else tmp_:=sub(geneval=a_,g_invs(0))$
   return tmp_;
   end;
@@ -986,11 +1044,11 @@ procedure ginv_proc(a_);  begin scalar tmp_,k;
 Copy and adjust the above for the projection.  But first
 define the generic procedure.  
 \begin{reduce}
-procedure inv_proc(a_,invs);  begin scalar tmp_,k;
-  if a_ member eval_set_
-  then << k:=0; 
-    repeat k:=k+1 until a_=eval_s(k);
-    tmp_:=invs(k)*exp(a_*t) >>
+procedure inv_proc(a_,invs);  begin scalar tmp_;
+  if a_ member eval_set
+  then << k_:=0; 
+    repeat k_:=k_+1 until a_=eval_s(k_);
+    tmp_:=invs(k_)*exp(a_*t) >>
   else tmp_:=sub(geneval=a_,invs(0))*exp(a_*t)$
   return tmp_;
   end;
@@ -1022,13 +1080,13 @@ but needs checking.
 \begin{reduce}
 if spacex neq {} then
 let { df(~a,~x,~b)=>pdf(x) when a=b 
-    , df(~a,~x,~l,~b)=>pdf(x)^l when a=b and fixp(l)
+    , df(~a,~x,~n,~b)=>pdf(x)^n when a=b and fixp(n)
     , df(~a,~x,~y,~b)=>pdf(x)*pdf(y) 
         when a=b and not fixp(y)
-    , df(~a,~x,~l,~y,~b)=>pdf(x)^l*pdf(y) 
-        when a=b and fixp(l) and not fixp(y)
-    , df(~a,~x,~y,~l,~b)=>pdf(x)*pdf(y)^l 
-        when a=b and not fixp(y) and fixp(l)
+    , df(~a,~x,~n,~y,~b)=>pdf(x)^n*pdf(y) 
+        when a=b and fixp(n) and not fixp(y)
+    , df(~a,~x,~y,~n,~b)=>pdf(x)*pdf(y)^n 
+        when a=b and not fixp(y) and fixp(n)
     , df(~a,~x,~y,~z,~b)=>pdf(x)*pdf(y)*pdf(z) 
         when a=b and not fixp(y) and not fixp(z)
     }; 
@@ -1149,8 +1207,7 @@ for k:=1:m do tmp_z(k):=
 
 We have to be shifty here because \verb|rlfi| does not work
 inside a loop: so write the commands to a file, and then
-input the file.   Unclear why \verb|off echo| needed after
-2021.
+input the file.   Unclear why \verb|off echo| needed after 2021.
 \begin{reduce}
 out "scratchfile.red";
 write "off echo;"$ 
@@ -1196,22 +1253,22 @@ write "Analyse ODE/DDE system du/dt = ",ff;
 \end{reduce}
 
 Parametrise the invariant manifold in terms of these
-amplitudes. For this substitution to work, \verb|dsdt|
+amplitudes. For this substitution to work, \verb|gg|
 \emph{cannot} be declared scalar as then it gets replaced by
-zero here and throughout.  Let \verb|dsdt| be global so a user
+zero here and throughout.  Let \verb|gg| be global so a user
 can access the time derivative expressions afterwards,
 similarly for \verb|uu| the constructed invariant manifold.
 \begin{reduce}
-clear dsdt;
+clear gg;
 clear s; operator s; depend s,t;
 foreach z_ in spacex do depend s,z_;
-let { df(s(~j),t)=>coeffn(dsdt,e_(j,1),1)
-	, df(s(~j),t,~b)=> df(coeffn(dsdt,e_(j,1),1),b) when not fixp(b)
-	, df(s(~j),t,~b)=> df(coeffn(dsdt,e_(j,1),1),t,b-1) when (fixp(b) and b>1)
-	, df(s(~j),t,~b,~c)=> df(coeffn(dsdt,e_(j,1),1),b,c) when not fixp(b)
-	, df(s(~j),t,~b,~c)=> df(coeffn(dsdt,e_(j,1),1),t,b-1,c) when (fixp(b) and b>1)
-	, df(s(~j),t,~b,~c,~d)=> df(coeffn(dsdt,e_(j,1),1),b,c,d) when not fixp(b)
-	, df(s(~j),t,~b,~c,~d)=> df(coeffn(dsdt,e_(j,1),1),t,b-1,c,d) when (fixp(b) and b>1)
+let { df(s(~j),t)=>coeffn(gg,e_(j,1),1)
+	, df(s(~j),t,~b)=> df(coeffn(gg,e_(j,1),1),b) when not fixp(b)
+	, df(s(~j),t,~b)=> df(coeffn(gg,e_(j,1),1),t,b-1) when (fixp(b) and b>1)
+	, df(s(~j),t,~b,~c)=> df(coeffn(gg,e_(j,1),1),b,c) when not fixp(b)
+	, df(s(~j),t,~b,~c)=> df(coeffn(gg,e_(j,1),1),t,b-1,c) when (fixp(b) and b>1)
+	, df(s(~j),t,~b,~c,~d)=> df(coeffn(gg,e_(j,1),1),b,c,d) when not fixp(b)
+	, df(s(~j),t,~b,~c,~d)=> df(coeffn(gg,e_(j,1),1),t,b-1,c,d) when (fixp(b) and b>1)
 	};
 \end{reduce}
 
@@ -1232,7 +1289,7 @@ amplitudes of oscillating modes.
 \begin{reduce}
 uu:=for j:=1:m sum s(j)*exp(eval_(j)*t)
   *(for k:=1:n sum e_(k,1)*ee(k,j));
-dsdt:=0;
+gg:=0;
 if trace then write uu:=uu;
 \end{reduce}
 
@@ -1265,8 +1322,8 @@ pp:=0$
 But first establish the Taylor series in any delay factors
 of slow amplitudes.
 \begin{reduce}
-let d_(s(~k),t,~dt)=>s(k)+(for j:=1:toosmall sum 
-        (-dt)^j*df(s(k),t,j)/factorial(j));
+let d_(s(~k),t,~dt)=>s(k)+(for n:=1:toosmall sum 
+        (-dt)^n*df(s(k),t,n)/factorial(n));
 \end{reduce}
 
 Truncate expansions to specified order of error (via loop
@@ -1301,7 +1358,7 @@ if trace then write "est=",matify_(est,m,n);
 
 Compute residual matrix for the isochron projection
 \cite{Roberts89b, Roberts97b}. But for the moment, only do
-it if the \verb|eval_set_| is for slow manifolds.
+it if the \verb|eval_set| is for slow manifolds.
 \begin{reduce}
 if itisAutoSlowMan_ then begin
     jacadj:=conj_(sub(manifold_(uu,n),rhsjact));
@@ -1327,11 +1384,10 @@ write lengthRes:=map(length(~a),{resde,resd,resz});
 Solve for updates---all the hard work is already encoded in
 the operators.
 \begin{reduce}
-if trace then write "Solve for updates";
 uu:=uu+l_inv(resde,exp);
 if trace then write "uu=",matify_(uu,n,1);
-dsdt:=dsdt+g_inv(resde,exp);
-if trace then write "dsdt=",matify_(dsdt,m,1);
+gg:=gg+g_inv(resde,exp);
+if trace then write "gg=",matify_(gg,m,1);
 \end{reduce}
 
 Now update the isochron projection, with normalisation.
@@ -1350,7 +1406,7 @@ Terminate the iteration loop once residuals are zero,
 clearing~\verb|zs| when it is not computed.
 \begin{reduce}
 if {resde,resd,resz}={0,0,0} then write iter:=iter+10000;
-end;%for iter
+end;
 showtime;
 if not itisAutoSlowMan_ then clear zs;
 \end{reduce}
@@ -1389,7 +1445,7 @@ for j:=1:n do write "u",j," = ",
   coeffn(small*uu,e_(j,1),1)/small;
 write "The evolution of the real/complex amplitudes";
 for j:=1:m do write "ds(",j,")/dt = ",
-  coeffn(dsdt,e_(j,1),1);
+  coeffn(gg,e_(j,1),1);
 \end{reduce}
 
 Optionally write the projection vectors.
@@ -1410,14 +1466,14 @@ end;
 Write text results numerically evaluated when expressions
 are long.
 \begin{reduce}
-if length(dsdt)>30 then begin
+if length(gg)>30 then begin
 on rounded; print_precision 4$
 write "Numerically, the invariant manifold is (to one order lower)";
 for j:=1:n do write "u",j," = ",
   coeffn(small*uu,e_(j,1),1)/small;
 write "Numerically, the evolution of the real/complex amplitudes";
 for j:=1:m do write "ds(",j,")/dt = ",
-  coeffn(dsdt,e_(j,1),1);
+  coeffn(gg,e_(j,1),1);
 if itisAutoSlowMan_ then begin
   write "Numerically, normals to isochrons at slow manifold.";
   for j:=1:m do write "z",j," = ",
@@ -1446,7 +1502,7 @@ clear tmp_zz; array tmp_zz(m,n);
 defid tmp_,name="u";
 defid tmp_s,name="\dot s";
 defid tmp_z,name="\vec z";
-clear zs_;operator zs_;%(m,n);
+operator zs_;%(m,n);
 defid zs_,name="z";
 defindex zs_(down,down);
 \end{reduce}
@@ -1482,7 +1538,7 @@ terms of parameters~\(s_ j\).
 \("";";
 for j:=1:n do write "tmp_(",j,"):=coeffn(small*uu,e_(",j,
         ",1),1)/small +order_(varepsilon^",toosmall-1,");";
-if length(dsdt)>30 then begin
+if length(gg)>30 then begin
 write "on rounded; print_precision 4$"$
 for j:=1:n do write "tmp_(",j,"):=coeffn(small*uu,e_(",j,
         ",1),1)/small +order_(varepsilon^",toosmall-1,");";
@@ -1498,11 +1554,11 @@ write "write ""\)
 The system evolves on the invariant manifold such
 that the parameters evolve according to these ODEs.
 \("";";
-for j:=1:m do write "tmp_s(",j,"):=1*coeffn(dsdt,e_(",j
+for j:=1:m do write "tmp_s(",j,"):=1*coeffn(gg,e_(",j
            ,",1),1)+order_(varepsilon^",toosmall,");";
-if length(dsdt)>30 then begin
+if length(gg)>30 then begin
 write "on rounded; print_precision 4$"$
-for j:=1:m do write "tmp_s(",j,"):=1*coeffn(dsdt,e_(",j
+for j:=1:m do write "tmp_s(",j,"):=1*coeffn(gg,e_(",j
            ,",1),1)+order_(varepsilon^",toosmall,");";
 write "off rounded;"$
 end;
@@ -1574,76 +1630,6 @@ First define how various tokens get printed.   Package
 deflist('((!( !\!b!i!g!() (!) !\!b!i!g!))
          (!p!i !\!p!i! ) (!E !E) (!I !I) (e !e) (i !i)),'name)$
 \end{reduce}
-
-Override printing of all derivatives to partials (hacked 
-from \verb|rlfi.red|).
-\begin{reduce}
-put('df,'lapop,"\partial ")$
-\end{reduce}
-Change printing of \verb|pdf()|, from \verb|rlfi.red|),
-so it also caters for operators without an explicit function.
-\begin{reduce}
-% from reduce.rlfi, dated 23/05/1995
-% AJR, this proc modified 17/3/2026
-symbolic procedure dfprla(dfex,p)$
-% Prints derivatives
-begin
-  scalar op,ord,arg,x,argup; 
-  op:=p;%AJR, dummy to remove warning msg
-  op:=get(car dfex,'lapop);
-  % AJR, added to print operator if only one argument to p/df
-  if null cddr dfex then <<         %AJR, case pdf(~x)
-    arg:=" "; dfex:=cdr dfex; >>
-  else if fixp caddr dfex then <<   %AJR, case pdf(~x,~n,...)
-    arg:=" "; dfex:=cdr dfex; >>
-  else << 
-    arg:=cadr dfex;  
-    dfex:=cddr dfex; 
-    >>;
-  x:=dfex; 
-  ord:=0;
-a:if null cdr x then
-      <<x:=cdr x; 
-        ord:=ord+1 >>
-    else if fixp cadr x then
-      <<ord:=ord+cadr x;
-        x:=cddr x >>
-    else
-      <<x:=cdr x;
-        ord:=ord+1 >>;
-  if x then go to a;
-  if atom arg or (not get(car arg,'infix) and not get(car arg,'laprifn))
-    then argup:=t;
-  prin2la "\frac{";
-  prin2la op;
-  if ord=1 then %prin2la "\,"  % AJR, N/A omit
-    else
-      <<prin2la '!^!{;
-        prin2la ord;
-        prin2la "}" >>;
-  if argup then maprintla(arg,0);
-  prin2la "}{";
-  x:=dfex;
-b:if not atom car x and cdr x and fixp cadr x then prin2la "(";
-  prin2la op;
-  if null cdr x or not fixp cadr x then
-      <<%prin2la "\,";      % AJR, N/A omit
-        maprintla(car x,0);
-        x:=cdr x >>
-    else
-      <<maprintla(car x,0);
-        if not atom car x then prin2la ")";
-        prin2la '!^!{;
-        prin2la cadr x;
-        prin2la "}";
-        x:=cddr x >>;
-  if x then go to b;
-  prin2la "}";
-  if null argup then maprintla(arg,get('quotient,'infix));
-  return arg
-end$%symbolic procedure
-\end{reduce}
-
 
 Override the procedure that prints annoying messages about
 multicharacter symbols.  It ends the output of one

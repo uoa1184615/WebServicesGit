@@ -1,0 +1,21 @@
+Comment From 2604.15914v1: Viable Cosmological Solutions
+from Hybrid Potentials.   AJR, 29 Apr 2026;
+on div,revpri; off allfac,raise,lower;
+factor small,s;
+%k:=n:=g:=1; Q:=1/2;  %optional for simplicity
+
+% base on equilibrium, use small to count order of terms correctly
+x:=k/sqrt(6)+u1*small;
+y:=1-k^2/6+u2*small;
+z:=k+u3*small;
+Omega:=1-x^2-y;
+dxdt:=sqrt(3/2)*(4-3*g)/2*Q*Omega-3*x
+    +sqrt(3/2)*y*z+3*x^3+3/2*g*x*Omega;
+dydt:=y*(-sqrt(6)*x*z+6*x^2+3*g*Omega);
+dzdt:=sqrt(6)*x*(k-z)^2/n;
+
+in_tex "../invariantManifold.tex"$
+invariantmanifold({}, mat((dxdt,dydt,dzdt))/small,
+    mat((0)), mat((1/sqrt(6),-k/3,1)), mat((0,0,1)), 3);
+
+end;
